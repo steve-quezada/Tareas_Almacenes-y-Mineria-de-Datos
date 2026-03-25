@@ -1,0 +1,438 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Análisis de Personas Desaparecidas en México",
+    "section": "",
+    "text": "Introducción\nEste proyecto aplica la metodología CRISP-DM para realizar un análisis exploratorio y una limpieza profunda del dataset data_secretariado.csv, que contiene registros de personas desaparecidas y no localizadas en México provenientes del Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO).",
+    "crumbs": [
+      "Introducción"
+    ]
+  },
+  {
+    "objectID": "index.html#objetivo",
+    "href": "index.html#objetivo",
+    "title": "Análisis de Personas Desaparecidas en México",
+    "section": "Objetivo",
+    "text": "Objetivo\nComprender el fenómeno de desaparición de personas en México a partir de los registros oficiales, identificando patrones geográficos, temporales y demográficos relevantes para la toma de decisiones en materia de política pública y búsqueda de personas.",
+    "crumbs": [
+      "Introducción"
+    ]
+  },
+  {
+    "objectID": "index.html#dataset-asignado",
+    "href": "index.html#dataset-asignado",
+    "title": "Análisis de Personas Desaparecidas en México",
+    "section": "Dataset asignado",
+    "text": "Dataset asignado\n\n\n\nAtributo\nValor\n\n\n\n\nArchivo\ndata_secretariado.csv\n\n\nFilas\n133,887 registros\n\n\nColumnas\n11 variables\n\n\nPeriodo\n1961 – 2025\n\n\nUnidad de análisis\nReporte individual de persona desaparecida\n\n\nFuente\nRNPDNO",
+    "crumbs": [
+      "Introducción"
+    ]
+  },
+  {
+    "objectID": "index.html#estructura-del-libro",
+    "href": "index.html#estructura-del-libro",
+    "title": "Análisis de Personas Desaparecidas en México",
+    "section": "Estructura del libro",
+    "text": "Estructura del libro\n\nMetodologías — Investigación individual sobre empresas y sus metodologías de minería de datos.\nDescripción del Dataset — Diccionario de datos y aplicación de CRISP-DM.\nExploración y Limpieza — Pipeline completo de limpieza con generación de CSV limpio.\nMedidas Descriptivas y EDA — Cálculo de medidas estadísticas con visualizaciones.\nCorrelación — Análisis de correlación entre variables.\nHallazgos y Limitaciones — Resultados principales y limitaciones detectadas.\nExposición — Resumen en lenguaje no técnico.",
+    "crumbs": [
+      "Introducción"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_metodologia.html",
+    "href": "notebooks/01_metodologia.html",
+    "title": "I. Empresa y Metodología de Minería de Datos",
+    "section": "",
+    "text": "Omar Fernando Gramer Muñoz — Bio Engine\nCada integrante del equipo eligió una empresa distinta e investigó qué metodología utiliza para desarrollar proyectos de Minería de Datos.\nEmpresa: Bio Engine (Bioengine.mx)\nMetodología: Analítica de datos orientada a procesos (Process-Driven Data Analytics) con sensores virtuales y detección predictiva de anomalías.\nBio Engine es una empresa mexicana con sede en Toluca y Mérida dedicada a convertir biogás en energía eléctrica mediante motogeneradores diseñados para operar con gas contaminado. Su proceso incluye la limpieza del biogás usando un sistema de absorción con amina que elimina \\(CO_2\\) y \\(H_2S\\), permitiendo obtener un gas rico en metano reutilizable.\nPara optimizar este proceso, la empresa quiere aplicar analítica de datos orientada a procesos utilizando sensores para monitorear variables operativas y modelos de machine learning que detecten anomalías de forma temprana, anticipando fallos como la saturación de la amina o problemas en equipos.\nComo próximos pasos se desea implementar sensores virtuales que estimen variables difíciles de medir directamente, reduciendo costos sin perder precisión. Con el tiempo, estos modelos evolucionan hacia sistemas de optimización que recomiendan ajustes operativos, siguiendo una metodología similar a CRISP-DM pero aplicada a procesos industriales.",
+    "crumbs": [
+      "Investigación",
+      "I. Empresa y Metodología de Minería de Datos"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_metodologia.html#omar-fernando-gramer-muñoz-bio-engine",
+    "href": "notebooks/01_metodologia.html#omar-fernando-gramer-muñoz-bio-engine",
+    "title": "I. Empresa y Metodología de Minería de Datos",
+    "section": "",
+    "text": "Fuente: Bio Engine (2024). Producción de energía renovable. bioengine.mx",
+    "crumbs": [
+      "Investigación",
+      "I. Empresa y Metodología de Minería de Datos"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_metodologia.html#kevin-steve-quezada-ordoñez-amazon-web-services-aws",
+    "href": "notebooks/01_metodologia.html#kevin-steve-quezada-ordoñez-amazon-web-services-aws",
+    "title": "I. Empresa y Metodología de Minería de Datos",
+    "section": "Kevin Steve Quezada Ordoñez — Amazon Web Services (AWS)",
+    "text": "Kevin Steve Quezada Ordoñez — Amazon Web Services (AWS)\nEmpresa: Amazon Web Services (AWS)\nMetodología: Ciclo de vida de Machine Learning (MLOps) mediante Amazon SageMaker.\nEn lugar de tratar el análisis de información como un proceso estático y aislado, los proyectos de minería de datos se abordan mediante un flujo de trabajo automatizado de extremo a extremo. Este enfoque convierte el descubrimiento de patrones en un proceso continuo, capaz de manejar grandes volúmenes de información sin perder consistencia ni reproducibilidad.\nLa metodología se organiza en fases iterativas: extracción y preparación de datos desde lagos de datos (como Amazon S3), construcción y entrenamiento de modelos con ajuste automático de parámetros, y despliegue para generar inferencias en contextos reales (sistemas de recomendación, detección de fraudes). Todo el proceso se mantiene bajo monitoreo continuo que detecta cambios en los datos en producción y permite activar reentrenamientos automáticos.\n\nFuente: AWS (2020). Architect and build the full machine learning lifecycle with Amazon SageMaker. aws.amazon.com",
+    "crumbs": [
+      "Investigación",
+      "I. Empresa y Metodología de Minería de Datos"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_metodologia.html#jesús-antonio-romero-godoy-uber",
+    "href": "notebooks/01_metodologia.html#jesús-antonio-romero-godoy-uber",
+    "title": "I. Empresa y Metodología de Minería de Datos",
+    "section": "Jesús Antonio Romero Godoy — Uber",
+    "text": "Jesús Antonio Romero Godoy — Uber\nEmpresa: Uber\nMetodología: Plataforma Michelangelo.\nUber desarrolla sus proyectos de minería de datos y machine learning con su plataforma interna Michelangelo. En lugar de que cada equipo arme su proceso por separado, Uber centraliza el trabajo: ingestión de datos al lago de datos, transformación y generación de variables, entrenamiento del modelo, validación de resultados, despliegue para predicciones en sistemas reales y monitoreo continuo. Esta infraestructura les permite usar los modelos tanto para predicciones por lotes como en tiempo real dentro de la app.\n\nFuente: Uber Engineering (2017). Meet Michelangelo: Uber’s Machine Learning Platform. uber.com",
+    "crumbs": [
+      "Investigación",
+      "I. Empresa y Metodología de Minería de Datos"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_metodologia.html#edgar-salgado-gonzález-microsoft",
+    "href": "notebooks/01_metodologia.html#edgar-salgado-gonzález-microsoft",
+    "title": "I. Empresa y Metodología de Minería de Datos",
+    "section": "Edgar Salgado González — Microsoft",
+    "text": "Edgar Salgado González — Microsoft\nEmpresa: Microsoft\nMetodología: Proceso de Minería de Datos de Microsoft (MS-DM).\nMicrosoft emplea un enfoque estructurado y cíclico similar a CRISP-DM, adaptado a sus herramientas de análisis:\n\nDefinición del problema: Análisis de requisitos empresariales, definición del ámbito del problema y métricas de evaluación.\nPreparación de datos: Limpieza para filtrar información útil y asegurar calidad.\nExploración de datos: Análisis de capas de datos limpios para generar diseños preliminares de modelos.\nConstrucción de modelos: Ejecución de algoritmos sobre la vista de origen de datos para generar modelos matemáticos.\nValidación de modelos: Herramientas de comparación para seleccionar el modelo más preciso.\nImplementación y actualización: Integración de modelos aprobados al entorno productivo.\n\n\nFuentes: Microsoft Learn. Conceptos de minería de datos; Proyectos de minería de datos. learn.microsoft.com",
+    "crumbs": [
+      "Investigación",
+      "I. Empresa y Metodología de Minería de Datos"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_dataset.html",
+    "href": "notebooks/02_dataset.html",
+    "title": "1  Descripción del Dataset y CRISP-DM",
+    "section": "",
+    "text": "1.1 II. Dataset a limpiar: personas desaparecidas en México\nEste conjunto de datos reúne reportes de personas desaparecidas o no localizadas en México, con información proveniente de instancias estatales y federales. El corte más reciente corresponde al 1 de agosto de 2025. Los registros abarcan casos desde 1961 hasta la actualidad.\nLa unidad de análisis es el reporte de desaparición. Esto significa que una misma persona puede aparecer en más de un registro si su caso fue documentado por distintas instituciones.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Descripción del Dataset y CRISP-DM</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_dataset.html#ii.-dataset-a-limpiar-personas-desaparecidas-en-méxico",
+    "href": "notebooks/02_dataset.html#ii.-dataset-a-limpiar-personas-desaparecidas-en-méxico",
+    "title": "1  Descripción del Dataset y CRISP-DM",
+    "section": "",
+    "text": "Atributo\nValor\n\n\n\n\nDataset asignado\ndata_secretariado.csv\n\n\nNúmero de filas\n133,887\n\n\nNúmero de columnas\n11\n\n\nPeriodo cubierto\n07/05/1961 – 30/09/2025\n\n\nUnidad de análisis\nRegistro individual de víctima, identificado por ID_VICTIMA\n\n\nFuente\nRegistro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO)",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Descripción del Dataset y CRISP-DM</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_dataset.html#diccionario-de-datos",
+    "href": "notebooks/02_dataset.html#diccionario-de-datos",
+    "title": "1  Descripción del Dataset y CRISP-DM",
+    "section": "1.2 Diccionario de datos",
+    "text": "1.2 Diccionario de datos\n\n\n\n\n\n\n\n\n\nColumna\nDescripción\nTipo de dato\nTipo estadístico\n\n\n\n\nID_VICTIMA\nIdentificador único del registro\nstring\nCategórica nominal (identificador)\n\n\nORIGEN_REPORTE\nInstitución que genera el reporte\nstring\nCategórica nominal\n\n\nFECHA_NACIMIENTO\nFecha de nacimiento (o CONFIDENCIAL)\nfecha/hora\nCategórica ordinal\n\n\nSEXO\nSexo reportado (incluye CONFIDENCIAL)\nstring\nCategórica nominal\n\n\nFECHA_DESAPARICION\nFecha y hora de desaparición\nfecha/hora\nCategórica ordinal\n\n\nFECHA_REGISTRO\nFecha y hora de registro del caso\nfecha/hora\nCategórica ordinal\n\n\nESTATUS_VICTIMA\nEstatus administrativo del registro\nstring\nCategórica nominal\n\n\nCVE_ENT\nClave de entidad federativa\nstring\nCategórica nominal\n\n\nENTIDAD\nNombre de la entidad federativa\nstring\nCategórica nominal\n\n\nCVE_MUN\nClave de municipio\nstring\nCategórica nominal\n\n\nMUNICIPIO\nNombre del municipio\nstring\nCategórica nominal",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Descripción del Dataset y CRISP-DM</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_dataset.html#aplicación-de-crisp-dm-al-dataset-asignado",
+    "href": "notebooks/02_dataset.html#aplicación-de-crisp-dm-al-dataset-asignado",
+    "title": "1  Descripción del Dataset y CRISP-DM",
+    "section": "1.3 Aplicación de CRISP-DM al dataset asignado",
+    "text": "1.3 Aplicación de CRISP-DM al dataset asignado\n\n1.3.1 1. Business Understanding\nObjetivo: Comprender el fenómeno de desaparición de personas en México a partir de los registros oficiales del dataset data_secretariado.csv, para identificar patrones geográficos, temporales y demográficos relevantes para la toma de decisiones.\nPreguntas de interés:\n\n¿En qué entidades y municipios se concentra el mayor número de personas desaparecidas?\n¿Existe alguna tendencia temporal en las desapariciones (por año, mes o época)?\n¿Hay diferencias en los patrones según el sexo o la edad de las víctimas?\n¿Qué instituciones reportan más casos y cómo varía eso por estado?\n¿Qué proporción de registros tiene información confidencial y cómo afecta al análisis?\n\nCriterios de éxito: Identificar al menos un patrón geográfico, demográfico o temporal significativo, y que el dataset limpio resultante sea consistente, reproducible y libre de duplicados.\n\n\n1.3.2 2. Data Understanding\nLa exploración inicial revela:\n\nCada fila representa un registro de persona desaparecida, identificada por ID_VICTIMA.\nLas columnas cubren origen del reporte, datos demográficos, fechas clave y ubicación geográfica.\nUn porcentaje considerable de registros tiene campos marcados como CONFIDENCIAL.\nLos registros con CVE_MUN = 999 y municipio confidencial limitan el análisis a nivel estatal.\nLa brecha entre fecha de desaparición y fecha de registro puede indicar tiempo de respuesta institucional.\n\n\n\n1.3.3 3. Data Preparation\nEl proceso dio lugar a dos versiones limpias del dataset:\n\ndata_secretariado_limpio_general.csv: conserva registros confidenciales cuando aportan información geográfica o institucional. Para análisis descriptivos generales.\ndata_secretariado_limpio_temporal.csv: excluye el bloque confidencial para análisis cronológicos consistentes.\n\nAcciones principales:\n\nEliminación de 29 registros completamente inutilizables.\nConversión de tipos de dato (claves a Int64, texto a string, fechas auxiliares _DT).\nNormalización preventiva de categorías (strip, espacios, mayúsculas).\nNo se detectaron duplicados bajo ningún criterio.\nVariables derivadas: EDAD y DIAS_RETRASO.\n\n\n\n1.3.4 4. Modelling\nAunque no se entrenan modelos formalmente, el EDA sugiere técnicas adecuadas:\n\nClustering geoespacial (K-Means) para identificar zonas con patrones similares de incidencia.\nDetección de anomalías (Isolation Forest) para los registros con tiempos de retraso atípicos.\nClasificación supervisada (árbol de decisión) para explorar si entidad, sexo y origen predicen el perfil demográfico.\n\n\n\n1.3.5 5. Evaluation\nLos hallazgos deben contrastarse con fuentes externas:\n\nDistribuciones por entidad vs. datos del dashboard público del RNPDNO.\nEl índice de concentración \\(R = 0.9955\\) podría deberse a errores de captura.\nLas anomalías temporales se concentran en pocas fuentes, apuntando a problemas sistemáticos.\n\n\n\n1.3.6 6. Deployment\nEl análisis se entrega mediante:\n\nEste Quarto Book reproducible (HTML + PDF) alojado en el repositorio Git.\nDos CSV limpios como productos del pipeline de limpieza.\nUn reporte PDF con hallazgos y limitaciones.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Descripción del Dataset y CRISP-DM</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html",
+    "href": "notebooks/03_exploracion_limpieza.html",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "",
+    "text": "2.1 Carga del dataset\nEste capítulo contiene el pipeline completo de exploración, análisis de calidad y limpieza del dataset data_secretariado.csv. Como resultado se generan dos versiones limpias del dataset en data/clean/.\nCode\nimport pandas as pd\nimport numpy as np\n\ndf_original = pd.read_csv('data/raw/data_secretariado.csv')\ndf = df_original.copy()\nprint(f\"Dataset original: {df.shape[0]:,} filas × {df.shape[1]} columnas\")\n\n\nDataset original: 133,887 filas × 11 columnas\nCode\nprint(f\"Columnas: {list(df.columns)}\")\ndf.dtypes\n\n\nColumnas: ['ID_VICTIMA', 'ORIGEN_REPORTE', 'FECHA_NACIMIENTO', 'SEXO', 'FECHA_DESAPARICION', 'FECHA_REGISTRO', 'ESTATUS_VICTIMA', 'CVE_ENT', 'ENTIDAD', 'CVE_MUN', 'MUNICIPIO']\n\n\nID_VICTIMA              str\nORIGEN_REPORTE          str\nFECHA_NACIMIENTO        str\nSEXO                    str\nFECHA_DESAPARICION      str\nFECHA_REGISTRO          str\nESTATUS_VICTIMA         str\nCVE_ENT               int64\nENTIDAD                 str\nCVE_MUN               int64\nMUNICIPIO               str\ndtype: object",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#análisis-exploratorio-por-columna",
+    "href": "notebooks/03_exploracion_limpieza.html#análisis-exploratorio-por-columna",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.2 Análisis exploratorio por columna",
+    "text": "2.2 Análisis exploratorio por columna\n\n2.2.1 ORIGEN_REPORTE\n\n\nCode\nvalores_na = df['ORIGEN_REPORTE'].isna().sum()\nprint(f\"Valores nulos: {valores_na}\")\n\norigen_reportes = df['ORIGEN_REPORTE'].value_counts()\nprint(f\"\\nFuentes de reporte distintas: {len(origen_reportes)}\")\n\n\nValores nulos: 0\n\nFuentes de reporte distintas: 74\n\n\nNo hay valores nulos. Se identifican 74 fuentes de origen de los reportes, que se categorizan en:\n\n\nCode\ncomisiones = origen_reportes[origen_reportes.index.str.contains('COMISION')]\nfiscalias = origen_reportes[origen_reportes.index.str.contains('FISCALIA GENERAL DE')]\nprocuradurias = origen_reportes[origen_reportes.index.str.contains('PROCURADURIA')]\nsubprocuradurias = origen_reportes[origen_reportes.index.str.contains('SUBPROCURADURIA')]\nprocuradurias = procuradurias[~procuradurias.index.str.contains('SUBPROCURADURIA')]\n\nfuentes_clasificadas = (\n    comisiones.index\n    .union(fiscalias.index)\n    .union(procuradurias.index)\n    .union(subprocuradurias.index)\n)\notras = origen_reportes[~origen_reportes.index.isin(fuentes_clasificadas)]\n\nprint(f\"Comisiones locales de búsqueda: {len(comisiones)}\")\nprint(f\"Fiscalías generales: {len(fiscalias)}\")\nprint(f\"Procuradurías: {len(procuradurias)}\")\nprint(f\"Subprocuradurías: {len(subprocuradurias)}\")\nprint(f\"Otras fuentes: {len(otras)}\")\n\n\nComisiones locales de búsqueda: 33\nFiscalías generales: 26\nProcuradurías: 7\nSubprocuradurías: 5\nOtras fuentes: 3\n\n\n\n\n2.2.2 FECHA_NACIMIENTO\n\n\nCode\nfechas_nacimiento = df['FECHA_NACIMIENTO']\n\nvalores_nulos = fechas_nacimiento.isna().sum()\nvalores_confidenciales = fechas_nacimiento.str.contains('CONFIDENCIAL', na=False).sum()\nvalores_formato_valido = fechas_nacimiento.str.match(r'^\\d{4}-\\d{2}-\\d{2}$', na=False).sum()\n\ntotal_registros = len(df)\nprint(f\"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})\")\nprint(f\"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})\")\nprint(f\"Valores con formato yyyy-mm-dd: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})\")\n\n\nValores nulos: 28887 (21.58%)\nValores confidenciales: 49149 (36.71%)\nValores con formato yyyy-mm-dd: 55851 (41.72%)\n\n\nLa columna contiene valores nulos y registros CONFIDENCIAL. Las fechas válidas siguen el formato yyyy-mm-dd.\n\n\n2.2.3 SEXO\n\n\nCode\nsexo = df['SEXO']\nvalores_nulos = sexo.isna().sum()\ncategorias_sexo = sexo.value_counts()\n\nprint(f\"Valores nulos: {valores_nulos}\")\nprint(f\"Categorías distintas: {len(categorias_sexo)}\")\ncategorias_sexo\n\n\nValores nulos: 0\nCategorías distintas: 4\n\n\nSEXO\nHOMBRE           64666\nCONFIDENCIAL     49149\nMUJER            19716\nINDETERMINADO      356\nName: count, dtype: int64\n\n\nNo hay valores nulos. Los registros se agrupan en pocas categorías.\n\n\n2.2.4 FECHA_DESAPARICION\n\n\nCode\nfechas_desaparicion = df['FECHA_DESAPARICION'].astype('string')\n\nvalores_nulos = fechas_desaparicion.isna().sum()\nvalores_confidenciales = fechas_desaparicion.str.contains('CONFIDENCIAL', case=False, na=False).sum()\nvalores_formato_valido = fechas_desaparicion.str.match(r'^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}$', na=False).sum()\n\nprint(f\"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})\")\nprint(f\"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})\")\nprint(f\"Valores con formato yyyy-mm-dd HH:MM:SS: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})\")\n\n\nValores nulos: 8160 (6.09%)\nValores confidenciales: 49149 (36.71%)\nValores con formato yyyy-mm-dd HH:MM:SS: 76578 (57.20%)\n\n\n\n\n2.2.5 FECHA_REGISTRO\n\n\nCode\nfechas_registro = df['FECHA_REGISTRO'].astype('string')\n\nvalores_nulos = fechas_registro.isna().sum()\nvalores_confidenciales = fechas_registro.str.contains('CONFIDENCIAL', case=False, na=False).sum()\nvalores_formato_valido = fechas_registro.str.match(r'^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}$', na=False).sum()\n\nprint(f\"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})\")\nprint(f\"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})\")\nprint(f\"Valores con formato yyyy-mm-dd HH:MM:SS: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})\")\n\n\nValores nulos: 6097 (4.55%)\nValores confidenciales: 49149 (36.71%)\nValores con formato yyyy-mm-dd HH:MM:SS: 78641 (58.74%)\n\n\n\n\n2.2.6 ESTATUS_VICTIMA\n\n\nCode\nestatus_victima = df['ESTATUS_VICTIMA'].astype('string')\nvalores_nulos = estatus_victima.isna().sum()\ncategorias_estatus = estatus_victima.value_counts()\n\nprint(f\"Valores nulos: {valores_nulos}\")\nprint(f\"Categorías distintas: {len(categorias_estatus)}\")\ncategorias_estatus\n\n\nValores nulos: 0\nCategorías distintas: 3\n\n\nESTATUS_VICTIMA\nDESAPARECIDA     79881\nCONFIDENCIAL     49149\nNO LOCALIZADA     4857\nName: count, dtype: Int64\n\n\n\n\n2.2.7 CVE_ENT y ENTIDAD\n\n\nCode\nclave_entidad = df['CVE_ENT']\nprint(f\"Valores nulos en CVE_ENT: {clave_entidad.isna().sum()}\")\nprint(f\"Claves distintas: {clave_entidad.nunique()}\")\n\nentidad = df['ENTIDAD'].astype('string')\nprint(f\"\\nValores nulos en ENTIDAD: {entidad.isna().sum()}\")\nprint(f\"Entidades distintas: {entidad.nunique()}\")\n\n# Verificar consistencia entre CVE_ENT=99 y SE DESCONOCE\nprint(f\"\\nRegistros con CVE_ENT=99: {(df['CVE_ENT'] == 99).sum()}\")\nprint(f\"Registros con ENTIDAD='SE DESCONOCE': {(entidad == 'SE DESCONOCE').sum()}\")\n\n\nValores nulos en CVE_ENT: 0\nClaves distintas: 33\n\nValores nulos en ENTIDAD: 0\nEntidades distintas: 33\n\nRegistros con CVE_ENT=99: 2953\nRegistros con ENTIDAD='SE DESCONOCE': 2953\n\n\nSe identifican 33 claves: las 32 entidades federativas más la clave 99 (SE DESCONOCE).\n\n\n2.2.8 CVE_MUN y MUNICIPIO\n\n\nCode\nclave_municipio = df['CVE_MUN']\nprint(f\"Valores nulos en CVE_MUN: {clave_municipio.isna().sum()}\")\nprint(f\"Claves de municipio distintas: {clave_municipio.nunique()}\")\nprint(f\"Registros con clave 999: {(df['CVE_MUN'] == 999).sum()}\")\n\nmunicipio = df['MUNICIPIO'].astype('string')\nmunicipios = municipio.value_counts()\nprint(f\"\\nValores nulos en MUNICIPIO: {municipio.isna().sum()}\")\nprint(f\"Municipios distintos: {len(municipios)}\")\nprint(f\"\\nRegistros CONFIDENCIAL: {municipios.get('CONFIDENCIAL', 0)}\")\nprint(f\"Registros SE DESCONOCE: {municipios.get('SE DESCONOCE', 0)}\")\n\n\nValores nulos en CVE_MUN: 0\nClaves de municipio distintas: 275\nRegistros con clave 999: 54547\n\nValores nulos en MUNICIPIO: 0\nMunicipios distintos: 1554\n\nRegistros CONFIDENCIAL: 49149\nRegistros SE DESCONOCE: 5396\n\n\nLa clave 999 no corresponde a un municipio específico; se asocia a registros confidenciales o desconocidos.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#análisis-de-registros-confidencial",
+    "href": "notebooks/03_exploracion_limpieza.html#análisis-de-registros-confidencial",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.3 Análisis de registros CONFIDENCIAL",
+    "text": "2.3 Análisis de registros CONFIDENCIAL\nDurante la exploración se observó una cantidad importante de registros marcados como CONFIDENCIAL en varias columnas clave. Se verifica si corresponden al mismo bloque:\n\n\nCode\ncolumnas_confidenciales = [\n    'FECHA_NACIMIENTO', 'SEXO', 'FECHA_DESAPARICION',\n    'FECHA_REGISTRO', 'ESTATUS_VICTIMA', 'MUNICIPIO'\n]\n\nfor col in columnas_confidenciales:\n    total_conf = (df[col] == 'CONFIDENCIAL').sum()\n    print(f\"{col}: {total_conf:,} registros confidenciales\")\n\n\nFECHA_NACIMIENTO: 49,149 registros confidenciales\nSEXO: 49,149 registros confidenciales\nFECHA_DESAPARICION: 49,149 registros confidenciales\nFECHA_REGISTRO: 49,149 registros confidenciales\nESTATUS_VICTIMA: 49,149 registros confidenciales\nMUNICIPIO: 49,149 registros confidenciales\n\n\n\n\nCode\nsubconjuntos_confidenciales = {\n    col: set(df.loc[df[col] == 'CONFIDENCIAL', 'ID_VICTIMA'])\n    for col in columnas_confidenciales\n}\n\nbase_ids = subconjuntos_confidenciales['FECHA_NACIMIENTO']\nprint(\"¿Los IDs confidenciales coinciden en todas las columnas?\")\nfor col, ids in subconjuntos_confidenciales.items():\n    print(f\"  {col}: {base_ids == ids}\")\n\n\n¿Los IDs confidenciales coinciden en todas las columnas?\n  FECHA_NACIMIENTO: True\n  SEXO: True\n  FECHA_DESAPARICION: True\n  FECHA_REGISTRO: True\n  ESTATUS_VICTIMA: True\n  MUNICIPIO: True\n\n\nSe confirma que 49,149 registros aparecen como CONFIDENCIAL simultáneamente en las mismas 6 columnas. No son datos faltantes dispersos sino un bloque censurado consistente.\n\n2.3.1 Banderas de confidencialidad\n\n\nCode\nmask_confidencial_total = (df['FECHA_NACIMIENTO'] == 'CONFIDENCIAL').fillna(False)\n\ndf['confidencial_con_estado'] = (\n    mask_confidencial_total & (df['ENTIDAD'] != 'SE DESCONOCE')\n).astype(int)\n\ndf['confidencial_sin_estado'] = (\n    mask_confidencial_total & (df['ENTIDAD'] == 'SE DESCONOCE')\n).astype(int)\n\nprint(f\"Confidencial con estado conocido: {df['confidencial_con_estado'].sum():,}\")\nprint(f\"Confidencial sin estado conocido: {df['confidencial_sin_estado'].sum():,}\")\n\n\nConfidencial con estado conocido: 48,565\nConfidencial sin estado conocido: 584\n\n\n\n\n2.3.2 Eliminación de registros con información mínima\nSe identifican registros que son CONFIDENCIAL en todas las variables sensibles Y además tienen ENTIDAD = SE DESCONOCE y ORIGEN_REPORTE = SE DESCONOCE:\n\n\nCode\nmask_informacion_minima = (\n    mask_confidencial_total &\n    (df['ENTIDAD'] == 'SE DESCONOCE') &\n    (df['ORIGEN_REPORTE'] == 'SE DESCONOCE')\n)\n\nprint(f\"Registros con información mínima: {mask_informacion_minima.sum()}\")\nprint(f\"Porcentaje del total: {mask_informacion_minima.sum() / len(df):.4%}\")\n\n\nRegistros con información mínima: 29\nPorcentaje del total: 0.0217%\n\n\n\n\nCode\ndf = df.loc[~mask_informacion_minima].copy()\nprint(f\"Filas restantes: {len(df):,}\")\n\n\nFilas restantes: 133,858",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#limpieza-de-datos",
+    "href": "notebooks/03_exploracion_limpieza.html#limpieza-de-datos",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.4 Limpieza de datos",
+    "text": "2.4 Limpieza de datos\n\n2.4.1 1. Valores faltantes\n\n\nCode\nresumen_faltantes = pd.DataFrame({\n    'columna': ['FECHA_NACIMIENTO', 'FECHA_DESAPARICION', 'FECHA_REGISTRO'],\n    'nulos': [\n        df['FECHA_NACIMIENTO'].isna().sum(),\n        df['FECHA_DESAPARICION'].isna().sum(),\n        df['FECHA_REGISTRO'].isna().sum()\n    ]\n})\nresumen_faltantes['porcentaje'] = (resumen_faltantes['nulos'] / len(df) * 100).round(2)\nresumen_faltantes['decision'] = 'Se conserva como nulo; no se imputa'\nresumen_faltantes\n\n\n\n\n\n\n\n\n\ncolumna\nnulos\nporcentaje\ndecision\n\n\n\n\n0\nFECHA_NACIMIENTO\n28887\n21.58\nSe conserva como nulo; no se imputa\n\n\n1\nFECHA_DESAPARICION\n8160\n6.10\nSe conserva como nulo; no se imputa\n\n\n2\nFECHA_REGISTRO\n6097\n4.55\nSe conserva como nulo; no se imputa\n\n\n\n\n\n\n\nLos valores faltantes se conservan como nulos sin imputación, ya que sustituirlos introduciría supuestos difíciles de justificar en variables temporales.\n\n\n2.4.2 2. Duplicados\n\n\nCode\nduplicados_fila = df.duplicated().sum()\nduplicados_id = df['ID_VICTIMA'].duplicated().sum()\nprint(f\"Duplicados por fila completa: {duplicados_fila}\")\nprint(f\"Duplicados en ID_VICTIMA: {duplicados_id}\")\n\n\nDuplicados por fila completa: 0\nDuplicados en ID_VICTIMA: 0\n\n\nNo se detectaron duplicados bajo ningún criterio.\n\n\n2.4.3 3. Tipos de datos correctos\n\n2.4.3.1 Variables numéricas\n\n\nCode\ndf['CVE_ENT'] = pd.to_numeric(df['CVE_ENT'], errors='coerce').astype('Int64')\ndf['CVE_MUN'] = pd.to_numeric(df['CVE_MUN'], errors='coerce').astype('Int64')\nprint(\"CVE_ENT y CVE_MUN convertidas a Int64.\")\n\n\nCVE_ENT y CVE_MUN convertidas a Int64.\n\n\n\n\n2.4.3.2 Variables textuales\n\n\nCode\ncolumnas_texto = [\n    'ID_VICTIMA', 'ORIGEN_REPORTE', 'FECHA_NACIMIENTO', 'SEXO',\n    'FECHA_DESAPARICION', 'FECHA_REGISTRO', 'ESTATUS_VICTIMA',\n    'ENTIDAD', 'MUNICIPIO'\n]\nfor col in columnas_texto:\n    df[col] = df[col].astype('string')\nprint(\"Columnas textuales convertidas a string.\")\n\n\nColumnas textuales convertidas a string.\n\n\n\n\n\n2.4.4 4. Normalización de categorías\n\n\nCode\ncolumnas_categoricas = ['ORIGEN_REPORTE', 'SEXO', 'ESTATUS_VICTIMA', 'ENTIDAD', 'MUNICIPIO']\n\nfor col in columnas_categoricas:\n    df[col] = (\n        df[col].astype('string')\n        .str.strip()\n        .str.replace(r'\\s+', ' ', regex=True)\n        .str.upper()\n    )\nprint(\"Normalización aplicada (strip, espacios, mayúsculas).\")\nprint(\"No se detectaron cambios sustantivos en la cardinalidad de categorías.\")\n\n\nNormalización aplicada (strip, espacios, mayúsculas).\nNo se detectaron cambios sustantivos en la cardinalidad de categorías.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#construcción-del-dataset-limpio-general",
+    "href": "notebooks/03_exploracion_limpieza.html#construcción-del-dataset-limpio-general",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.5 Construcción del dataset limpio general",
+    "text": "2.5 Construcción del dataset limpio general\nEsta versión conserva los registros confidenciales que aún aportan información útil para análisis descriptivos.\n\n\nCode\ndf_limpio_general = df.copy()\n\ndf_limpio_general['FECHA_NACIMIENTO_DT'] = pd.to_datetime(\n    df_limpio_general['FECHA_NACIMIENTO'], format='%Y-%m-%d', errors='coerce')\ndf_limpio_general['FECHA_DESAPARICION_DT'] = pd.to_datetime(\n    df_limpio_general['FECHA_DESAPARICION'], format='%Y-%m-%d %H:%M:%S', errors='coerce')\ndf_limpio_general['FECHA_REGISTRO_DT'] = pd.to_datetime(\n    df_limpio_general['FECHA_REGISTRO'], format='%Y-%m-%d %H:%M:%S', errors='coerce')\n\nprint(f\"Dataset limpio general: {len(df_limpio_general):,} filas\")\n\n\nDataset limpio general: 133,858 filas",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#construcción-del-dataset-limpio-temporal",
+    "href": "notebooks/03_exploracion_limpieza.html#construcción-del-dataset-limpio-temporal",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.6 Construcción del dataset limpio temporal",
+    "text": "2.6 Construcción del dataset limpio temporal\nEsta versión excluye el bloque confidencial para trabajar exclusivamente con fechas interpretables.\n\n\nCode\nmask_confidencial_total = (df_limpio_general['FECHA_NACIMIENTO'] == 'CONFIDENCIAL').fillna(False)\ndf_limpio_temporal = df_limpio_general.loc[~mask_confidencial_total].copy()\nprint(f\"Dataset limpio temporal: {len(df_limpio_temporal):,} filas\")\n\n\nDataset limpio temporal: 84,738 filas\n\n\n\n\nCode\ndf_limpio_temporal['nulo_fecha_nacimiento'] = df_limpio_temporal['FECHA_NACIMIENTO'].isna().astype(int)\ndf_limpio_temporal['nulo_fecha_desaparicion'] = df_limpio_temporal['FECHA_DESAPARICION'].isna().astype(int)\ndf_limpio_temporal['nulo_fecha_registro'] = df_limpio_temporal['FECHA_REGISTRO'].isna().astype(int)\n\ndf_limpio_temporal[['nulo_fecha_nacimiento', 'nulo_fecha_desaparicion', 'nulo_fecha_registro']].sum()\n\n\nnulo_fecha_nacimiento      28887\nnulo_fecha_desaparicion     8160\nnulo_fecha_registro         6097\ndtype: int64",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#validaciones",
+    "href": "notebooks/03_exploracion_limpieza.html#validaciones",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.7 Validaciones",
+    "text": "2.7 Validaciones\n\n2.7.1 Validación estructural\n\n\nCode\ninconsistencia = (\n    ((df_limpio_general['CVE_ENT'] == 99) & (df_limpio_general['ENTIDAD'] != 'SE DESCONOCE')) |\n    ((df_limpio_general['CVE_ENT'] != 99) & (df_limpio_general['ENTIDAD'] == 'SE DESCONOCE'))\n).sum()\nprint(f\"Inconsistencias entre CVE_ENT y ENTIDAD: {inconsistencia}\")\n\n\nInconsistencias entre CVE_ENT y ENTIDAD: 0\n\n\n\n\n2.7.2 Validación de conversión de fechas\n\n\nCode\ndf_limpio_temporal['flag_nacimiento_invalido'] = (\n    df_limpio_temporal['FECHA_NACIMIENTO'].notna() &\n    df_limpio_temporal['FECHA_NACIMIENTO_DT'].isna()\n).astype(int)\n\ndf_limpio_temporal['flag_desaparicion_invalido'] = (\n    df_limpio_temporal['FECHA_DESAPARICION'].notna() &\n    df_limpio_temporal['FECHA_DESAPARICION_DT'].isna()\n).astype(int)\n\ndf_limpio_temporal['flag_registro_invalido'] = (\n    df_limpio_temporal['FECHA_REGISTRO'].notna() &\n    df_limpio_temporal['FECHA_REGISTRO_DT'].isna()\n).astype(int)\n\ndf_limpio_temporal[['flag_nacimiento_invalido', 'flag_desaparicion_invalido', 'flag_registro_invalido']].sum()\n\n\nflag_nacimiento_invalido      0\nflag_desaparicion_invalido    0\nflag_registro_invalido        0\ndtype: int64\n\n\n\n\n2.7.3 Validación de consistencia temporal\n\n\nCode\ndf_limpio_temporal['flag_nacimiento_despues_desaparicion'] = (\n    df_limpio_temporal['FECHA_NACIMIENTO_DT'].notna() &\n    df_limpio_temporal['FECHA_DESAPARICION_DT'].notna() &\n    (df_limpio_temporal['FECHA_NACIMIENTO_DT'] &gt; df_limpio_temporal['FECHA_DESAPARICION_DT'])\n).astype(int)\n\ndf_limpio_temporal['flag_nacimiento_despues_registro'] = (\n    df_limpio_temporal['FECHA_NACIMIENTO_DT'].notna() &\n    df_limpio_temporal['FECHA_REGISTRO_DT'].notna() &\n    (df_limpio_temporal['FECHA_NACIMIENTO_DT'] &gt; df_limpio_temporal['FECHA_REGISTRO_DT'])\n).astype(int)\n\ndf_limpio_temporal['flag_registro_antes_desaparicion'] = (\n    df_limpio_temporal['FECHA_REGISTRO_DT'].notna() &\n    df_limpio_temporal['FECHA_DESAPARICION_DT'].notna() &\n    (df_limpio_temporal['FECHA_REGISTRO_DT'] &lt; df_limpio_temporal['FECHA_DESAPARICION_DT'])\n).astype(int)\n\ndf_limpio_temporal[['flag_nacimiento_despues_desaparicion', 'flag_nacimiento_despues_registro', 'flag_registro_antes_desaparicion']].sum()\n\n\nflag_nacimiento_despues_desaparicion      96\nflag_nacimiento_despues_registro         133\nflag_registro_antes_desaparicion        1121\ndtype: int64\n\n\nSe identificaron 1,121 casos con fecha de registro anterior a la de desaparición (1.52% del dataset temporal), concentrados en la Fiscalía General de Veracruz y la Procuraduría de Michoacán.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_exploracion_limpieza.html#exportación-de-los-csv-limpios",
+    "href": "notebooks/03_exploracion_limpieza.html#exportación-de-los-csv-limpios",
+    "title": "2  Exploración y Limpieza del Dataset",
+    "section": "2.8 Exportación de los CSV limpios",
+    "text": "2.8 Exportación de los CSV limpios\n\n\nCode\ndf_export_general = df_limpio_general.copy()\ndf_export_temporal = df_limpio_temporal.copy()\n\n# Dataset general: agregar versiones limpias de fechas\ndf_export_general['FECHA_NACIMIENTO_LIMPIA'] = df_export_general['FECHA_NACIMIENTO_DT'].dt.strftime('%Y-%m-%d')\ndf_export_general['FECHA_DESAPARICION_LIMPIA'] = df_export_general['FECHA_DESAPARICION_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')\ndf_export_general['FECHA_REGISTRO_LIMPIA'] = df_export_general['FECHA_REGISTRO_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')\n\n# Dataset temporal: reemplazar columnas de fecha con versión limpia\ndf_export_temporal['FECHA_NACIMIENTO'] = df_export_temporal['FECHA_NACIMIENTO_DT'].dt.strftime('%Y-%m-%d')\ndf_export_temporal['FECHA_DESAPARICION'] = df_export_temporal['FECHA_DESAPARICION_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')\ndf_export_temporal['FECHA_REGISTRO'] = df_export_temporal['FECHA_REGISTRO_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')\n\n# Selección de columnas finales\ncolumnas_general = [\n    'ID_VICTIMA', 'ORIGEN_REPORTE',\n    'FECHA_NACIMIENTO', 'FECHA_NACIMIENTO_LIMPIA', 'SEXO',\n    'FECHA_DESAPARICION', 'FECHA_DESAPARICION_LIMPIA',\n    'FECHA_REGISTRO', 'FECHA_REGISTRO_LIMPIA',\n    'ESTATUS_VICTIMA', 'CVE_ENT', 'ENTIDAD', 'CVE_MUN', 'MUNICIPIO',\n    'confidencial_con_estado', 'confidencial_sin_estado'\n]\n\ncolumnas_temporal = [\n    'ID_VICTIMA', 'ORIGEN_REPORTE', 'FECHA_NACIMIENTO', 'SEXO',\n    'FECHA_DESAPARICION', 'FECHA_REGISTRO', 'ESTATUS_VICTIMA',\n    'CVE_ENT', 'ENTIDAD', 'CVE_MUN', 'MUNICIPIO',\n    'nulo_fecha_nacimiento', 'nulo_fecha_desaparicion', 'nulo_fecha_registro',\n    'flag_nacimiento_invalido',\n    'flag_nacimiento_despues_desaparicion', 'flag_nacimiento_despues_registro',\n    'flag_registro_antes_desaparicion'\n]\n\ndf_export_general = df_export_general[columnas_general].copy()\ndf_export_temporal = df_export_temporal[columnas_temporal].copy()\n\n\n\n\nCode\ndf_export_general.to_csv('data/clean/data_secretariado_limpio_general.csv', index=False)\ndf_export_temporal.to_csv('data/clean/data_secretariado_limpio_temporal.csv', index=False)\n\nprint(\"Archivos exportados:\")\nprint(f\"  data/clean/data_secretariado_limpio_general.csv -&gt; {len(df_export_general):,} filas × {df_export_general.shape[1]} cols\")\nprint(f\"  data/clean/data_secretariado_limpio_temporal.csv -&gt; {len(df_export_temporal):,} filas × {df_export_temporal.shape[1]} cols\")\n\n\nArchivos exportados:\n  data/clean/data_secretariado_limpio_general.csv -&gt; 133,858 filas × 16 cols\n  data/clean/data_secretariado_limpio_temporal.csv -&gt; 84,738 filas × 18 cols",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Exploración y Limpieza del Dataset</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/04_medidas_eda.html",
+    "href": "notebooks/04_medidas_eda.html",
+    "title": "3  Medidas Descriptivas y EDA",
+    "section": "",
+    "text": "3.1 Medidas de localización\nEste capítulo carga los datasets limpios generados en el capítulo anterior y calcula las medidas estadísticas descriptivas con sus visualizaciones correspondientes.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Medidas Descriptivas y EDA</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/04_medidas_eda.html#medidas-de-localización",
+    "href": "notebooks/04_medidas_eda.html#medidas-de-localización",
+    "title": "3  Medidas Descriptivas y EDA",
+    "section": "",
+    "text": "3.1.1 Moda\nPara las medidas de localización, extraemos los datos de df_export_general ya que cuenta con mayor cantidad de información.\n\n\nCode\ndatos_moda = {\n    \"Variable\": [\"Sexo\", \"Entidad\", \"Estatus\", \"Origen del Reporte\"],\n    \"Valor más frecuente\": [\n        df_export_general['SEXO'].mode()[0],\n        df_export_general['ENTIDAD'].mode()[0],\n        df_export_general['ESTATUS_VICTIMA'].mode()[0],\n        df_export_general['ORIGEN_REPORTE'].mode()[0]\n    ],\n    \"Ocurrencias\": [\n        df_export_general['SEXO'].value_counts().max(),\n        df_export_general['ENTIDAD'].value_counts().max(),\n        df_export_general['ESTATUS_VICTIMA'].value_counts().max(),\n        df_export_general['ORIGEN_REPORTE'].value_counts().max()\n    ],\n    \"% del total\": [\n        f\"{df_export_general['SEXO'].value_counts().max() / total_registros * 100:.1f}%\",\n        f\"{df_export_general['ENTIDAD'].value_counts().max() / total_registros * 100:.1f}%\",\n        f\"{df_export_general['ESTATUS_VICTIMA'].value_counts().max() / total_registros * 100:.1f}%\",\n        f\"{df_export_general['ORIGEN_REPORTE'].value_counts().max() / total_registros * 100:.1f}%\"\n    ]\n}\npd.DataFrame(datos_moda)\n\n\n\n\n\n\n\n\n\nVariable\nValor más frecuente\nOcurrencias\n% del total\n\n\n\n\n0\nSexo\nHOMBRE\n64666\n48.3%\n\n\n1\nEntidad\nJALISCO\n14811\n11.1%\n\n\n2\nEstatus\nDESAPARECIDA\n79881\n59.7%\n\n\n3\nOrigen del Reporte\nPROCURADURIA GENERAL DE JUSTICIA DEL ESTADO DE...\n12085\n9.0%\n\n\n\n\n\n\n\nEl sexo masculino es el más registrado en los reportes. Jalisco lidera en entidad y su procuraduría en origen de reporte, lo cual se asocia a la alta presencia de grupos delictivos.\n\n\nCode\nplt.figure(figsize=(8, 8))\ndf_export_general['SEXO'].value_counts().plot.pie(autopct='%1.1f%%', startangle=90, cmap='Pastel1')\nplt.title('Distribución Porcentual por Sexo')\nplt.ylabel('')\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.1: Distribución porcentual por sexo\n\n\n\n\n\n\n\nCode\nplt.figure(figsize=(10, 6))\nsns.countplot(data=df_export_general, y='ENTIDAD',\n              order=df_export_general['ENTIDAD'].value_counts().index[:5],\n              palette='magma')\nplt.title('Top 5 Entidades con más reportes')\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.2: Top 5 entidades con más reportes\n\n\n\n\n\n\n\n3.1.2 Media y Mediana\nPara evitar sesgos por registros confidenciales, cambiamos a df_export_temporal para análisis con fechas.\n\n\nCode\nfecha_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')\nfecha_nacimiento_temp = pd.to_datetime(df_export_temporal['FECHA_NACIMIENTO'], errors='coerce')\n\nedades = fecha_desaparicion_temp.dt.year - fecha_nacimiento_temp.dt.year\nedades_validas = edades.dropna()\nedades_validas = edades_validas[(edades_validas &gt;= 0) & (edades_validas &lt;= 110)]\n\nmedia_e = edades_validas.mean()\nmediana_e = edades_validas.median()\n\nprint(f\"--- Edades al desaparecer ---\")\nprint(f\"Promedio: {media_e:.2f} años\")\nprint(f\"Mediana: {mediana_e:.2f} años\")\n\nf_registro_temp = pd.to_datetime(df_export_temporal['FECHA_REGISTRO'], errors='coerce')\nf_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')\ndias_diferencia = (f_registro_temp - f_desaparicion_temp).dt.days\ndias_validos = dias_diferencia[dias_diferencia &gt;= 0].dropna()\n\nmedia_tramite = dias_validos.mean()\nmediana_tramite = dias_validos.median()\n\nprint(f\"\\n--- Días entre desaparición y registro ---\")\nprint(f\"Promedio: {media_tramite:.2f} días\")\nprint(f\"Mediana: {mediana_tramite:.0f} días\")\n\n\n--- Edades al desaparecer ---\nPromedio: 32.34 años\nMediana: 30.00 años\n\n--- Días entre desaparición y registro ---\nPromedio: 16.33 días\nMediana: 0 días\n\n\nLa mediana de 0 días indica que la mitad de los registros se realizaron el mismo día. La media elevada refleja el impacto de valores atípicos con tiempos de espera de meses o años.\n\n\nCode\ny_dias = dias_validos.values\ny_meses = y_dias / 30\nx_casos = np.arange(len(y_dias))\n\nfig, axes = plt.subplots(1, 2, figsize=(16, 5))\n\n# Escala de días\naxes[0].vlines(x_casos, ymin=0, ymax=y_dias, color='skyblue', alpha=0.3)\naxes[0].axhline(y_dias.mean(), color=\"red\", linestyle=\"--\", linewidth=2, label=f\"Media = {y_dias.mean():.1f} días\")\naxes[0].axhline(np.median(y_dias), color=\"darkorange\", linestyle=\"-\", linewidth=2, label=f\"Mediana = {np.median(y_dias):.0f} días\")\naxes[0].set_ylim(-2, 200)\naxes[0].set_title(\"Escala de Días\")\naxes[0].set_xlabel(\"Índice del registro\")\naxes[0].set_ylabel(\"Días de diferencia\")\naxes[0].legend()\naxes[0].grid(axis='y', alpha=0.2)\n\n# Escala de meses\naxes[1].vlines(x_casos, ymin=0, ymax=y_meses, color='lightgreen', alpha=0.3)\naxes[1].set_title(\"Escala de Meses\")\naxes[1].set_xlabel(\"Índice del registro\")\naxes[1].set_ylabel(\"Meses de diferencia\")\naxes[1].grid(axis='y', alpha=0.2)\n\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.3: Tiempo de registro en distintas escalas",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Medidas Descriptivas y EDA</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/04_medidas_eda.html#medidas-de-variabilidad",
+    "href": "notebooks/04_medidas_eda.html#medidas-de-variabilidad",
+    "title": "3  Medidas Descriptivas y EDA",
+    "section": "3.2 Medidas de variabilidad",
+    "text": "3.2 Medidas de variabilidad\n\n3.2.1 Rango, IQR, Varianza y Desviación Estándar\n\n\nCode\nrango_e = edades_validas.max() - edades_validas.min()\nq75, q25 = np.percentile(edades_validas, [75, 25])\niqr_e = q75 - q25\nvarianza_e = edades_validas.var()\nstd_e = edades_validas.std()\n\nprint(f\"--- Variabilidad de Edades ---\")\nprint(f\"Rango: {rango_e:.0f} años\")\nprint(f\"IQR: {iqr_e:.0f} años (Q25={q25:.0f}, Q75={q75:.0f})\")\nprint(f\"Varianza: {varianza_e:.2f}\")\nprint(f\"Desviación Estándar: {std_e:.2f} años\")\n\n\n--- Variabilidad de Edades ---\nRango: 110 años\nIQR: 18 años (Q25=22, Q75=40)\nVarianza: 213.62\nDesviación Estándar: 14.62 años\n\n\n\n\nCode\nplt.figure(figsize=(8, 6))\nsns.boxplot(y=edades_validas, color=\"skyblue\", width=0.4)\nplt.plot(0, media_e, marker='o', color='red', label=f'Media: {media_e:.1f}')\nplt.title(\"Boxplot de Edades al Desaparecer (Dataset Temporal)\")\nplt.ylabel(\"Edad (Años)\")\nplt.grid(axis='y', linestyle='--', alpha=0.7)\nplt.legend()\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.4: Boxplot de edades al desaparecer\n\n\n\n\n\nLa concentración entre 20 y 40 años confirma que las desapariciones afectan principalmente a adultos jóvenes.\n\n\nCode\nplt.figure(figsize=(10, 6))\nsns.histplot(edades_validas, kde=True, color=\"skyblue\", stat=\"density\", alpha=0.4)\nplt.axvline(media_e, color=\"red\", linestyle=\"--\", linewidth=2, label=f\"Media ({media_e:.1f})\")\nplt.axvspan(media_e - std_e, media_e + std_e, color='gray', alpha=0.15,\n            label=f\"±1σ ({std_e:.1f} años)\")\nplt.title(\"Dispersión de Edades al Desaparecer\")\nplt.xlabel(\"Edad\")\nplt.ylabel(\"Densidad\")\nplt.legend()\nplt.grid(axis='y', alpha=0.2)\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.5: Dispersión de edades con desviación estándar\n\n\n\n\n\n\n\n3.2.2 Verificación de limpieza: comparativa General vs Temporal\n\n\nCode\nf_nac_gen = pd.to_datetime(df_export_general['FECHA_NACIMIENTO_LIMPIA'], errors='coerce')\nf_des_gen = pd.to_datetime(df_export_general['FECHA_DESAPARICION_LIMPIA'], errors='coerce')\nedades_general = (f_des_gen.dt.year - f_nac_gen.dt.year).dropna()\n\ndef analizar_variabilidad(datos, nombre):\n    rango = datos.max() - datos.min()\n    iqr = np.percentile(datos, 75) - np.percentile(datos, 25)\n    print(f\"--- {nombre} ---\")\n    print(f\"  Rango: {rango:.0f} | IQR: {iqr:.0f} | σ: {datos.std():.2f} | Var: {datos.var():.2f}\")\n\nanalizar_variabilidad(edades_general, \"Dataset General\")\nanalizar_variabilidad(edades_validas, \"Dataset Temporal\")\n\nfig, axes = plt.subplots(1, 2, figsize=(15, 6), sharey=True)\nsns.boxplot(y=edades_general, ax=axes[0], color=\"lightgray\")\naxes[0].set_title(\"Dataset General\\n(Sin filtros de consistencia)\")\naxes[0].set_ylabel(\"Años\")\n\nsns.boxplot(y=edades_validas, ax=axes[1], color=\"skyblue\")\naxes[1].set_title(\"Dataset Temporal\\n(Datos limpios/válidos)\")\naxes[1].set_ylabel(\"\")\n\nplt.tight_layout()\nplt.show()\n\n\n--- Dataset General ---\n  Rango: 964 | IQR: 19 | σ: 16.94 | Var: 287.13\n--- Dataset Temporal ---\n  Rango: 110 | IQR: 18 | σ: 14.62 | Var: 213.62\n\n\n\n\n\n\n\n\nFigure 3.6: Comparativa de boxplots: Dataset General vs Temporal\n\n\n\n\n\nLa comparativa confirma que la limpieza redujo los valores atípicos y centralizó mejor los whiskers, eliminando edades negativas y focalizando la información.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Medidas Descriptivas y EDA</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/04_medidas_eda.html#medidas-de-heterogeneidad",
+    "href": "notebooks/04_medidas_eda.html#medidas-de-heterogeneidad",
+    "title": "3  Medidas Descriptivas y EDA",
+    "section": "3.3 Medidas de heterogeneidad",
+    "text": "3.3 Medidas de heterogeneidad\n\n3.3.1 Índice de Gini e Índice de Entropía de Shannon\nSe analiza la proporción de reportes por entidad para determinar si las desapariciones son un problema generalizado o concentrado en pocos estados.\n\n\nCode\ndef calcular_indices(serie):\n    proporciones = serie.value_counts(normalize=True)\n    p = proporciones[proporciones &gt; 0]\n    n = len(p)\n    gini = 1 - np.sum(p**2)\n    h_shannon = -np.sum(p * np.log2(p))\n    h_max = np.log2(n)\n    h_norm = h_shannon / h_max if n &gt; 1 else 0\n    return gini, h_shannon, h_norm, n, proporciones\n\nentidades_limpias = df_export_general[df_export_general['ENTIDAD'] != 'SE DESCONOCE']['ENTIDAD']\ngini, h_sha, h_norm, n_cat, dist_e = calcular_indices(entidades_limpias)\n\nprint(f\"--- Heterogeneidad por Entidad ---\")\nprint(f\"Categorías: {n_cat}\")\nprint(f\"Índice de Gini: {gini:.4f}\")\nprint(f\"Entropía de Shannon (H): {h_sha:.4f}\")\nprint(f\"Equidad de Pielou (J'): {h_norm:.4f}\")\n\n\n--- Heterogeneidad por Entidad ---\nCategorías: 32\nÍndice de Gini: 0.9399\nEntropía de Shannon (H): 4.4048\nEquidad de Pielou (J'): 0.8810\n\n\nAmbos índices cercanos a 1 confirman una distribución ampliamente generalizada de los reportes en todo el país, aunque con picos marcados en ciertos estados.\n\n\nCode\nplt.figure(figsize=(12, 6))\ndist_e.plot(kind='bar', color='firebrick')\nplt.axhline(1/32, color='black', linestyle='--', label='Distribución Uniforme Teórica')\nplt.title(\"Probabilidad por Estado vs. Uniformidad Perfecta\")\nplt.ylabel(\"Proporción de registros\")\nplt.legend()\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.7: Probabilidad por Estado vs. Uniformidad Perfecta",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Medidas Descriptivas y EDA</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/04_medidas_eda.html#medidas-de-concentración",
+    "href": "notebooks/04_medidas_eda.html#medidas-de-concentración",
+    "title": "3  Medidas Descriptivas y EDA",
+    "section": "3.4 Medidas de concentración",
+    "text": "3.4 Medidas de concentración\n\n3.4.1 Índice de Concentración (R) y Curva de Lorenz\nSe analiza la concentración de días de retraso entre desaparición y registro.\n\n\nCode\ndef calcular_indice_concentracion(datos):\n    x = np.sort(datos)\n    N = len(x)\n    i = np.arange(1, N + 1)\n    fi = i / N\n    qi = np.cumsum(x) / np.sum(x)\n    numerador = np.sum(fi[:-1] - qi[:-1])\n    denominador = np.sum(fi[:-1])\n    R = numerador / denominador\n    return R, fi, qi\n\nr_valor, fi_vals, qi_vals = calcular_indice_concentracion(dias_validos)\n\nprint(f\"--- Índice de Concentración (R) ---\")\nprint(f\"R = {r_valor:.4f}\")\nprint(f\"\\nInterpretación: concentración extremadamente alta.\")\nprint(f\"Una fracción mínima de los registros acumula la mayor parte del tiempo de retraso.\")\n\n\n--- Índice de Concentración (R) ---\nR = 0.9955\n\nInterpretación: concentración extremadamente alta.\nUna fracción mínima de los registros acumula la mayor parte del tiempo de retraso.\n\n\n\n\nCode\ndatos_ordenados = np.sort(dias_validos.values)\nn = len(datos_ordenados)\nfi = np.insert(np.arange(1, n + 1) / n, 0, 0)\nqi = np.insert(np.cumsum(datos_ordenados) / np.sum(datos_ordenados), 0, 0)\n\nplt.figure(figsize=(9, 9))\nplt.plot([0, 1], [0, 1], color='black', linestyle='--', linewidth=1.5, label='Equidad Perfecta')\nplt.plot(fi, qi, color='#D81B60', linewidth=3, label=f'Curva de Lorenz (R = {r_valor:.4f})')\nplt.fill_between(fi, fi, qi, color='#D81B60', alpha=0.15)\nplt.title(\"Curva de Lorenz: Concentración de Tiempos de Registro\", fontsize=14)\nplt.xlabel(\"Proporción acumulada de casos (Fi)\")\nplt.ylabel(\"Proporción acumulada de días de retraso (Qi)\")\nplt.grid(True, linestyle=':', alpha=0.6)\nplt.legend(loc='upper left')\nplt.annotate(f'Área de Concentración\\nR = {r_valor:.4f}', xy=(0.6, 0.3),\n             xytext=(0.7, 0.15), arrowprops=dict(arrowstyle='-&gt;', color='black'))\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 3.8: Curva de Lorenz para días de retraso\n\n\n\n\n\nLa enorme distancia entre la curva y la línea de equidad perfecta confirma que un porcentaje muy pequeño de los reportes acumula la gran mayoría de los días de retraso totales.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Medidas Descriptivas y EDA</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_correlacion_analisis.html",
+    "href": "notebooks/05_correlacion_analisis.html",
+    "title": "4  Correlación de Variables",
+    "section": "",
+    "text": "4.1 Matriz de correlación de Pearson\nEn esta sección determinamos si existe relación entre los resultados de cada uno de los registros, centrándonos en la edad de la desaparición, el sexo de la persona y el tiempo de retraso en el registro.\nCode\ndf_analisis = pd.DataFrame({\n    'Edad': edades_validas,\n    'Dias_Registro': dias_validos\n})\n\nsexo_dummies = pd.get_dummies(df_export_temporal['SEXO'], prefix='Sexo')\ndf_analisis = pd.concat([df_analisis, sexo_dummies], axis=1)\n\nmatriz_pearson = df_analisis.corr(method='pearson')\nprint(\"--- Matriz de Correlación de Pearson ---\")\nprint(matriz_pearson.round(4))\n\n\n--- Matriz de Correlación de Pearson ---\n                      Edad  Dias_Registro  Sexo_HOMBRE  Sexo_INDETERMINADO  \\\nEdad                1.0000        -0.0053       0.2071              0.0006   \nDias_Registro      -0.0053         1.0000       0.0032              0.0024   \nSexo_HOMBRE         0.2071         0.0032       1.0000             -0.1166   \nSexo_INDETERMINADO  0.0006         0.0024      -0.1166              1.0000   \nSexo_MUJER         -0.2075        -0.0035      -0.9884             -0.0358   \n\n                    Sexo_MUJER  \nEdad                   -0.2075  \nDias_Registro          -0.0035  \nSexo_HOMBRE            -0.9884  \nSexo_INDETERMINADO     -0.0358  \nSexo_MUJER              1.0000\nCode\nplt.figure(figsize=(10, 8))\nsns.heatmap(matriz_pearson, annot=True, cmap='RdBu_r', center=0, fmt=\".2f\", linewidths=0.5)\nplt.title(\"Matriz de Correlación de Pearson: Variables Demográficas y de Registro\", fontsize=14)\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 4.1: Heatmap de Correlación: Edad, Sexo y Retraso",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Correlación de Variables</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_correlacion_analisis.html#matriz-de-correlación-de-pearson",
+    "href": "notebooks/05_correlacion_analisis.html#matriz-de-correlación-de-pearson",
+    "title": "4  Correlación de Variables",
+    "section": "",
+    "text": "4.1.1 Interpretación\n\nSexo_Hombre vs. Sexo_Mujer (\\(r ≈ -0.99\\)): relación técnica por exclusión mutua.\nSexo_Masculino vs. Edad: relación débil positiva (hombres desaparecidos tienden a ser de mayor edad).\nSexo_Femenino vs. Edad: relación débil negativa (mujeres desaparecidas tienden a ser más jóvenes).\nEdad vs. Días de registro (\\(r ≈ -0.005\\)): independencia total.\nSexo vs. Días de registro (\\(r ≈ 0.003\\)): independencia total.\n\nLos días de retraso no presentan asociación lineal con los factores demográficos, posiblemente por el enorme sesgo de esa variable (índice de concentración \\(R = 0.9955\\)).",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Correlación de Variables</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_correlacion_analisis.html#análisis-de-confidencialidad-y-origen-del-reporte",
+    "href": "notebooks/05_correlacion_analisis.html#análisis-de-confidencialidad-y-origen-del-reporte",
+    "title": "4  Correlación de Variables",
+    "section": "4.2 Análisis de Confidencialidad y Origen del Reporte",
+    "text": "4.2 Análisis de Confidencialidad y Origen del Reporte\nSe evalúa la relación entre el origen de los reportes y la probabilidad de que contengan información confidencial.\n\n\nCode\ncolumnas_interes = ['ORIGEN_REPORTE', 'confidencial_con_estado', 'confidencial_sin_estado']\ndf_privacy = df_export_general[columnas_interes].copy()\n\ndf_privacy['Confidencialidad_Total'] = (\n    (df_privacy['confidencial_con_estado'] == 1) |\n    (df_privacy['confidencial_sin_estado'] == 1)\n).astype(int)\n\norigen_dummies = pd.get_dummies(df_privacy['ORIGEN_REPORTE'], prefix='Origen').astype(int)\ndf_corr_final = pd.concat([df_privacy[['Confidencialidad_Total']], origen_dummies], axis=1)\nmatriz_privacidad = df_corr_final.corr(method='pearson')\n\nanalisis_origen = (\n    matriz_privacidad[['Confidencialidad_Total']]\n    .drop('Confidencialidad_Total')\n    .sort_values(by='Confidencialidad_Total', ascending=False)\n)\n\n\n\n\nCode\nplt.figure(figsize=(10, 12))\nsns.heatmap(analisis_origen, annot=True, cmap='viridis', fmt=\".4f\",\n            cbar_kws={'label': 'Coeficiente de Pearson (r)'})\nplt.title(\"Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad\", fontsize=14)\nplt.ylabel(\"Fuente del Reporte\")\nplt.xlabel(\"Correlación con Confidencialidad\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\nFigure 4.2: Heatmap de Origen del Reporte vs. Confidencialidad\n\n\n\n\n\n\n4.2.1 Interpretación\nLas correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.\nDestaca que Jalisco, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Correlación de Variables</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/05_correlacion_analisis.html#resumen-de-correlaciones",
+    "href": "notebooks/05_correlacion_analisis.html#resumen-de-correlaciones",
+    "title": "4  Correlación de Variables",
+    "section": "4.3 Resumen de correlaciones",
+    "text": "4.3 Resumen de correlaciones\n\n4.3.1 Correlaciones más fuertes\n\n\n\n\n\n\n\n\nPar de variables\n\\(r\\)\nInterpretación\n\n\n\n\nSexo_Hombre vs. Sexo_Mujer\n≈ −0.988\nExclusión mutua lógica\n\n\nComisión Local Jalisco vs. Confidencialidad\n≈ 0.183\nAlta probabilidad de censura\n\n\nFiscalía Chihuahua vs. Confidencialidad\n≈ −0.151\nTendencia a la transparencia\n\n\n\n\n\n4.3.2 Correlaciones más débiles\n\n\n\n\n\n\n\n\nPar de variables\n\\(r\\)\nInterpretación\n\n\n\n\nEdad vs. Días de registro\n≈ −0.005\nIndependencia total\n\n\nSexo vs. Días de registro\n≈ 0.003\nIndependencia total\n\n\nEntidades vs. Días de registro\n|r| &lt; 0.05\nSin asociación lineal",
+    "crumbs": [
+      "Análisis Técnico",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Correlación de Variables</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html",
+    "href": "notebooks/06_hallazgos.html",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "",
+    "text": "5.1 Objetivo y preguntas de análisis\nObjetivo general: Analizar el dataset asignado sobre personas desaparecidas y no localizadas en México para identificar patrones descriptivos, problemas de calidad de datos, comportamientos temporales y diferencias institucionales en los registros.\nPreguntas de análisis:",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html#objetivo-y-preguntas-de-análisis",
+    "href": "notebooks/06_hallazgos.html#objetivo-y-preguntas-de-análisis",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "",
+    "text": "¿La presencia de valores CONFIDENCIAL aparece de forma aleatoria o sigue un patrón estructurado según entidad u origen institucional?\n¿Existen anomalías cronológicas relevantes, por ejemplo registros cuya fecha de registro sea anterior a la fecha de desaparición?\n¿Qué diferencias analíticas aparecen al trabajar con un dataset general frente a uno depurado específicamente para análisis temporal?\n¿Las desapariciones se concentran en unas pocas entidades o constituyen una problemática ampliamente distribuida en el país?\n¿Qué relaciones débiles o fuertes pueden detectarse entre variables demográficas, temporales e institucionales?",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html#descripción-del-dataset",
+    "href": "notebooks/06_hallazgos.html#descripción-del-dataset",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "5.2 Descripción del dataset",
+    "text": "5.2 Descripción del dataset\nEl dataset data_secretariado.csv contiene registros de personas desaparecidas o no localizadas provenientes de distintas instancias estatales y federales. La versión original tiene 133,887 filas y 11 columnas, con registros desde 1961 hasta 2025. La unidad de análisis es el reporte registrado, no la persona como tal. Tras la limpieza se conservaron 133,858 registros válidos.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html#hallazgos-principales",
+    "href": "notebooks/06_hallazgos.html#hallazgos-principales",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "5.3 Hallazgos principales",
+    "text": "5.3 Hallazgos principales\n\n5.3.1 1. Bloque de datos confidenciales estructurado y territorialmente desigual\nLos registros CONFIDENCIAL no están distribuidos al azar. 49,149 registros aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.\nLa proporción nacional de registros confidenciales es 36.3%, pero en ciertos estados este porcentaje sube drásticamente:\n\nJalisco: 67.5%\nGuanajuato: 58.7%\nCiudad de México: 58.4%\n\nLa reserva de información depende fuertemente de cómo reporta cada entidad o institución, no solo del fenómeno en sí.\n\n\n5.3.2 2. Anomalías temporales concentradas en pocas fuentes\nEn el dataset temporal, 1,121 casos (1.52%) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.\n\nEl 64% de estos desfases son de 1 día o menos (posibles errores de captura).\nSe detectaron 64 registros con desfases mayores a un año ().\n\n\n\n5.3.3 3. Predominio masculino en los reportes de desaparición\nEl sexo masculino es el más registrado en los reportes. La proporción de hombres desaparecidos respecto al de mujeres es notable y consistente en todo el dataset.\n\n\n5.3.4 4. Concentración geográfica en Jalisco, Estado de México y Tamaulipas\nJalisco lidera en número de reportes de desaparición, seguido del Estado de México y Tamaulipas. Las tres entidades comparten la problemática de alta presencia de grupos delictivos.\n\n\n5.3.5 5. Perfil demográfico: adultos jóvenes entre 20 y 40 años\nLa edad media al momento de la desaparición es de poco más de 30 años (media ≈ mediana). El análisis por desviación estándar revela que las desapariciones afectan fuertemente a adultos jóvenes y adolescentes. Combinado con el predominio masculino, el perfil apunta a personas en rango de fuerza laboral.\n\n\n5.3.6 6. Distribución generalizada pero desigual (Gini ≈ 1, Entropía ≈ 1)\nTanto el índice de Gini como la entropía de Shannon son cercanos a 1 (diversidad máxima), indicando que las desapariciones son un problema generalizado en todo el país. Sin embargo, hay picos marcados en un grupo específico de entidades.\n\n\n5.3.7 7. Concentración extrema en el tiempo de retraso (R = 0.9955)\nEl índice de concentración \\(R = 0.9955\\) muestra que una fracción mínima de los registros acumula la gran mayoría del tiempo de retraso entre desaparición y registro. La mayoría de reportes se realizan el mismo día, pero los casos con retraso extremo sesgan significativamente las medidas globales. La curva de Lorenz confirma visualmente esta concentración.\n\n\n5.3.8 8. Correlación débil entre edad y sexo; independencia total del retraso\nLa correlación de Pearson revela:\n\nSexo_Hombre vs. Sexo_Mujer: \\(r \\approx -0.988\\) (exclusión mutua lógica).\nSexo_Masculino vs. Edad: relación débil positiva (hombres de mayor edad).\nSexo_Femenino vs. Edad: relación débil negativa (mujeres más jóvenes).\nEdad vs. Días de registro: \\(r \\approx -0.005\\) (independencia total).\nOrigen de reporte vs. Confidencialidad: correlaciones significativas para Jalisco (positiva), Chihuahua (negativa, tendencia a la transparencia).",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html#limitaciones-del-análisis",
+    "href": "notebooks/06_hallazgos.html#limitaciones-del-análisis",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "5.4 Limitaciones del análisis",
+    "text": "5.4 Limitaciones del análisis\n\nUnidad de análisis ≠ personas únicas. El dataset contiene reportes, no personas. Una misma persona podría tener múltiples registros de distintas instituciones.\nBloque confidencial extenso. 49,149 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.\nAnomalías temporales persistentes. Aunque se identificaron y marcaron, los 1,121 registros con secuencias cronológicas poco probables obligan a interpretar con cautela las medidas basadas en tiempo.\nAusencia de variables contextuales. No hay información socioeconómica, circunstancias del hecho, vínculos con violencia delictiva, nivel educativo ni coordenadas geográficas exactas. El análisis describe patrones estadísticos pero no puede explicar causalmente el fenómeno.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/06_hallazgos.html#conclusión",
+    "href": "notebooks/06_hallazgos.html#conclusión",
+    "title": "5  Hallazgos y Limitaciones",
+    "section": "5.5 Conclusión",
+    "text": "5.5 Conclusión\nEl análisis permitió identificar patrones del fenómeno reportado y, simultáneamente, patrones internos del sistema de registro. La confidencialidad resultó ser un mecanismo estructurado y territorialmente desigual, no una simple ausencia aleatoria de datos. Las anomalías temporales también muestran concentración en pocas fuentes.\nLa construcción de dos versiones limpias del dataset (general y temporal) permitió aprovechar tanto la riqueza descriptiva del conjunto completo como la mayor consistencia cronológica del subconjunto temporal.\nLas desapariciones constituyen un problema amplio y distribuido en el país, aunque con mayor intensidad en ciertos estados y bajo ciertas formas de registro. Estudiar este tipo de bases requiere tanto técnicas de minería de datos como una lectura crítica de la calidad: limpiar el dataset no fue únicamente una etapa técnica, sino una condición necesaria para interpretar de manera responsable cualquier hallazgo.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Hallazgos y Limitaciones</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_exposicion.html",
+    "href": "notebooks/07_exposicion.html",
+    "title": "6  Exposición",
+    "section": "",
+    "text": "6.1 ¿De qué trata este proyecto?\nAnalizamos una base de datos oficial con más de 133 mil reportes de personas desaparecidas en México, proveniente del Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO). Nuestro objetivo fue entender qué nos dicen estos datos sobre el problema, qué patrones existen y qué limitaciones tiene la información disponible.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Exposición</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_exposicion.html#qué-encontramos",
+    "href": "notebooks/07_exposicion.html#qué-encontramos",
+    "title": "6  Exposición",
+    "section": "6.2 ¿Qué encontramos?",
+    "text": "6.2 ¿Qué encontramos?\n\n6.2.1 Las desapariciones no son un problema local: afectan a todo el país\nAnalizamos los reportes de las 32 entidades federativas y encontramos que todas tienen casos registrados. Esto significa que no estamos frente a un problema de unas pocas zonas conflictivas, sino uno de alcance nacional. Sin embargo, Jalisco, Estado de México y Tamaulipas concentran el mayor número de reportes, lo cual coincide con zonas de alta actividad delictiva documentada por otras fuentes.\n\n\n6.2.2 El perfil más frecuente: hombres jóvenes\nLa mayoría de los reportes corresponden a hombres, y la edad promedio al momento de la desaparición ronda los 30 años. Esto nos habla de personas en edad productiva, lo cual podría estar relacionado con dinámicas de reclutamiento forzado o conflictos vinculados a la delincuencia organizada, aunque nuestros datos no permiten confirmar esas causas.\n\n\n6.2.3 La mayoría de los registros se hacen rápido, pero hay casos que tardan años\nAl analizar el tiempo entre la desaparición y el registro oficial, encontramos que la mitad de los casos se registran el mismo día. Sin embargo, existe un grupo reducido de reportes donde el registro se hizo meses o incluso años después. Estos casos tardíos, aunque pocos, distorsionan significativamente los promedios generales.\n\n\n6.2.4 Un tercio de la información está clasificada como confidencial\nAproximadamente 49 mil registros (36% del total) tienen todas sus variables sensibles marcadas como CONFIDENCIAL: sexo, fechas, estatus y municipio. Lo más revelador es que esta censura no se distribuye por igual: en Jalisco alcanza el 67%, en Guanajuato el 59% y en la Ciudad de México el 58%. Esto sugiere que la reserva de información depende más de las prácticas de cada institución que del fenómeno mismo.\n\n\n6.2.5 Hay errores en los registros que revelan problemas de captura\nEncontramos más de mil reportes donde la fecha de registro aparece antes que la fecha de desaparición, algo que no debería ocurrir. Estas anomalías se concentran en unas pocas instituciones (Fiscalía de Veracruz, Procuraduría de Michoacán), lo que apunta a problemas sistemáticos en sus procesos de captura de datos.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Exposición</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_exposicion.html#qué-significa-todo-esto-para-la-toma-de-decisiones",
+    "href": "notebooks/07_exposicion.html#qué-significa-todo-esto-para-la-toma-de-decisiones",
+    "title": "6  Exposición",
+    "section": "6.3 ¿Qué significa todo esto para la toma de decisiones?",
+    "text": "6.3 ¿Qué significa todo esto para la toma de decisiones?\n\n6.3.1 1. Se necesita homogeneizar los criterios de registro\nEl hecho de que la confidencialidad varíe tanto entre entidades muestra que no hay un estándar uniforme para reportar. Esto dificulta hacer comparaciones justas entre estados y limita la capacidad de análisis a nivel nacional.\n\n\n6.3.2 2. Concentrar esfuerzos de búsqueda en el perfil identificado\nLos datos muestran un perfil recurrente: hombres jóvenes en estados con alta presencia delictiva. Esto permite orientar recursos y programas de prevención hacia los grupos más vulnerables.\n\n\n6.3.3 3. Mejorar la calidad de los datos es tan importante como recopilarlos\nLas anomalías temporales y la información confidencial reducen significativamente la utilidad analítica de la base de datos. Invertir en la calidad de la captura de información debe ser una prioridad para poder tomar mejores decisiones en el futuro.\n\n\n6.3.4 4. El problema es nacional, no regional\nAunque hay estados que concentran más reportes, las desapariciones se documentan en todo el país. Las políticas de atención no pueden limitarse a unas cuantas entidades.",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Exposición</span>"
+    ]
+  },
+  {
+    "objectID": "notebooks/07_exposicion.html#resumen-final",
+    "href": "notebooks/07_exposicion.html#resumen-final",
+    "title": "6  Exposición",
+    "section": "6.4 Resumen final",
+    "text": "6.4 Resumen final\n\n\n\n\n\n\n\nHallazgo\nImplicación\n\n\n\n\nMás de 133 mil reportes analizados\nBase de datos robusta para análisis nacional\n\n\nDistribución geográfica generalizada\nProblema de alcance nacional\n\n\nPerfil predominante: hombres ~30 años\nPoblación vulnerable identificable\n\n\n36% de registros confidenciales\nLimitación grave para el análisis\n\n\nConfidencialidad desigual por estado\nFalta de estándares institucionales\n\n\nErrores de captura concentrados en pocas fuentes\nNecesidad de mejora en procesos de registro\n\n\nRetraso de registro: la mayoría inmediato, pocos extremos\nEl promedio global es engañoso\n\n\nRelaciones demográficas débiles\nNo hay un predictor fuerte aislado",
+    "crumbs": [
+      "Conclusiones",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Exposición</span>"
+    ]
+  }
+]
