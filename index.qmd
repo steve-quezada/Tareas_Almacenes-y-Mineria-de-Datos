@@ -1,0 +1,28 @@
+# Introducción {.unnumbered}
+
+Este proyecto aplica la metodología **CRISP-DM** para realizar un análisis exploratorio y una limpieza profunda del dataset `data_secretariado.csv`, que contiene registros de personas desaparecidas y no localizadas en México provenientes del Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO).
+
+## Objetivo
+
+Comprender el fenómeno de desaparición de personas en México a partir de los registros oficiales, identificando patrones geográficos, temporales y demográficos relevantes para la toma de decisiones en materia de política pública y búsqueda de personas.
+
+## Dataset asignado
+
+| Atributo | Valor |
+|---|---|
+| **Archivo** | `data_secretariado.csv` |
+| **Filas** | 133,887 registros |
+| **Columnas** | 11 variables |
+| **Periodo** | 1961 – 2025 |
+| **Unidad de análisis** | Reporte individual de persona desaparecida |
+| **Fuente** | RNPDNO |
+
+## Estructura del libro
+
+1. **Metodologías** — Investigación individual sobre empresas y sus metodologías de minería de datos.
+2. **Descripción del Dataset** — Diccionario de datos y aplicación de CRISP-DM.
+3. **Exploración y Limpieza** — Pipeline completo de limpieza con generación de CSV limpio.
+4. **Medidas Descriptivas y EDA** — Cálculo de medidas estadísticas con visualizaciones.
+5. **Correlación** — Análisis de correlación entre variables.
+6. **Hallazgos y Limitaciones** — Resultados principales y limitaciones detectadas.
+7. **Exposición** — Resumen en lenguaje no técnico.

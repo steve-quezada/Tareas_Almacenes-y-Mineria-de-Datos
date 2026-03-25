@@ -1,0 +1,17 @@
+name: almacenes-mineria
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scipy
+  - jupyter
+  - pip
+  - pip:
+      - plotly
+      - nbformat
+      - jupyter-cache

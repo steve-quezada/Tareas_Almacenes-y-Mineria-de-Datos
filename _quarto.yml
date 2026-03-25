@@ -1,0 +1,40 @@
+project:
+  type: book
+  output-dir: _book
+  execute-dir: project
+
+book:
+  title: "Análisis de Personas Desaparecidas en México"
+  subtitle: "Tarea 02 — Almacenes y Minería de Datos (2026-2)"
+  author:
+    - "Omar Fernando Gramer Muñoz"
+    - "Kevin Steve Quezada Ordoñez"
+    - "Jesús Antonio Romero Godoy"
+    - "Edgar Salgado González"
+  date: "2026-03-25"
+  chapters:
+    - index.qmd
+    - part: "Investigación"
+      chapters:
+        - notebooks/01_metodologia.qmd
+    - part: "Análisis Técnico"
+      chapters:
+        - notebooks/02_dataset.qmd
+        - notebooks/03_exploracion_limpieza.qmd
+        - notebooks/04_medidas_eda.qmd
+        - notebooks/05_correlacion_analisis.qmd
+    - part: "Conclusiones"
+      chapters:
+        - notebooks/06_hallazgos.qmd
+        - notebooks/07_exposicion.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-tools: true
+
+execute:
+  freeze: auto
+  warning: false
