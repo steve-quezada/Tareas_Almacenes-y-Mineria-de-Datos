@@ -1,0 +1,88 @@
+---
+title: "Hallazgos y Limitaciones"
+---
+
+## Objetivo y preguntas de análisis
+
+**Objetivo general:** Analizar el dataset asignado sobre personas desaparecidas y no localizadas en México para identificar patrones descriptivos, problemas de calidad de datos, comportamientos temporales y diferencias institucionales en los registros.
+
+**Preguntas de análisis:**
+
+- ¿La presencia de valores `CONFIDENCIAL` aparece de forma aleatoria o sigue un patrón estructurado según entidad u origen institucional?
+- ¿Existen anomalías cronológicas relevantes, por ejemplo registros cuya fecha de registro sea anterior a la fecha de desaparición?
+- ¿Qué diferencias analíticas aparecen al trabajar con un dataset general frente a uno depurado específicamente para análisis temporal?
+- ¿Las desapariciones se concentran en unas pocas entidades o constituyen una problemática ampliamente distribuida en el país?
+- ¿Qué relaciones débiles o fuertes pueden detectarse entre variables demográficas, temporales e institucionales?
+
+## Descripción del dataset
+
+El dataset `data_secretariado.csv` contiene registros de personas desaparecidas o no localizadas provenientes de distintas instancias estatales y federales. La versión original tiene **133,887 filas** y **11 columnas**, con registros desde 1961 hasta 2025. La unidad de análisis es el *reporte registrado*, no la persona como tal. Tras la limpieza se conservaron **133,858 registros** válidos.
+
+## Hallazgos principales
+
+### 1. Bloque de datos confidenciales estructurado y territorialmente desigual
+
+Los registros `CONFIDENCIAL` no están distribuidos al azar. **49,149 registros** aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.
+
+La proporción nacional de registros confidenciales es 36.3%, pero en ciertos estados este porcentaje sube drásticamente:
+
+- Jalisco: 67.5%
+- Guanajuato: 58.7%
+- Ciudad de México: 58.4%
+
+La reserva de información depende fuertemente de cómo reporta cada entidad o institución, no solo del fenómeno en sí.
+
+### 2. Anomalías temporales concentradas en pocas fuentes
+
+En el dataset temporal, 1,121 casos (1.52%) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.
+
+- El 64% de estos desfases son de 1 día o menos (posibles errores de captura).
+- Se detectaron 64 registros con desfases mayores a un año ().
+
+### 3. Predominio masculino en los reportes de desaparición
+
+El sexo masculino es el más registrado en los reportes. La proporción de hombres desaparecidos respecto al de mujeres es notable y consistente en todo el dataset.
+
+### 4. Concentración geográfica en Jalisco, Estado de México y Tamaulipas
+
+Jalisco lidera en número de reportes de desaparición, seguido del Estado de México y Tamaulipas. Las tres entidades comparten la problemática de alta presencia de grupos delictivos.
+
+### 5. Perfil demográfico: adultos jóvenes entre 20 y 40 años
+
+La edad media al momento de la desaparición es de poco más de 30 años (media ≈ mediana). El análisis por desviación estándar revela que las desapariciones afectan fuertemente a adultos jóvenes y adolescentes. Combinado con el predominio masculino, el perfil apunta a personas en rango de fuerza laboral.
+
+### 6. Distribución generalizada pero desigual (Gini ≈ 1, Entropía ≈ 1)
+
+Tanto el índice de Gini como la entropía de Shannon son cercanos a 1 (diversidad máxima), indicando que las desapariciones son un problema **generalizado** en todo el país. Sin embargo, hay picos marcados en un grupo específico de entidades.
+
+### 7. Concentración extrema en el tiempo de retraso (R = 0.9955)
+
+El índice de concentración $R = 0.9955$ muestra que una fracción mínima de los registros acumula la gran mayoría del tiempo de retraso entre desaparición y registro. La mayoría de reportes se realizan el mismo día, pero los casos con retraso extremo sesgan significativamente las medidas globales. La curva de Lorenz confirma visualmente esta concentración.
+
+### 8. Correlación débil entre edad y sexo; independencia total del retraso
+
+La correlación de Pearson revela:
+
+- **Sexo_Hombre vs. Sexo_Mujer**: $r \approx -0.988$ (exclusión mutua lógica).
+- **Sexo_Masculino vs. Edad**: relación débil positiva (hombres de mayor edad).
+- **Sexo_Femenino vs. Edad**: relación débil negativa (mujeres más jóvenes).
+- **Edad vs. Días de registro**: $r \approx -0.005$ (independencia total).
+- **Origen de reporte vs. Confidencialidad**: correlaciones significativas para Jalisco (positiva), Chihuahua (negativa, tendencia a la transparencia).
+
+## Limitaciones del análisis
+
+1. **Unidad de análisis ≠ personas únicas.** El dataset contiene *reportes*, no personas. Una misma persona podría tener múltiples registros de distintas instituciones.
+
+2. **Bloque confidencial extenso.** 49,149 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.
+
+3. **Anomalías temporales persistentes.** Aunque se identificaron y marcaron, los 1,121 registros con secuencias cronológicas poco probables obligan a interpretar con cautela las medidas basadas en tiempo.
+
+4. **Ausencia de variables contextuales.** No hay información socioeconómica, circunstancias del hecho, vínculos con violencia delictiva, nivel educativo ni coordenadas geográficas exactas. El análisis describe patrones estadísticos pero no puede explicar causalmente el fenómeno.
+
+## Conclusión
+
+El análisis permitió identificar patrones del fenómeno reportado y, simultáneamente, patrones internos del sistema de registro. La confidencialidad resultó ser un mecanismo estructurado y territorialmente desigual, no una simple ausencia aleatoria de datos. Las anomalías temporales también muestran concentración en pocas fuentes.
+
+La construcción de dos versiones limpias del dataset (general y temporal) permitió aprovechar tanto la riqueza descriptiva del conjunto completo como la mayor consistencia cronológica del subconjunto temporal.
+
+Las desapariciones constituyen un problema amplio y distribuido en el país, aunque con mayor intensidad en ciertos estados y bajo ciertas formas de registro. Estudiar este tipo de bases requiere tanto técnicas de minería de datos como una lectura crítica de la calidad: limpiar el dataset no fue únicamente una etapa técnica, sino una condición necesaria para interpretar de manera responsable cualquier hallazgo.

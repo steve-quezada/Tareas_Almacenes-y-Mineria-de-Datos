@@ -1,0 +1,56 @@
+# I. Empresa y Metodología de Minería de Datos {.unnumbered}
+
+Cada integrante del equipo eligió una empresa distinta e investigó qué metodología utiliza para desarrollar proyectos de Minería de Datos.
+
+## Omar Fernando Gramer Muñoz — Bio Engine
+
+**Empresa:** Bio Engine (Bioengine.mx)
+
+**Metodología:** Analítica de datos orientada a procesos (*Process-Driven Data Analytics*) con sensores virtuales y detección predictiva de anomalías.
+
+Bio Engine es una empresa mexicana con sede en Toluca y Mérida dedicada a convertir biogás en energía eléctrica mediante motogeneradores diseñados para operar con gas contaminado. Su proceso incluye la limpieza del biogás usando un sistema de absorción con amina que elimina $CO_2$ y $H_2S$, permitiendo obtener un gas rico en metano reutilizable.
+
+Para optimizar este proceso, la empresa quiere aplicar analítica de datos orientada a procesos utilizando sensores para monitorear variables operativas y modelos de machine learning que detecten anomalías de forma temprana, anticipando fallos como la saturación de la amina o problemas en equipos.
+
+Como próximos pasos se desea implementar sensores virtuales que estimen variables difíciles de medir directamente, reduciendo costos sin perder precisión. Con el tiempo, estos modelos evolucionan hacia sistemas de optimización que recomiendan ajustes operativos, siguiendo una metodología similar a CRISP-DM pero aplicada a procesos industriales.
+
+> *Fuente: Bio Engine (2024). Producción de energía renovable. [bioengine.mx](https://bioengine.mx/)*
+
+## Kevin Steve Quezada Ordoñez — Amazon Web Services (AWS)
+
+**Empresa:** Amazon Web Services (AWS)
+
+**Metodología:** Ciclo de vida de Machine Learning (MLOps) mediante Amazon SageMaker.
+
+En lugar de tratar el análisis de información como un proceso estático y aislado, los proyectos de minería de datos se abordan mediante un flujo de trabajo automatizado de extremo a extremo. Este enfoque convierte el descubrimiento de patrones en un proceso continuo, capaz de manejar grandes volúmenes de información sin perder consistencia ni reproducibilidad.
+
+La metodología se organiza en fases iterativas: extracción y preparación de datos desde lagos de datos (como Amazon S3), construcción y entrenamiento de modelos con ajuste automático de parámetros, y despliegue para generar inferencias en contextos reales (sistemas de recomendación, detección de fraudes). Todo el proceso se mantiene bajo monitoreo continuo que detecta cambios en los datos en producción y permite activar reentrenamientos automáticos.
+
+> *Fuente: AWS (2020). Architect and build the full machine learning lifecycle with Amazon SageMaker. [aws.amazon.com](https://aws.amazon.com/blogs/machine-learning/architect-and-build-the-full-machine-learning-lifecycle-with-amazon-sagemaker/)*
+
+## Jesús Antonio Romero Godoy — Uber
+
+**Empresa:** Uber
+
+**Metodología:** Plataforma Michelangelo.
+
+Uber desarrolla sus proyectos de minería de datos y machine learning con su plataforma interna Michelangelo. En lugar de que cada equipo arme su proceso por separado, Uber centraliza el trabajo: ingestión de datos al lago de datos, transformación y generación de variables, entrenamiento del modelo, validación de resultados, despliegue para predicciones en sistemas reales y monitoreo continuo. Esta infraestructura les permite usar los modelos tanto para predicciones por lotes como en tiempo real dentro de la app.
+
+> *Fuente: Uber Engineering (2017). Meet Michelangelo: Uber's Machine Learning Platform. [uber.com](https://www.uber.com/blog/michelangelo-machine-learning-platform/)*
+
+## Edgar Salgado González — Microsoft
+
+**Empresa:** Microsoft
+
+**Metodología:** Proceso de Minería de Datos de Microsoft (MS-DM).
+
+Microsoft emplea un enfoque estructurado y cíclico similar a CRISP-DM, adaptado a sus herramientas de análisis:
+
+1. **Definición del problema:** Análisis de requisitos empresariales, definición del ámbito del problema y métricas de evaluación.
+2. **Preparación de datos:** Limpieza para filtrar información útil y asegurar calidad.
+3. **Exploración de datos:** Análisis de capas de datos limpios para generar diseños preliminares de modelos.
+4. **Construcción de modelos:** Ejecución de algoritmos sobre la vista de origen de datos para generar modelos matemáticos.
+5. **Validación de modelos:** Herramientas de comparación para seleccionar el modelo más preciso.
+6. **Implementación y actualización:** Integración de modelos aprobados al entorno productivo.
+
+> *Fuentes: Microsoft Learn. Conceptos de minería de datos; Proyectos de minería de datos. [learn.microsoft.com](https://learn.microsoft.com/es-es/analysis-services/data-mining/data-mining-concepts)*

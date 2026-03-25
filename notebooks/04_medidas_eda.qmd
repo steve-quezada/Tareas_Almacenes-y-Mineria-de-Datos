@@ -1,0 +1,320 @@
+---
+title: "Medidas Descriptivas y EDA"
+---
+
+Este capítulo carga los datasets limpios generados en el capítulo anterior y calcula las medidas estadísticas descriptivas con sus visualizaciones correspondientes.
+
+```{python}
+#| label: setup-medidas
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df_export_general = pd.read_csv('data/clean/data_secretariado_limpio_general.csv')
+df_export_temporal = pd.read_csv('data/clean/data_secretariado_limpio_temporal.csv')
+
+total_registros = len(df_export_general)
+print(f"Dataset general: {total_registros:,} filas")
+print(f"Dataset temporal: {len(df_export_temporal):,} filas")
+```
+
+## Medidas de localización
+
+### Moda
+
+Para las medidas de localización, extraemos los datos de `df_export_general` ya que cuenta con mayor cantidad de información.
+
+```{python}
+#| label: tabla-moda
+datos_moda = {
+    "Variable": ["Sexo", "Entidad", "Estatus", "Origen del Reporte"],
+    "Valor más frecuente": [
+        df_export_general['SEXO'].mode()[0],
+        df_export_general['ENTIDAD'].mode()[0],
+        df_export_general['ESTATUS_VICTIMA'].mode()[0],
+        df_export_general['ORIGEN_REPORTE'].mode()[0]
+    ],
+    "Ocurrencias": [
+        df_export_general['SEXO'].value_counts().max(),
+        df_export_general['ENTIDAD'].value_counts().max(),
+        df_export_general['ESTATUS_VICTIMA'].value_counts().max(),
+        df_export_general['ORIGEN_REPORTE'].value_counts().max()
+    ],
+    "% del total": [
+        f"{df_export_general['SEXO'].value_counts().max() / total_registros * 100:.1f}%",
+        f"{df_export_general['ENTIDAD'].value_counts().max() / total_registros * 100:.1f}%",
+        f"{df_export_general['ESTATUS_VICTIMA'].value_counts().max() / total_registros * 100:.1f}%",
+        f"{df_export_general['ORIGEN_REPORTE'].value_counts().max() / total_registros * 100:.1f}%"
+    ]
+}
+pd.DataFrame(datos_moda)
+```
+
+El sexo masculino es el más registrado en los reportes. Jalisco lidera en entidad y su procuraduría en origen de reporte, lo cual se asocia a la alta presencia de grupos delictivos.
+
+```{python}
+#| label: fig-pie-sexo
+#| fig-cap: "Distribución porcentual por sexo"
+plt.figure(figsize=(8, 8))
+df_export_general['SEXO'].value_counts().plot.pie(autopct='%1.1f%%', startangle=90, cmap='Pastel1')
+plt.title('Distribución Porcentual por Sexo')
+plt.ylabel('')
+plt.show()
+```
+
+```{python}
+#| label: fig-barras-entidades
+#| fig-cap: "Top 5 entidades con más reportes"
+plt.figure(figsize=(10, 6))
+sns.countplot(data=df_export_general, y='ENTIDAD',
+              order=df_export_general['ENTIDAD'].value_counts().index[:5],
+              palette='magma')
+plt.title('Top 5 Entidades con más reportes')
+plt.show()
+```
+
+### Media y Mediana
+
+Para evitar sesgos por registros confidenciales, cambiamos a `df_export_temporal` para análisis con fechas.
+
+```{python}
+#| label: media-mediana
+fecha_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')
+fecha_nacimiento_temp = pd.to_datetime(df_export_temporal['FECHA_NACIMIENTO'], errors='coerce')
+
+edades = fecha_desaparicion_temp.dt.year - fecha_nacimiento_temp.dt.year
+edades_validas = edades.dropna()
+edades_validas = edades_validas[(edades_validas >= 0) & (edades_validas <= 110)]
+
+media_e = edades_validas.mean()
+mediana_e = edades_validas.median()
+
+print(f"--- Edades al desaparecer ---")
+print(f"Promedio: {media_e:.2f} años")
+print(f"Mediana: {mediana_e:.2f} años")
+
+f_registro_temp = pd.to_datetime(df_export_temporal['FECHA_REGISTRO'], errors='coerce')
+f_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')
+dias_diferencia = (f_registro_temp - f_desaparicion_temp).dt.days
+dias_validos = dias_diferencia[dias_diferencia >= 0].dropna()
+
+media_tramite = dias_validos.mean()
+mediana_tramite = dias_validos.median()
+
+print(f"\n--- Días entre desaparición y registro ---")
+print(f"Promedio: {media_tramite:.2f} días")
+print(f"Mediana: {mediana_tramite:.0f} días")
+```
+
+La mediana de 0 días indica que la mitad de los registros se realizaron el mismo día. La media elevada refleja el impacto de valores atípicos con tiempos de espera de meses o años.
+
+```{python}
+#| label: fig-tiempo-registro
+#| fig-cap: "Tiempo de registro en distintas escalas"
+y_dias = dias_validos.values
+y_meses = y_dias / 30
+x_casos = np.arange(len(y_dias))
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+
+# Escala de días
+axes[0].vlines(x_casos, ymin=0, ymax=y_dias, color='skyblue', alpha=0.3)
+axes[0].axhline(y_dias.mean(), color="red", linestyle="--", linewidth=2, label=f"Media = {y_dias.mean():.1f} días")
+axes[0].axhline(np.median(y_dias), color="darkorange", linestyle="-", linewidth=2, label=f"Mediana = {np.median(y_dias):.0f} días")
+axes[0].set_ylim(-2, 200)
+axes[0].set_title("Escala de Días")
+axes[0].set_xlabel("Índice del registro")
+axes[0].set_ylabel("Días de diferencia")
+axes[0].legend()
+axes[0].grid(axis='y', alpha=0.2)
+
+# Escala de meses
+axes[1].vlines(x_casos, ymin=0, ymax=y_meses, color='lightgreen', alpha=0.3)
+axes[1].set_title("Escala de Meses")
+axes[1].set_xlabel("Índice del registro")
+axes[1].set_ylabel("Meses de diferencia")
+axes[1].grid(axis='y', alpha=0.2)
+
+plt.tight_layout()
+plt.show()
+```
+
+## Medidas de variabilidad
+
+### Rango, IQR, Varianza y Desviación Estándar
+
+```{python}
+#| label: variabilidad
+rango_e = edades_validas.max() - edades_validas.min()
+q75, q25 = np.percentile(edades_validas, [75, 25])
+iqr_e = q75 - q25
+varianza_e = edades_validas.var()
+std_e = edades_validas.std()
+
+print(f"--- Variabilidad de Edades ---")
+print(f"Rango: {rango_e:.0f} años")
+print(f"IQR: {iqr_e:.0f} años (Q25={q25:.0f}, Q75={q75:.0f})")
+print(f"Varianza: {varianza_e:.2f}")
+print(f"Desviación Estándar: {std_e:.2f} años")
+```
+
+```{python}
+#| label: fig-boxplot
+#| fig-cap: "Boxplot de edades al desaparecer"
+plt.figure(figsize=(8, 6))
+sns.boxplot(y=edades_validas, color="skyblue", width=0.4)
+plt.plot(0, media_e, marker='o', color='red', label=f'Media: {media_e:.1f}')
+plt.title("Boxplot de Edades al Desaparecer (Dataset Temporal)")
+plt.ylabel("Edad (Años)")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+La concentración entre 20 y 40 años confirma que las desapariciones afectan principalmente a adultos jóvenes.
+
+```{python}
+#| label: fig-dispersion-edades
+#| fig-cap: "Dispersión de edades con desviación estándar"
+plt.figure(figsize=(10, 6))
+sns.histplot(edades_validas, kde=True, color="skyblue", stat="density", alpha=0.4)
+plt.axvline(media_e, color="red", linestyle="--", linewidth=2, label=f"Media ({media_e:.1f})")
+plt.axvspan(media_e - std_e, media_e + std_e, color='gray', alpha=0.15,
+            label=f"±1σ ({std_e:.1f} años)")
+plt.title("Dispersión de Edades al Desaparecer")
+plt.xlabel("Edad")
+plt.ylabel("Densidad")
+plt.legend()
+plt.grid(axis='y', alpha=0.2)
+plt.show()
+```
+
+### Verificación de limpieza: comparativa General vs Temporal
+
+```{python}
+#| label: fig-comparativa-boxplots
+#| fig-cap: "Comparativa de boxplots: Dataset General vs Temporal"
+f_nac_gen = pd.to_datetime(df_export_general['FECHA_NACIMIENTO_LIMPIA'], errors='coerce')
+f_des_gen = pd.to_datetime(df_export_general['FECHA_DESAPARICION_LIMPIA'], errors='coerce')
+edades_general = (f_des_gen.dt.year - f_nac_gen.dt.year).dropna()
+
+def analizar_variabilidad(datos, nombre):
+    rango = datos.max() - datos.min()
+    iqr = np.percentile(datos, 75) - np.percentile(datos, 25)
+    print(f"--- {nombre} ---")
+    print(f"  Rango: {rango:.0f} | IQR: {iqr:.0f} | σ: {datos.std():.2f} | Var: {datos.var():.2f}")
+
+analizar_variabilidad(edades_general, "Dataset General")
+analizar_variabilidad(edades_validas, "Dataset Temporal")
+
+fig, axes = plt.subplots(1, 2, figsize=(15, 6), sharey=True)
+sns.boxplot(y=edades_general, ax=axes[0], color="lightgray")
+axes[0].set_title("Dataset General\n(Sin filtros de consistencia)")
+axes[0].set_ylabel("Años")
+
+sns.boxplot(y=edades_validas, ax=axes[1], color="skyblue")
+axes[1].set_title("Dataset Temporal\n(Datos limpios/válidos)")
+axes[1].set_ylabel("")
+
+plt.tight_layout()
+plt.show()
+```
+
+La comparativa confirma que la limpieza redujo los valores atípicos y centralizó mejor los whiskers, eliminando edades negativas y focalizando la información.
+
+## Medidas de heterogeneidad
+
+### Índice de Gini e Índice de Entropía de Shannon
+
+Se analiza la proporción de reportes por entidad para determinar si las desapariciones son un problema generalizado o concentrado en pocos estados.
+
+```{python}
+#| label: heterogeneidad
+def calcular_indices(serie):
+    proporciones = serie.value_counts(normalize=True)
+    p = proporciones[proporciones > 0]
+    n = len(p)
+    gini = 1 - np.sum(p**2)
+    h_shannon = -np.sum(p * np.log2(p))
+    h_max = np.log2(n)
+    h_norm = h_shannon / h_max if n > 1 else 0
+    return gini, h_shannon, h_norm, n, proporciones
+
+entidades_limpias = df_export_general[df_export_general['ENTIDAD'] != 'SE DESCONOCE']['ENTIDAD']
+gini, h_sha, h_norm, n_cat, dist_e = calcular_indices(entidades_limpias)
+
+print(f"--- Heterogeneidad por Entidad ---")
+print(f"Categorías: {n_cat}")
+print(f"Índice de Gini: {gini:.4f}")
+print(f"Entropía de Shannon (H): {h_sha:.4f}")
+print(f"Equidad de Pielou (J'): {h_norm:.4f}")
+```
+
+Ambos índices cercanos a 1 confirman una distribución **ampliamente generalizada** de los reportes en todo el país, aunque con picos marcados en ciertos estados.
+
+```{python}
+#| label: fig-entropia
+#| fig-cap: "Probabilidad por Estado vs. Uniformidad Perfecta"
+plt.figure(figsize=(12, 6))
+dist_e.plot(kind='bar', color='firebrick')
+plt.axhline(1/32, color='black', linestyle='--', label='Distribución Uniforme Teórica')
+plt.title("Probabilidad por Estado vs. Uniformidad Perfecta")
+plt.ylabel("Proporción de registros")
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+## Medidas de concentración
+
+### Índice de Concentración (R) y Curva de Lorenz
+
+Se analiza la concentración de días de retraso entre desaparición y registro.
+
+```{python}
+#| label: concentracion
+def calcular_indice_concentracion(datos):
+    x = np.sort(datos)
+    N = len(x)
+    i = np.arange(1, N + 1)
+    fi = i / N
+    qi = np.cumsum(x) / np.sum(x)
+    numerador = np.sum(fi[:-1] - qi[:-1])
+    denominador = np.sum(fi[:-1])
+    R = numerador / denominador
+    return R, fi, qi
+
+r_valor, fi_vals, qi_vals = calcular_indice_concentracion(dias_validos)
+
+print(f"--- Índice de Concentración (R) ---")
+print(f"R = {r_valor:.4f}")
+print(f"\nInterpretación: concentración extremadamente alta.")
+print(f"Una fracción mínima de los registros acumula la mayor parte del tiempo de retraso.")
+```
+
+```{python}
+#| label: fig-lorenz
+#| fig-cap: "Curva de Lorenz para días de retraso"
+datos_ordenados = np.sort(dias_validos.values)
+n = len(datos_ordenados)
+fi = np.insert(np.arange(1, n + 1) / n, 0, 0)
+qi = np.insert(np.cumsum(datos_ordenados) / np.sum(datos_ordenados), 0, 0)
+
+plt.figure(figsize=(9, 9))
+plt.plot([0, 1], [0, 1], color='black', linestyle='--', linewidth=1.5, label='Equidad Perfecta')
+plt.plot(fi, qi, color='#D81B60', linewidth=3, label=f'Curva de Lorenz (R = {r_valor:.4f})')
+plt.fill_between(fi, fi, qi, color='#D81B60', alpha=0.15)
+plt.title("Curva de Lorenz: Concentración de Tiempos de Registro", fontsize=14)
+plt.xlabel("Proporción acumulada de casos (Fi)")
+plt.ylabel("Proporción acumulada de días de retraso (Qi)")
+plt.grid(True, linestyle=':', alpha=0.6)
+plt.legend(loc='upper left')
+plt.annotate(f'Área de Concentración\nR = {r_valor:.4f}', xy=(0.6, 0.3),
+             xytext=(0.7, 0.15), arrowprops=dict(arrowstyle='->', color='black'))
+plt.tight_layout()
+plt.show()
+```
+
+La enorme distancia entre la curva y la línea de equidad perfecta confirma que un porcentaje muy pequeño de los reportes acumula la gran mayoría de los días de retraso totales.

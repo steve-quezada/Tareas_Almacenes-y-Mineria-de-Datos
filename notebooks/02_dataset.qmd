@@ -1,0 +1,97 @@
+# Descripción del Dataset y CRISP-DM
+
+## II. Dataset a limpiar: personas desaparecidas en México
+
+Este conjunto de datos reúne reportes de personas desaparecidas o no localizadas en México, con información proveniente de instancias estatales y federales. El corte más reciente corresponde al 1 de agosto de 2025. Los registros abarcan casos desde 1961 hasta la actualidad.
+
+La unidad de análisis es el **reporte de desaparición**. Esto significa que una misma persona puede aparecer en más de un registro si su caso fue documentado por distintas instituciones.
+
+| Atributo | Valor |
+|---|---|
+| **Dataset asignado** | `data_secretariado.csv` |
+| **Número de filas** | 133,887 |
+| **Número de columnas** | 11 |
+| **Periodo cubierto** | 07/05/1961 – 30/09/2025 |
+| **Unidad de análisis** | Registro individual de víctima, identificado por `ID_VICTIMA` |
+| **Fuente** | Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO) |
+
+## Diccionario de datos
+
+| Columna | Descripción | Tipo de dato | Tipo estadístico |
+|---|---|---|---|
+| `ID_VICTIMA` | Identificador único del registro | string | Categórica nominal (identificador) |
+| `ORIGEN_REPORTE` | Institución que genera el reporte | string | Categórica nominal |
+| `FECHA_NACIMIENTO` | Fecha de nacimiento (o `CONFIDENCIAL`) | fecha/hora | Categórica ordinal |
+| `SEXO` | Sexo reportado (incluye `CONFIDENCIAL`) | string | Categórica nominal |
+| `FECHA_DESAPARICION` | Fecha y hora de desaparición | fecha/hora | Categórica ordinal |
+| `FECHA_REGISTRO` | Fecha y hora de registro del caso | fecha/hora | Categórica ordinal |
+| `ESTATUS_VICTIMA` | Estatus administrativo del registro | string | Categórica nominal |
+| `CVE_ENT` | Clave de entidad federativa | string | Categórica nominal |
+| `ENTIDAD` | Nombre de la entidad federativa | string | Categórica nominal |
+| `CVE_MUN` | Clave de municipio | string | Categórica nominal |
+| `MUNICIPIO` | Nombre del municipio | string | Categórica nominal |
+
+## Aplicación de CRISP-DM al dataset asignado
+
+### 1. Business Understanding
+
+**Objetivo:** Comprender el fenómeno de desaparición de personas en México a partir de los registros oficiales del dataset `data_secretariado.csv`, para identificar patrones geográficos, temporales y demográficos relevantes para la toma de decisiones.
+
+**Preguntas de interés:**
+
+- ¿En qué entidades y municipios se concentra el mayor número de personas desaparecidas?
+- ¿Existe alguna tendencia temporal en las desapariciones (por año, mes o época)?
+- ¿Hay diferencias en los patrones según el sexo o la edad de las víctimas?
+- ¿Qué instituciones reportan más casos y cómo varía eso por estado?
+- ¿Qué proporción de registros tiene información confidencial y cómo afecta al análisis?
+
+**Criterios de éxito:** Identificar al menos un patrón geográfico, demográfico o temporal significativo, y que el dataset limpio resultante sea consistente, reproducible y libre de duplicados.
+
+### 2. Data Understanding
+
+La exploración inicial revela:
+
+- Cada fila representa un registro de persona desaparecida, identificada por `ID_VICTIMA`.
+- Las columnas cubren origen del reporte, datos demográficos, fechas clave y ubicación geográfica.
+- Un porcentaje considerable de registros tiene campos marcados como `CONFIDENCIAL`.
+- Los registros con `CVE_MUN = 999` y municipio confidencial limitan el análisis a nivel estatal.
+- La brecha entre fecha de desaparición y fecha de registro puede indicar tiempo de respuesta institucional.
+
+### 3. Data Preparation
+
+El proceso dio lugar a **dos versiones** limpias del dataset:
+
+- **`data_secretariado_limpio_general.csv`**: conserva registros confidenciales cuando aportan información geográfica o institucional. Para análisis descriptivos generales.
+- **`data_secretariado_limpio_temporal.csv`**: excluye el bloque confidencial para análisis cronológicos consistentes.
+
+Acciones principales:
+
+- Eliminación de 29 registros completamente inutilizables.
+- Conversión de tipos de dato (claves a `Int64`, texto a `string`, fechas auxiliares `_DT`).
+- Normalización preventiva de categorías (strip, espacios, mayúsculas).
+- No se detectaron duplicados bajo ningún criterio.
+- Variables derivadas: `EDAD` y `DIAS_RETRASO`.
+
+### 4. Modelling
+
+Aunque no se entrenan modelos formalmente, el EDA sugiere técnicas adecuadas:
+
+- **Clustering geoespacial** (K-Means) para identificar zonas con patrones similares de incidencia.
+- **Detección de anomalías** (Isolation Forest) para los registros con tiempos de retraso atípicos.
+- **Clasificación supervisada** (árbol de decisión) para explorar si entidad, sexo y origen predicen el perfil demográfico.
+
+### 5. Evaluation
+
+Los hallazgos deben contrastarse con fuentes externas:
+
+- Distribuciones por entidad vs. datos del dashboard público del RNPDNO.
+- El índice de concentración $R = 0.9955$ podría deberse a errores de captura.
+- Las anomalías temporales se concentran en pocas fuentes, apuntando a problemas sistemáticos.
+
+### 6. Deployment
+
+El análisis se entrega mediante:
+
+- Este **Quarto Book** reproducible (HTML + PDF) alojado en el repositorio Git.
+- **Dos CSV limpios** como productos del pipeline de limpieza.
+- Un **reporte PDF** con hallazgos y limitaciones.

@@ -1,0 +1,65 @@
+---
+title: "Exposición"
+---
+
+::: {.callout-note}
+## Nota sobre este capítulo
+Esta sección presenta los resultados del análisis en un lenguaje accesible y no técnico, dirigido a tomadores de decisiones que necesitan comprender los hallazgos sin entrar en detalles metodológicos.
+:::
+
+## ¿De qué trata este proyecto?
+
+Analizamos una base de datos oficial con **más de 133 mil reportes de personas desaparecidas en México**, proveniente del Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO). Nuestro objetivo fue entender qué nos dicen estos datos sobre el problema, qué patrones existen y qué limitaciones tiene la información disponible.
+
+## ¿Qué encontramos?
+
+### Las desapariciones no son un problema local: afectan a todo el país
+
+Analizamos los reportes de las 32 entidades federativas y encontramos que **todas** tienen casos registrados. Esto significa que no estamos frente a un problema de unas pocas zonas conflictivas, sino uno de alcance nacional. Sin embargo, **Jalisco, Estado de México y Tamaulipas** concentran el mayor número de reportes, lo cual coincide con zonas de alta actividad delictiva documentada por otras fuentes.
+
+### El perfil más frecuente: hombres jóvenes
+
+La mayoría de los reportes corresponden a **hombres**, y la edad promedio al momento de la desaparición ronda los **30 años**. Esto nos habla de personas en edad productiva, lo cual podría estar relacionado con dinámicas de reclutamiento forzado o conflictos vinculados a la delincuencia organizada, aunque nuestros datos no permiten confirmar esas causas.
+
+### La mayoría de los registros se hacen rápido, pero hay casos que tardan años
+
+Al analizar el tiempo entre la desaparición y el registro oficial, encontramos que **la mitad de los casos se registran el mismo día**. Sin embargo, existe un grupo reducido de reportes donde el registro se hizo meses o incluso años después. Estos casos tardíos, aunque pocos, distorsionan significativamente los promedios generales.
+
+### Un tercio de la información está clasificada como confidencial
+
+Aproximadamente **49 mil registros** (36% del total) tienen todas sus variables sensibles marcadas como `CONFIDENCIAL`: sexo, fechas, estatus y municipio. Lo más revelador es que esta censura **no se distribuye por igual**: en Jalisco alcanza el 67%, en Guanajuato el 59% y en la Ciudad de México el 58%. Esto sugiere que la reserva de información depende más de las prácticas de cada institución que del fenómeno mismo.
+
+### Hay errores en los registros que revelan problemas de captura
+
+Encontramos **más de mil reportes** donde la fecha de registro aparece *antes* que la fecha de desaparición, algo que no debería ocurrir. Estas anomalías se concentran en unas pocas instituciones (Fiscalía de Veracruz, Procuraduría de Michoacán), lo que apunta a problemas sistemáticos en sus procesos de captura de datos.
+
+## ¿Qué significa todo esto para la toma de decisiones?
+
+### 1. Se necesita homogeneizar los criterios de registro
+
+El hecho de que la confidencialidad varíe tanto entre entidades muestra que no hay un estándar uniforme para reportar. Esto dificulta hacer comparaciones justas entre estados y limita la capacidad de análisis a nivel nacional.
+
+### 2. Concentrar esfuerzos de búsqueda en el perfil identificado
+
+Los datos muestran un perfil recurrente: hombres jóvenes en estados con alta presencia delictiva. Esto permite orientar recursos y programas de prevención hacia los grupos más vulnerables.
+
+### 3. Mejorar la calidad de los datos es tan importante como recopilarlos
+
+Las anomalías temporales y la información confidencial reducen significativamente la utilidad analítica de la base de datos. Invertir en la calidad de la captura de información debe ser una prioridad para poder tomar mejores decisiones en el futuro.
+
+### 4. El problema es nacional, no regional
+
+Aunque hay estados que concentran más reportes, las desapariciones se documentan en todo el país. Las políticas de atención no pueden limitarse a unas cuantas entidades.
+
+## Resumen final
+
+| Hallazgo | Implicación |
+|---|---|
+| Más de 133 mil reportes analizados | Base de datos robusta para análisis nacional |
+| Distribución geográfica generalizada | Problema de alcance nacional |
+| Perfil predominante: hombres ~30 años | Población vulnerable identificable |
+| 36% de registros confidenciales | Limitación grave para el análisis |
+| Confidencialidad desigual por estado | Falta de estándares institucionales |
+| Errores de captura concentrados en pocas fuentes | Necesidad de mejora en procesos de registro |
+| Retraso de registro: la mayoría inmediato, pocos extremos | El promedio global es engañoso |
+| Relaciones demográficas débiles | No hay un predictor fuerte aislado |
