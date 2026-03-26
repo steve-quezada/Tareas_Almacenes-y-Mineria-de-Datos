@@ -22,9 +22,9 @@ El dataset `data_secretariado.csv` contiene registros de personas desaparecidas 
 
 ### 1. Bloque de datos confidenciales estructurado y territorialmente desigual
 
-Los registros `CONFIDENCIAL` no están distribuidos al azar. **49,149 registros** aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.
+Los registros `CONFIDENCIAL` no están distribuidos al azar. **49,120 registros** (en el dataset limpio) aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.
 
-La proporción nacional de registros confidenciales es 36.3%, pero en ciertos estados este porcentaje sube drásticamente:
+La proporción nacional de registros confidenciales es 36.7%, pero en ciertos estados este porcentaje sube drásticamente:
 
 - Jalisco: 67.5%
 - Guanajuato: 58.7%
@@ -34,7 +34,7 @@ La reserva de información depende fuertemente de cómo reporta cada entidad o i
 
 ### 2. Anomalías temporales concentradas en pocas fuentes
 
-En el dataset temporal, 1,121 casos (1.52%) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.
+En el dataset temporal, 1,121 casos (1.52% de los registros con fechas calculables) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.8% de los registros válidos.
 
 - El 64% de estos desfases son de 1 día o menos (posibles errores de captura).
 - Se detectaron 64 registros con desfases mayores a un año ().
@@ -73,7 +73,7 @@ La correlación de Pearson revela:
 
 1. **Unidad de análisis ≠ personas únicas.** El dataset contiene *reportes*, no personas. Una misma persona podría tener múltiples registros de distintas instituciones.
 
-2. **Bloque confidencial extenso.** 49,149 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.
+2. **Bloque confidencial extenso.** 49,120 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.
 
 3. **Anomalías temporales persistentes.** Aunque se identificaron y marcaron, los 1,121 registros con secuencias cronológicas poco probables obligan a interpretar con cautela las medidas basadas en tiempo.
 

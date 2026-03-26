@@ -344,6 +344,8 @@ Tarea02/_book.rar
 Tarea02/_freeze/
 Tarea02/.quarto/
 Tarea02/**/*.quarto_ipynb
+Tarea02/presentacion.html
+Tarea02/presentacion/presentacion.html
 
 # Auxiliares LaTeX
 Tarea02/LaTex/build/
@@ -352,3 +354,7 @@ Tarea02/LaTex/src/build/
 # Python
 Tarea02/__pycache__/
 Tarea02/*.pyc
+/Tarea02/LaTex
+
+/.quarto/
+**/*.quarto_ipynb

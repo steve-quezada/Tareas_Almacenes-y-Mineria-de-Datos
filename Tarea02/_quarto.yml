@@ -2,6 +2,11 @@ project:
   type: book
   output-dir: _book
   execute-dir: project
+  render:
+    - "index.qmd"
+    - "notebooks/*.qmd"
+  resources:
+    - presentacion/presentacion.html
 
 book:
   title: "Análisis de Personas Desaparecidas en México"
@@ -12,6 +17,10 @@ book:
     - "Jesús Antonio Romero Godoy"
     - "Edgar Salgado González"
   date: "2026-03-25"
+  navbar:
+    right:
+      - text: "Presentacion"
+        href: presentacion/presentacion.html
   chapters:
     - index.qmd
     - part: "Investigación"

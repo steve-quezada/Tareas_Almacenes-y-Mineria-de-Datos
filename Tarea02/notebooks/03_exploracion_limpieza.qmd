@@ -399,7 +399,7 @@ df_limpio_temporal['flag_registro_antes_desaparicion'] = (
 df_limpio_temporal[['flag_nacimiento_despues_desaparicion', 'flag_nacimiento_despues_registro', 'flag_registro_antes_desaparicion']].sum()
 ```
 
-Se identificaron **1,121 casos** con fecha de registro anterior a la de desaparición (1.52% del dataset temporal), concentrados en la Fiscalía General de Veracruz y la Procuraduría de Michoacán.
+Se identificaron **1,121 casos** con fecha de registro anterior a la de desaparición (1.52% de los registros con fechas calculables), concentrados en la Fiscalía General de Veracruz y la Procuraduría de Michoacán.
 
 ## Exportación de los CSV limpios
 

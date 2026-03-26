@@ -1,0 +1,418 @@
+---
+title: "Análisis de Personas Desaparecidas en México"
+subtitle: "Tarea 02 — Almacenes y Minería de Datos (2026-2)"
+author:
+  - Omar Fernando Gramer Muñoz
+  - Kevin Steve Quezada Ordoñez
+  - Jesús Antonio Romero Godoy
+  - Edgar Salgado González
+date: "2026-03-27"
+format:
+  revealjs:
+    theme: [default, presentacion-theme.scss]
+    slide-number: true
+    transition: slide
+    width: 1280
+    height: 720
+    margin: 0.06
+    logo: https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png
+    footer: "Facultad de Ciencias, UNAM · Almacenes y Minería de Datos 2026-2"
+    code-fold: true
+    fig-align: center
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  fig-dpi: 96
+  fig-width: 9
+  fig-height: 4.5
+---
+
+```{python}
+#| label: setup
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import seaborn as sns
+
+# Paleta teal
+TEAL_DARK  = '#004D40'
+TEAL       = '#00695C'
+TEAL_MID   = '#00897B'
+TEAL_LIGHT = '#4DB6AC'
+TEAL_PALE  = '#B2DFDB'
+TEAL_BG    = '#E0F2F1'
+ACCENT     = '#FF8A65'
+
+PALETTE = [TEAL_DARK, TEAL, TEAL_MID, TEAL_LIGHT, TEAL_PALE, '#80CBC4', '#26A69A', ACCENT]
+
+sns.set_theme(style='whitegrid', palette=PALETTE,
+              rc={'axes.edgecolor': TEAL_DARK, 'axes.labelcolor': TEAL_DARK,
+                  'xtick.color': TEAL_DARK, 'ytick.color': TEAL_DARK,
+                  'text.color': '#263238', 'figure.facecolor': 'white'})
+
+df_general = pd.read_csv('../data/clean/data_secretariado_limpio_general.csv')
+df_temporal = pd.read_csv('../data/clean/data_secretariado_limpio_temporal.csv')
+
+total_general = len(df_general)
+total_temporal = len(df_temporal)
+```
+
+
+## El problema {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+- La desaparición de personas en México es una **crisis humanitaria** documentada por organismos nacionales e internacionales.
+
+- El **Registro Nacional de Personas Desaparecidas y No Localizadas (RNPDNO)** centraliza reportes de instancias estatales y federales.
+
+- Los registros abarcan desde **1961 hasta 2025**, con más de 133 mil reportes acumulados.
+
+- El fenómeno **no es regional**: las 32 entidades federativas tienen casos registrados.
+
+:::
+::: {.column width="45%"}
+
+::: {.stat-box}
+[133,887]{.stat-number}
+[reportes registrados]{.stat-label}
+:::
+
+::: {.stat-box}
+[32]{.stat-number}
+[entidades con casos]{.stat-label}
+:::
+
+::: {.stat-box}
+[64 años]{.stat-number}
+[de registros (1961–2025)]{.stat-label}
+:::
+
+:::
+::::
+
+
+## Preguntas de investigación
+
+::: {.incremental}
+
+1. ¿En qué **entidades y municipios** se concentra el mayor número de desapariciones?
+
+2. ¿Existen **tendencias temporales** en el fenómeno?
+
+3. ¿Hay diferencias en los patrones según el **sexo o la edad** de las víctimas?
+
+4. ¿Qué **instituciones** reportan más casos y cómo varía por estado?
+
+5. ¿Qué proporción de registros tiene información **confidencial** y cómo afecta al análisis?
+
+:::
+
+
+## Visión general del dataset {.smaller}
+
+| Propiedad | Valor |
+|---|---|
+| **Archivo** | `data_secretariado.csv` |
+| **Registros originales** | 133,887 filas × 11 columnas |
+| **Periodo** | 07/05/1961 – 30/09/2025 |
+| **Fuente** | RNPDNO (Secretariado Ejecutivo del SNSP) |
+| **Unidad de análisis** | Reporte de desaparición (no persona única) |
+| **Fuentes de reporte** | 74 instituciones (fiscalías, comisiones, procuradurías) |
+
+```{python}
+#| label: columnas-dataset
+print("Columnas originales:")
+print("ID_VICTIMA · ORIGEN_REPORTE · FECHA_NACIMIENTO · SEXO")
+print("FECHA_DESAPARICION · FECHA_REGISTRO · ESTATUS_VICTIMA")
+print("CVE_ENT · ENTIDAD · CVE_MUN · MUNICIPIO")
+```
+
+
+## Pipeline de limpieza {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Proceso aplicado (CRISP-DM):**
+
+1. Eliminación de 29 registros inutilizables
+2. Tipado de columnas (claves → `Int64`, texto → `string`)
+3. Detección del bloque `CONFIDENCIAL` (49,149 registros censurados en las mismas 6 columnas; 49,120 tras limpieza)
+4. Parseo y validación de fechas
+5. Creación de banderas de integridad temporal
+
+:::
+::: {.column width="50%"}
+
+**Dos datasets resultantes:**
+
+```{python}
+#| label: stats-datasets
+resumen = pd.DataFrame({
+    'Dataset': ['General', 'Temporal'],
+    'Filas': [f'{total_general:,}', f'{total_temporal:,}'],
+    'Columnas': [16, 18],
+    'Uso': ['Análisis descriptivo\n(incluye CONFIDENCIAL)',
+            'Análisis cronológico\n(sin CONFIDENCIAL)']
+})
+print(resumen.to_string(index=False))
+```
+
+::: {.callout-note}
+Los **49,120 registros** confidenciales se censuran simultáneamente en 6 columnas. No son datos faltantes dispersos sino un bloque estructurado.
+:::
+
+:::
+::::
+
+
+## EDA — Distribución por sexo
+
+```{python}
+#| label: fig-sexo
+#| fig-cap: "Distribución porcentual de reportes por sexo"
+#| out-width: "70%"
+conteo_sexo = df_general['SEXO'].value_counts()
+
+fig, ax = plt.subplots(figsize=(6, 4))
+colors = [TEAL_DARK, TEAL_LIGHT, TEAL_PALE, '#80CBC4', ACCENT][:len(conteo_sexo)]
+wedges, texts, autotexts = ax.pie(
+    conteo_sexo.values, labels=conteo_sexo.index, autopct='%1.1f%%',
+    startangle=90, colors=colors,
+    textprops={'fontsize': 12, 'color': '#263238'},
+    pctdistance=0.75
+)
+for t in autotexts:
+    t.set_fontweight('bold')
+ax.set_title('Distribución de Reportes por Sexo', fontsize=16, color=TEAL_DARK, fontweight='bold')
+plt.tight_layout()
+plt.show()
+```
+
+
+## EDA — Entidades con más reportes
+
+```{python}
+#| label: fig-entidades
+#| fig-cap: "Top 10 entidades federativas por número de reportes"
+#| out-width: "100%"
+top_entidades = df_general['ENTIDAD'].value_counts().head(10)
+
+fig, ax = plt.subplots(figsize=(9, 4.5))
+bars = ax.barh(top_entidades.index[::-1], top_entidades.values[::-1],
+               color=[TEAL_DARK, TEAL, TEAL_MID, TEAL_LIGHT, TEAL_PALE,
+                      '#80CBC4', '#26A69A', '#4DB6AC', '#B2DFDB', TEAL_BG])
+for bar, val in zip(bars, top_entidades.values[::-1]):
+    ax.text(bar.get_width() + 200, bar.get_y() + bar.get_height()/2,
+            f'{val:,}', va='center', fontsize=10, color=TEAL_DARK, fontweight='bold')
+ax.set_xlabel('Número de reportes', fontsize=12)
+ax.set_title('Top 10 Entidades con más Reportes de Desaparición',
+             fontsize=15, color=TEAL_DARK, fontweight='bold')
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{x:,.0f}'))
+ax.spines[['top', 'right']].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+
+## EDA — Perfil demográfico: edad al desaparecer
+
+```{python}
+#| label: fig-edad
+#| fig-cap: "Distribución de edades al momento de la desaparición (dataset temporal)"
+#| out-width: "100%"
+fecha_des = pd.to_datetime(df_temporal['FECHA_DESAPARICION'], errors='coerce')
+fecha_nac = pd.to_datetime(df_temporal['FECHA_NACIMIENTO'], errors='coerce')
+
+edades = fecha_des.dt.year - fecha_nac.dt.year
+edades_validas = edades.dropna()
+edades_validas = edades_validas[(edades_validas >= 0) & (edades_validas <= 110)]
+
+media_e = edades_validas.mean()
+mediana_e = edades_validas.median()
+std_e = edades_validas.std()
+
+fig, ax = plt.subplots(figsize=(9, 4))
+sns.histplot(edades_validas, bins=60, kde=True, color=TEAL, alpha=0.5,
+             edgecolor=TEAL_DARK, linewidth=0.3, ax=ax)
+ax.axvline(media_e, color='#D84315', ls='--', lw=2.5, label=f'Media: {media_e:.1f} años')
+ax.axvline(mediana_e, color=ACCENT, ls='-', lw=2.5, label=f'Mediana: {mediana_e:.0f} años')
+ax.axvspan(media_e - std_e, media_e + std_e, color=TEAL_PALE, alpha=0.3,
+           label=f'±1σ ({std_e:.1f} años)')
+ax.set_xlabel('Edad (años)', fontsize=12)
+ax.set_ylabel('Frecuencia', fontsize=12)
+ax.set_title('Distribución de Edades al Desaparecer',
+             fontsize=15, color=TEAL_DARK, fontweight='bold')
+ax.legend(fontsize=10)
+ax.spines[['top', 'right']].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+> **Perfil predominante:** adultos jóvenes de **20 a 40 años**, con media ≈ 32 y mediana = 30 años.
+
+
+## EDA — Tiempo entre desaparición y registro {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+
+```{python}
+#| label: stats-retraso
+f_reg = pd.to_datetime(df_temporal['FECHA_REGISTRO'], errors='coerce')
+f_des = pd.to_datetime(df_temporal['FECHA_DESAPARICION'], errors='coerce')
+dias = (f_reg - f_des).dt.days
+dias_validos = dias[dias >= 0].dropna()
+
+print(f"Registros analizados: {len(dias_validos):,}")
+print(f"Mediana:  {dias_validos.median():.0f} días")
+print(f"Media:    {dias_validos.mean():.1f} días")
+print(f"Máximo:   {dias_validos.max():,.0f} días ({dias_validos.max()/365:.0f} años)")
+print(f"\nEl 50% se registra el mismo día.")
+
+# Calcular R (índice de concentración)
+import numpy as np
+dv_sorted = np.sort(dias_validos.values)
+cumsum_d = np.cumsum(dv_sorted)
+total_d = dv_sorted.sum()
+lorenz = cumsum_d / total_d
+area = np.trapezoid(lorenz, dx=1.0/len(dv_sorted))
+R_val = 1 - 2*area
+print(f"Indice de concentracion R = {R_val:.4f}")
+```
+
+::: {.callout-note}
+La mitad de los casos se registran **el mismo día**, pero unos pocos con retraso extremo elevan el promedio drásticamente.
+:::
+
+:::
+::: {.column width="55%"}
+
+```{python}
+#| label: fig-retraso
+#| fig-cap: "Distribución del tiempo de registro (acotado a 200 días)"
+#| out-width: "100%"
+fig, ax = plt.subplots(figsize=(6, 4))
+dias_acotados = dias_validos[dias_validos <= 200]
+sns.histplot(dias_acotados, bins=80, color=TEAL, alpha=0.6, edgecolor=TEAL_DARK, linewidth=0.3, ax=ax)
+ax.axvline(dias_validos.mean(), color='#D84315', ls='--', lw=2, label=f'Media: {dias_validos.mean():.0f} días')
+ax.axvline(dias_validos.median(), color=ACCENT, ls='-', lw=2, label=f'Mediana: {dias_validos.median():.0f} días')
+ax.set_xlabel('Días de diferencia', fontsize=11)
+ax.set_ylabel('Frecuencia', fontsize=11)
+ax.set_title('Tiempo entre Desaparición y Registro',
+             fontsize=13, color=TEAL_DARK, fontweight='bold')
+ax.legend(fontsize=9)
+ax.spines[['top', 'right']].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::::
+
+
+## Confidencialidad: un sesgo institucional {.smaller}
+
+```{python}
+#| label: fig-confidencialidad
+#| fig-cap: "Porcentaje de registros confidenciales por entidad (top 15)"
+#| out-width: "100%"
+es_confidencial = (
+    (df_general['confidencial_con_estado'] == 1) |
+    (df_general['confidencial_sin_estado'] == 1)
+)
+df_general['es_confidencial'] = es_confidencial.astype(int)
+
+conf_por_estado = df_general.groupby('ENTIDAD')['es_confidencial'].agg(['sum', 'count'])
+conf_por_estado['pct'] = (conf_por_estado['sum'] / conf_por_estado['count'] * 100).round(1)
+conf_por_estado = conf_por_estado.sort_values('pct', ascending=True)
+
+top15 = conf_por_estado.tail(15)
+
+fig, ax = plt.subplots(figsize=(9, 5))
+bars = ax.barh(top15.index, top15['pct'], color=TEAL, edgecolor=TEAL_DARK, linewidth=0.5)
+pct_nacional = df_general['es_confidencial'].mean() * 100
+ax.axvline(pct_nacional, color='#D84315', ls='--', lw=2, label=f'Promedio nacional: {pct_nacional:.1f}%')
+
+for bar, pct in zip(bars, top15['pct']):
+    ax.text(bar.get_width() + 0.8, bar.get_y() + bar.get_height()/2,
+            f'{pct:.1f}%', va='center', fontsize=9, color=TEAL_DARK, fontweight='bold')
+
+ax.set_xlabel('% de registros confidenciales', fontsize=12)
+ax.set_title('Porcentaje de Registros Confidenciales por Entidad',
+             fontsize=14, color=TEAL_DARK, fontweight='bold')
+ax.legend(fontsize=10, loc='lower right')
+ax.spines[['top', 'right']].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+
+## Principales tendencias identificadas {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+### Sobre el fenómeno
+
+- **Distribución nacional** pero desigual: Jalisco, Edo. Méx. y Tamaulipas lideran.
+
+- **Perfil predominante:** hombres jóvenes (~32 años) en edad productiva.
+
+- **Registro inmediato** en la mitad de los casos, pero casos extremos distorsionan promedios.
+
+:::
+::: {.column width="50%"}
+
+### Sobre los datos
+
+- **36.7% de registros confidenciales** — bloque estructurado de 49,120 registros censurados en 6 columnas simultáneas.
+
+- **Desigualdad territorial** en la censura: Jalisco 67.5%, Guanajuato 58.7%, CDMX 58.4%.
+
+- **1,121 anomalías temporales** concentradas en pocas instituciones (65.4% provienen del 15.8% de las fuentes).
+
+:::
+::::
+
+::: {.callout-note}
+Las correlaciones **demográfico-temporales** son prácticamente nulas (|r| < 0.01), pero la relación **institución–confidencialidad** es significativa (Comisión Local de Jalisco r = 0.18, Fiscalía Edo. Méx. r = −0.15).
+:::
+
+
+## Implicaciones
+
+::: {.incremental}
+
+1. **Homogeneizar criterios de registro** — La confidencialidad varía drásticamente por entidad; no hay un estándar uniforme.
+
+2. **Focalizar esfuerzos de prevención** — El perfil recurrente (hombres jóvenes en estados con alta actividad delictiva) permite orientar recursos.
+
+3. **Mejorar la calidad de captura** — Las anomalías temporales se concentran en pocas fuentes: son errores sistemáticos corregibles.
+
+4. **El problema es nacional** — Las políticas de atención no pueden limitarse a unas cuantas entidades.
+
+:::
+
+
+## {background-color="#004D40"}
+
+:::: {.columns}
+::: {.column width="100%" style="text-align: center; color: white; padding-top: 80px;"}
+
+### Gracias
+
+**Almacenes y Minería de Datos — Tarea 02**
+
+Facultad de Ciencias, UNAM · 2026-2
+
+<br>
+
+Omar · Steve · Jesús · Edgar
+
+:::
+::::

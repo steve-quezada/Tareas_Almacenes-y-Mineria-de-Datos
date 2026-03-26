@@ -107,7 +107,7 @@ plt.show()
 
 ### Interpretación
 
-Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.
+Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.
 
 Destaca que **Jalisco**, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.
 
@@ -119,7 +119,8 @@ Destaca que **Jalisco**, el estado líder en desapariciones, también presenta u
 |---|---|---|
 | Sexo_Hombre vs. Sexo_Mujer | ≈ −0.988 | Exclusión mutua lógica |
 | Comisión Local Jalisco vs. Confidencialidad | ≈ 0.183 | Alta probabilidad de censura |
-| Fiscalía Chihuahua vs. Confidencialidad | ≈ −0.151 | Tendencia a la transparencia |
+| Fiscalía Edo. Méx. vs. Confidencialidad | ≈ −0.151 | Tendencia a la transparencia |
+| Fiscalía Chihuahua vs. Confidencialidad | ≈ −0.108 | Tendencia a la transparencia |
 
 ### Correlaciones más débiles
 
