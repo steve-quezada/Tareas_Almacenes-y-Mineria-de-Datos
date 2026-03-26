@@ -465,7 +465,7 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 </div>
 <section id="interpretación-1" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="interpretación-1"><span class="header-section-number">4.2.1</span> Interpretación</h3>
-<p>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</p>
+<p>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</p>
 <p>Destaca que <strong>Jalisco</strong>, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.</p>
 </section>
 </section>
@@ -498,8 +498,13 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 <td>Alta probabilidad de censura</td>
 </tr>
 <tr class="odd">
-<td>Fiscalía Chihuahua vs.&nbsp;Confidencialidad</td>
+<td>Fiscalía Edo. Méx. vs.&nbsp;Confidencialidad</td>
 <td>≈ −0.151</td>
+<td>Tendencia a la transparencia</td>
+</tr>
+<tr class="even">
+<td>Fiscalía Chihuahua vs.&nbsp;Confidencialidad</td>
+<td>≈ −0.108</td>
 <td>Tendencia a la transparencia</td>
 </tr>
 </tbody>
@@ -1118,7 +1123,7 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 <span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretación</span></span>
 <span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</span>
 <span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>Destaca que **Jalisco**, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.</span>
 <span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
@@ -1130,15 +1135,16 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 <span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
 <span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sexo_Hombre vs. Sexo_Mujer <span class="pp">|</span> ≈ −0.988 <span class="pp">|</span> Exclusión mutua lógica <span class="pp">|</span></span>
 <span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Comisión Local Jalisco vs. Confidencialidad <span class="pp">|</span> ≈ 0.183 <span class="pp">|</span> Alta probabilidad de censura <span class="pp">|</span></span>
-<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Chihuahua vs. Confidencialidad <span class="pp">|</span> ≈ −0.151 <span class="pp">|</span> Tendencia a la transparencia <span class="pp">|</span></span>
-<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más débiles</span></span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
-<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Edad vs. Días de registro <span class="pp">|</span> ≈ −0.005 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sexo vs. Días de registro <span class="pp">|</span> ≈ 0.003 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Entidades vs. Días de registro <span class="pp">|</span> <span class="sc">\|</span>r<span class="sc">\|</span> &lt; 0.05 <span class="pp">|</span> Sin asociación lineal <span class="pp">|</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Edo. Méx. vs. Confidencialidad <span class="pp">|</span> ≈ −0.151 <span class="pp">|</span> Tendencia a la transparencia <span class="pp">|</span></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Chihuahua vs. Confidencialidad <span class="pp">|</span> ≈ −0.108 <span class="pp">|</span> Tendencia a la transparencia <span class="pp">|</span></span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más débiles</span></span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Edad vs. Días de registro <span class="pp">|</span> ≈ −0.005 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sexo vs. Días de registro <span class="pp">|</span> ≈ 0.003 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Entidades vs. Días de registro <span class="pp">|</span> <span class="sc">\|</span>r<span class="sc">\|</span> &lt; 0.05 <span class="pp">|</span> Sin asociación lineal <span class="pp">|</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

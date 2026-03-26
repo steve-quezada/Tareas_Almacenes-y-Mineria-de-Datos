@@ -335,8 +335,8 @@ window.Quarto = {
 <h2 data-number="5.3" class="anchored" data-anchor-id="hallazgos-principales"><span class="header-section-number">5.3</span> Hallazgos principales</h2>
 <section id="bloque-de-datos-confidenciales-estructurado-y-territorialmente-desigual" class="level3" data-number="5.3.1">
 <h3 data-number="5.3.1" class="anchored" data-anchor-id="bloque-de-datos-confidenciales-estructurado-y-territorialmente-desigual"><span class="header-section-number">5.3.1</span> 1. Bloque de datos confidenciales estructurado y territorialmente desigual</h3>
-<p>Los registros <code>CONFIDENCIAL</code> no están distribuidos al azar. <strong>49,149 registros</strong> aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.</p>
-<p>La proporción nacional de registros confidenciales es 36.3%, pero en ciertos estados este porcentaje sube drásticamente:</p>
+<p>Los registros <code>CONFIDENCIAL</code> no están distribuidos al azar. <strong>49,120 registros</strong> (en el dataset limpio) aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.</p>
+<p>La proporción nacional de registros confidenciales es 36.7%, pero en ciertos estados este porcentaje sube drásticamente:</p>
 <ul>
 <li>Jalisco: 67.5%</li>
 <li>Guanajuato: 58.7%</li>
@@ -346,7 +346,7 @@ window.Quarto = {
 </section>
 <section id="anomalías-temporales-concentradas-en-pocas-fuentes" class="level3" data-number="5.3.2">
 <h3 data-number="5.3.2" class="anchored" data-anchor-id="anomalías-temporales-concentradas-en-pocas-fuentes"><span class="header-section-number">5.3.2</span> 2. Anomalías temporales concentradas en pocas fuentes</h3>
-<p>En el dataset temporal, 1,121 casos (1.52%) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.</p>
+<p>En el dataset temporal, 1,121 casos (1.52% de los registros con fechas calculables) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.8% de los registros válidos.</p>
 <ul>
 <li>El 64% de estos desfases son de 1 día o menos (posibles errores de captura).</li>
 <li>Se detectaron 64 registros con desfases mayores a un año ().</li>
@@ -388,7 +388,7 @@ window.Quarto = {
 <h2 data-number="5.4" class="anchored" data-anchor-id="limitaciones-del-análisis"><span class="header-section-number">5.4</span> Limitaciones del análisis</h2>
 <ol type="1">
 <li><p><strong>Unidad de análisis ≠ personas únicas.</strong> El dataset contiene <em>reportes</em>, no personas. Una misma persona podría tener múltiples registros de distintas instituciones.</p></li>
-<li><p><strong>Bloque confidencial extenso.</strong> 49,149 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.</p></li>
+<li><p><strong>Bloque confidencial extenso.</strong> 49,120 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.</p></li>
 <li><p><strong>Anomalías temporales persistentes.</strong> Aunque se identificaron y marcaron, los 1,121 registros con secuencias cronológicas poco probables obligan a interpretar con cautela las medidas basadas en tiempo.</p></li>
 <li><p><strong>Ausencia de variables contextuales.</strong> No hay información socioeconómica, circunstancias del hecho, vínculos con violencia delictiva, nivel educativo ni coordenadas geográficas exactas. El análisis describe patrones estadísticos pero no puede explicar causalmente el fenómeno.</p></li>
 </ol>
@@ -892,9 +892,9 @@ window.Quarto = {
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. Bloque de datos confidenciales estructurado y territorialmente desigual</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Los registros <span class="in">`CONFIDENCIAL`</span> no están distribuidos al azar. **49,149 registros** aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Los registros <span class="in">`CONFIDENCIAL`</span> no están distribuidos al azar. **49,120 registros** (en el dataset limpio) aparecen censurados simultáneamente en las mismas 6 columnas sensibles (fecha de nacimiento, sexo, fecha de desaparición, fecha de registro, estatus y municipio). Esto constituye un subconjunto censurado de forma consistente, no errores de captura aislados.</span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>La proporción nacional de registros confidenciales es 36.3%, pero en ciertos estados este porcentaje sube drásticamente:</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>La proporción nacional de registros confidenciales es 36.7%, pero en ciertos estados este porcentaje sube drásticamente:</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Jalisco: 67.5%</span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Guanajuato: 58.7%</span>
@@ -904,7 +904,7 @@ window.Quarto = {
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. Anomalías temporales concentradas en pocas fuentes</span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>En el dataset temporal, 1,121 casos (1.52%) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>En el dataset temporal, 1,121 casos (1.52% de los registros con fechas calculables) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.8% de los registros válidos.</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El 64% de estos desfases son de 1 día o menos (posibles errores de captura).</span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Se detectaron 64 registros con desfases mayores a un año ().</span>
@@ -943,7 +943,7 @@ window.Quarto = {
 <span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Unidad de análisis ≠ personas únicas.** El dataset contiene *reportes*, no personas. Una misma persona podría tener múltiples registros de distintas instituciones.</span>
 <span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Bloque confidencial extenso.** 49,149 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Bloque confidencial extenso.** 49,120 registros censurados reducen la profundidad del análisis temporal y demográfico, e introducen un sesgo institucional y territorial.</span>
 <span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Anomalías temporales persistentes.** Aunque se identificaron y marcaron, los 1,121 registros con secuencias cronológicas poco probables obligan a interpretar con cautela las medidas basadas en tiempo.</span>
 <span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a></span>
