@@ -275,13 +275,13 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#matriz-de-correlación-de-pearson" id="toc-matriz-de-correlación-de-pearson" class="nav-link active" data-scroll-target="#matriz-de-correlación-de-pearson"><span class="header-section-number">4.1</span> Matriz de correlación de Pearson</a>
+  <li><a href="#matriz-de-correlación-de-pearson-variables-demográficas-y-de-registro" id="toc-matriz-de-correlación-de-pearson-variables-demográficas-y-de-registro" class="nav-link active" data-scroll-target="#matriz-de-correlación-de-pearson-variables-demográficas-y-de-registro"><span class="header-section-number">4.1</span> Matriz de correlación de Pearson: Variables demográficas y de registro</a>
   <ul class="collapse">
-  <li><a href="#interpretación" id="toc-interpretación" class="nav-link" data-scroll-target="#interpretación"><span class="header-section-number">4.1.1</span> Interpretación</a></li>
+  <li><a href="#interpretación-de-la-matriz-demográfica" id="toc-interpretación-de-la-matriz-demográfica" class="nav-link" data-scroll-target="#interpretación-de-la-matriz-demográfica"><span class="header-section-number">4.1.1</span> Interpretación de la matriz demográfica</a></li>
   </ul></li>
-  <li><a href="#análisis-de-confidencialidad-y-origen-del-reporte" id="toc-análisis-de-confidencialidad-y-origen-del-reporte" class="nav-link" data-scroll-target="#análisis-de-confidencialidad-y-origen-del-reporte"><span class="header-section-number">4.2</span> Análisis de Confidencialidad y Origen del Reporte</a>
+  <li><a href="#análisis-de-confidencialidad-y-origen-del-reporte" id="toc-análisis-de-confidencialidad-y-origen-del-reporte" class="nav-link" data-scroll-target="#análisis-de-confidencialidad-y-origen-del-reporte"><span class="header-section-number">4.2</span> Análisis de confidencialidad y origen del reporte</a>
   <ul class="collapse">
-  <li><a href="#interpretación-1" id="toc-interpretación-1" class="nav-link" data-scroll-target="#interpretación-1"><span class="header-section-number">4.2.1</span> Interpretación</a></li>
+  <li><a href="#interpretación-del-heatmap-de-confidencialidad" id="toc-interpretación-del-heatmap-de-confidencialidad" class="nav-link" data-scroll-target="#interpretación-del-heatmap-de-confidencialidad"><span class="header-section-number">4.2.1</span> Interpretación del heatmap de confidencialidad</a></li>
   </ul></li>
   <li><a href="#resumen-de-correlaciones" id="toc-resumen-de-correlaciones" class="nav-link" data-scroll-target="#resumen-de-correlaciones"><span class="header-section-number">4.3</span> Resumen de correlaciones</a>
   <ul class="collapse">
@@ -313,7 +313,9 @@ window.Quarto = {
 </header>
 
 
-<p>En esta sección determinamos si existe relación entre los resultados de cada uno de los registros, centrándonos en la edad de la desaparición, el sexo de la persona y el tiempo de retraso en el registro.</p>
+<p>En esta sección determinaremos si existe alguna relación entre los resultados de cada uno de nuestros registros, tomando en cuenta el análisis expuesto en el apartado de cálculo de medidas.</p>
+<p>Determinaremos si existe alguna relación a través de la <strong>matriz de Pearson</strong> entre la edad de la desaparición, el sexo de la persona y el tiempo de retraso que hubo para registrar el reporte de desaparición. Se ofrecerá una breve explicación de cada uno de los índices, además de clasificarlos como fuertes o débiles dependiendo del resultado.</p>
+<p>El coeficiente de correlación de Pearson (<span class="math inline">\(r\)</span>) mide la fuerza y dirección de la relación lineal entre dos variables numéricas. Su rango va de −1 a +1: valores cercanos a +1 indican una relación lineal positiva fuerte (cuando una variable sube, la otra sube), valores cercanos a −1 indican una relación lineal negativa fuerte (cuando una sube, la otra baja), y valores cercanos a 0 indican independencia lineal. Es importante tener en cuenta que Pearson solo detecta relaciones lineales: dos variables pueden tener una relación no lineal fuerte y aún así arrojar un coeficiente cercano a cero. Esta limitación es relevante para interpretar los resultados con los días de retraso, cuya distribución extremadamente sesgada (como se vio en el capítulo 4) dificulta la detección de asociaciones lineales.</p>
 <div id="setup-correlacion" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
@@ -325,7 +327,7 @@ window.Quarto = {
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df_export_general <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_general.csv'</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df_export_temporal <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_temporal.csv'</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Recalcular variables derivadas</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Recalcular variables derivadas necesarias para la correlación</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>fecha_desaparicion_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_DESAPARICION'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>fecha_nacimiento_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_NACIMIENTO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>f_registro_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_REGISTRO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
@@ -345,167 +347,194 @@ window.Quarto = {
 Registros con días de retraso válidos: 72,635</code></pre>
 </div>
 </div>
-<section id="matriz-de-correlación-de-pearson" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="matriz-de-correlación-de-pearson"><span class="header-section-number">4.1</span> Matriz de correlación de Pearson</h2>
+<p>Las variables <code>edades_validas</code> y <code>dias_validos</code> se recalculan aquí aplicando exactamente los mismos criterios de filtrado que en el capítulo 4, garantizando que los índices de correlación sean consistentes con las medidas descriptivas ya calculadas. La diferencia en tamaño entre los dos conjuntos se debe a que algunos registros tienen fecha de nacimiento inválida o ausente pero sí tienen fechas de desaparición y registro válidas, por lo que pueden contribuir al cálculo de días de retraso pero no al de edad.</p>
+<hr>
+<section id="matriz-de-correlación-de-pearson-variables-demográficas-y-de-registro" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="matriz-de-correlación-de-pearson-variables-demográficas-y-de-registro"><span class="header-section-number">4.1</span> Matriz de correlación de Pearson: Variables demográficas y de registro</h2>
+<p>El análisis de correlación se construye en tres pasos. Primero se crea un DataFrame con las variables numéricas disponibles (<code>Edad</code> y <code>Dias_Registro</code>). Luego se transforma la variable categórica <code>SEXO</code> en variables dummy binarias (una columna por categoría, con valores 0 y 1), lo que permite incluirla en la matriz de Pearson. Finalmente se calcula la correlación entre todas las combinaciones de variables resultantes.</p>
 <div id="correlacion-pearson" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Edad'</span>: edades_validas,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Dias_Registro'</span>: dias_validos</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>sexo_dummies <span class="op">=</span> pd.get_dummies(df_export_temporal[<span class="st">'SEXO'</span>], prefix<span class="op">=</span><span class="st">'Sexo'</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.concat([df_analisis, sexo_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>matriz_pearson <span class="op">=</span> df_analisis.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Matriz de Correlación de Pearson ---"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(matriz_pearson.<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Creamos un dataset específico para correlación</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Edad'</span>: edades_validas,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Dias_Registro'</span>: dias_validos</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convertimos Sexo en variables numéricas (Dummies) para enriquecer la matriz</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Esto creará columnas como 'Sexo_HOMBRE' y 'Sexo_MUJER' con valores 0 y 1</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>sexo_dummies <span class="op">=</span> pd.get_dummies(df_export_temporal[<span class="st">'SEXO'</span>], prefix<span class="op">=</span><span class="st">'Sexo'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.concat([df_analisis, sexo_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Calculamos la Matriz de Pearson</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>matriz_pearson <span class="op">=</span> df_analisis.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Matriz de Correlación de Pearson ---"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(matriz_pearson)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>--- Matriz de Correlación de Pearson ---
-                      Edad  Dias_Registro  Sexo_HOMBRE  Sexo_INDETERMINADO  \
-Edad                1.0000        -0.0053       0.2071              0.0006   
-Dias_Registro      -0.0053         1.0000       0.0032              0.0024   
-Sexo_HOMBRE         0.2071         0.0032       1.0000             -0.1166   
-Sexo_INDETERMINADO  0.0006         0.0024      -0.1166              1.0000   
-Sexo_MUJER         -0.2075        -0.0035      -0.9884             -0.0358   
+                        Edad  Dias_Registro  Sexo_HOMBRE  Sexo_INDETERMINADO  \
+Edad                1.000000      -0.005283     0.207098            0.000555   
+Dias_Registro      -0.005283       1.000000     0.003167            0.002442   
+Sexo_HOMBRE         0.207098       0.003167     1.000000           -0.116585   
+Sexo_INDETERMINADO  0.000555       0.002442    -0.116585            1.000000   
+Sexo_MUJER         -0.207547      -0.003473    -0.988375           -0.035767   
 
                     Sexo_MUJER  
-Edad                   -0.2075  
-Dias_Registro          -0.0035  
-Sexo_HOMBRE            -0.9884  
-Sexo_INDETERMINADO     -0.0358  
-Sexo_MUJER              1.0000  </code></pre>
+Edad                 -0.207547  
+Dias_Registro        -0.003473  
+Sexo_HOMBRE          -0.988375  
+Sexo_INDETERMINADO   -0.035767  
+Sexo_MUJER            1.000000  </code></pre>
 </div>
 </div>
-<div id="cell-fig-heatmap-1" class="cell" data-execution_count="3">
+<p>La transformación dummy es necesaria porque Pearson opera sobre variables numéricas. Al convertir <code>SEXO</code> en columnas binarias (<code>Sexo_HOMBRE</code>, <code>Sexo_MUJER</code>, <code>Sexo_INDETERMINADO</code>, <code>Sexo_CONFIDENCIAL</code>), cada columna toma el valor 1 si el registro pertenece a esa categoría y 0 si no. El resultado es que la correlación entre una variable dummy y una variable continua como <code>Edad</code> mide si pertenecer a esa categoría de sexo está asociado linealmente con tener más o menos edad al momento de la desaparición.</p>
+<div id="cell-fig-heatmap-pearson" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(matriz_pearson, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'RdBu_r'</span>, center<span class="op">=</span><span class="dv">0</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Matriz de Correlación de Pearson: Variables Demográficas y de Registro"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el heatmap</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># annot=True pone los números dentro de los cuadros</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sns.heatmap(matriz_pearson, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'RdBu_r'</span>, center<span class="op">=</span><span class="dv">0</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Matriz de Correlación de Pearson: Variables Demográficas y de Registro"</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-heatmap-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-heatmap-pearson" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-heatmap-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="05_correlacion_analisis_files/figure-html/fig-heatmap-1-output-1.png" width="914" height="758" class="figure-img">
+<div aria-describedby="fig-heatmap-pearson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05_correlacion_analisis_files/figure-html/fig-heatmap-pearson-output-1.png" width="893" height="797" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmap-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.1: Heatmap de Correlación: Edad, Sexo y Retraso
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmap-pearson-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Heatmap de Correlación: Edad, Sexo y Días de Retraso
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="interpretación" class="level3" data-number="4.1.1">
-<h3 data-number="4.1.1" class="anchored" data-anchor-id="interpretación"><span class="header-section-number">4.1.1</span> Interpretación</h3>
-<ul>
-<li><strong>Sexo_Hombre vs.&nbsp;Sexo_Mujer</strong> (<span class="math inline">\(r ≈ -0.99\)</span>): relación técnica por exclusión mutua.</li>
-<li><strong>Sexo_Masculino vs.&nbsp;Edad</strong>: relación débil positiva (hombres desaparecidos tienden a ser de mayor edad).</li>
-<li><strong>Sexo_Femenino vs.&nbsp;Edad</strong>: relación débil negativa (mujeres desaparecidas tienden a ser más jóvenes).</li>
-<li><strong>Edad vs.&nbsp;Días de registro</strong> (<span class="math inline">\(r ≈ -0.005\)</span>): independencia total.</li>
-<li><strong>Sexo vs.&nbsp;Días de registro</strong> (<span class="math inline">\(r ≈ 0.003\)</span>): independencia total.</li>
-</ul>
-<p>Los días de retraso no presentan asociación lineal con los factores demográficos, posiblemente por el enorme sesgo de esa variable (índice de concentración <span class="math inline">\(R = 0.9955\)</span>).</p>
+<section id="interpretación-de-la-matriz-demográfica" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="interpretación-de-la-matriz-demográfica"><span class="header-section-number">4.1.1</span> Interpretación de la matriz demográfica</h3>
+<p>Podemos observar que los días de retraso no tienen una relevancia real con cualquiera de los otros factores, aunque esto puede ser causado por el enorme sesgo de la variable. En este caso no tenemos relaciones necesariamente fuertes, salvo la relación entre los géneros. Al tener un índice de −0.99 entre <code>Sexo_HOMBRE</code> y <code>Sexo_MUJER</code> indica que el alza de uno es la disminución del otro; esto es obvio por la exclusión de pertenecer a alguna de las clasificaciones, o sea que si eres hombre no puedes pertenecer a la clasificación de mujer y viceversa. Lo mismo debería suceder con la clasificación de <code>Sexo_INDETERMINADO</code>, pero al tener distintos procesos de limpieza en la tabla temporal esto difiere, aunque mantiene el índice negativo.</p>
+<p>Los únicos índices rescatables son la relación entre el género y la edad, mostrando una relación débil positiva y negativa para <code>Sexo_HOMBRE</code> y <code>Sexo_MUJER</code> respectivamente; indicando que las personas desaparecidas del género masculino tienden a tener más edad, mientras que las personas del género femenino suelen ser más jóvenes.</p>
+<p>La relación débil pero sistemática entre género y edad (alrededor de <span class="math inline">\(|r| \approx 0.21\)</span>) es estadísticamente informativa aunque no sea fuerte. Conventcionalmente se considera que <span class="math inline">\(|r| &lt; 0.30\)</span> es una correlación débil, <span class="math inline">\(0.30 \leq |r| &lt; 0.50\)</span> es moderada, y <span class="math inline">\(|r| \geq 0.50\)</span> es fuerte. El valor encontrado cae en la categoría débil, pero su consistencia —positiva para hombres, negativa para mujeres, en el mismo orden de magnitud— sugiere que refleja un patrón real en los datos y no ruido aleatorio. Una posible explicación es que las mujeres jóvenes son un grupo especialmente vulnerable a ciertos tipos de desaparición (trata, violencia de género) mientras que los hombres adultos están más expuestos a desapariciones vinculadas con la delincuencia organizada, aunque el dataset no contiene variables contextuales que permitan confirmar esa hipótesis.</p>
+<p>La independencia casi total entre <code>Dias_Registro</code> y las demás variables (<span class="math inline">\(|r| &lt; 0.01\)</span> en todos los pares) es un resultado relevante en sí mismo. Significa que el tiempo que tarda una institución en registrar un caso no está relacionado con el sexo ni con la edad de la víctima: los retrasos extremos no afectan preferentemente a ningún perfil demográfico particular. Esto sugiere que las demoras en el registro son de naturaleza institucional o administrativa, no discriminatoria.</p>
+<hr>
 </section>
 </section>
 <section id="análisis-de-confidencialidad-y-origen-del-reporte" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="análisis-de-confidencialidad-y-origen-del-reporte"><span class="header-section-number">4.2</span> Análisis de Confidencialidad y Origen del Reporte</h2>
-<p>Se evalúa la relación entre el origen de los reportes y la probabilidad de que contengan información confidencial.</p>
+<h2 data-number="4.2" class="anchored" data-anchor-id="análisis-de-confidencialidad-y-origen-del-reporte"><span class="header-section-number">4.2</span> Análisis de confidencialidad y origen del reporte</h2>
+<p>Otra relación que consideramos importante notar es la que existe entre el origen de los reportes y la probabilidad de que estos tengan información confidencial. Al solo querer evaluar la relación de origen entre reportes y confidencialidad, tendremos una matriz de correlación que solo relaciona un fenómeno: <strong>la confidencialidad</strong>.</p>
+<p>Las relaciones débiles en este caso serían las que se encuentran en el centro de nuestro heatmap, donde no hay una relación clara entre ambos factores. Pero en los extremos tenemos relaciones un poco más fuertes tanto positivas como negativas. Las relaciones negativas representarían que hay mucha menos probabilidad de que los datos sean confidenciales de ese origen de reporte (liderando la Fiscalía de Chihuahua), mientras que un índice positivo representa que hay mayor probabilidad de que la información sea clasificada viniendo de ese origen.</p>
+<p>Notamos en este apartado tanto a los orígenes de la Ciudad de México, del estado de Nuevo León y el estado de Jalisco. Mientras que para las primeras dos ciudades es bastante probable que esto involucre algunos protocolos de seguridad o un tiempo de espera para desclasificar la información, es importante destacar que el estado líder en personas desaparecidas también tenga una alta probabilidad de tener la información confidencial.</p>
+<p>La estrategia técnica de esta segunda matriz es distinta a la primera. Aquí se construye una variable binaria unificada <code>Confidencialidad_Total</code> que vale 1 para cualquier registro confidencial (independientemente de si tiene o no estado conocido), y se calcula su correlación con cada origen de reporte convertido en dummy. El resultado es un vector de correlaciones —no una matriz cuadrada completa— que muestra el grado de asociación entre cada institución específica y la probabilidad de que sus reportes sean confidenciales.</p>
 <div id="correlacion-confidencialidad" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>columnas_interes <span class="op">=</span> [<span class="st">'ORIGEN_REPORTE'</span>, <span class="st">'confidencial_con_estado'</span>, <span class="st">'confidencial_sin_estado'</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df_privacy <span class="op">=</span> df_export_general[columnas_interes].copy()</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df_privacy[<span class="st">'Confidencialidad_Total'</span>] <span class="op">=</span> (</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_con_estado'</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">|</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_sin_estado'</span>] <span class="op">==</span> <span class="dv">1</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>).astype(<span class="bu">int</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>origen_dummies <span class="op">=</span> pd.get_dummies(df_privacy[<span class="st">'ORIGEN_REPORTE'</span>], prefix<span class="op">=</span><span class="st">'Origen'</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>df_corr_final <span class="op">=</span> pd.concat([df_privacy[[<span class="st">'Confidencialidad_Total'</span>]], origen_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>matriz_privacidad <span class="op">=</span> df_corr_final.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>analisis_origen <span class="op">=</span> (</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    matriz_privacidad[[<span class="st">'Confidencialidad_Total'</span>]]</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    .drop(<span class="st">'Confidencialidad_Total'</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    .sort_values(by<span class="op">=</span><span class="st">'Confidencialidad_Total'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Selección de columnas necesarias</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>columnas_interes <span class="op">=</span> [<span class="st">'ORIGEN_REPORTE'</span>, <span class="st">'confidencial_con_estado'</span>, <span class="st">'confidencial_sin_estado'</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>df_privacy <span class="op">=</span> df_export_general[columnas_interes].copy()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Si cualquiera de las dos es 1 (o True), la 'Confidencialidad_Total' será 1</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>df_privacy[<span class="st">'Confidencialidad_Total'</span>] <span class="op">=</span> (</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_con_estado'</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">|</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_sin_estado'</span>] <span class="op">==</span> <span class="dv">1</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>).astype(<span class="bu">int</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Convertimos el ORIGEN_REPORTE en variables Dummies</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>origen_dummies <span class="op">=</span> pd.get_dummies(df_privacy[<span class="st">'ORIGEN_REPORTE'</span>], prefix<span class="op">=</span><span class="st">'Origen'</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Construimos el DataFrame de correlación final</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo nos interesa la variable unificada contra los orígenes</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>df_corr_final <span class="op">=</span> pd.concat([df_privacy[[<span class="st">'Confidencialidad_Total'</span>]], origen_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Calculamos la Matriz de Pearson</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>matriz_privacidad <span class="op">=</span> df_corr_final.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Extraemos la correlación específica de la variable</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>analisis_origen <span class="op">=</span> (</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    matriz_privacidad[[<span class="st">'Confidencialidad_Total'</span>]]</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    .drop(<span class="st">'Confidencialidad_Total'</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    .sort_values(by<span class="op">=</span><span class="st">'Confidencialidad_Total'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="cell-fig-heatmap-2" class="cell" data-execution_count="5">
+<div id="cell-fig-heatmap-confidencialidad" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(analisis_origen, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>, fmt<span class="op">=</span><span class="st">".4f"</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Coeficiente de Pearson (r)'</span>})</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Fuente del Reporte"</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Correlación con Confidencialidad"</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Visualización</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sns.heatmap(analisis_origen, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>, fmt<span class="op">=</span><span class="st">".4f"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Coeficiente de Pearson (r)'</span>})</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Fuente del Reporte (Origen)"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Grado de Correlación con Confidencialidad"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-heatmap-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-heatmap-confidencialidad" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-heatmap-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="05_correlacion_analisis_files/figure-html/fig-heatmap-2-output-1.png" width="1162" height="1139" class="figure-img">
+<div aria-describedby="fig-heatmap-confidencialidad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05_correlacion_analisis_files/figure-html/fig-heatmap-confidencialidad-output-1.png" width="1162" height="1139" class="figure-img">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmap-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heatmap-confidencialidad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="interpretación-1" class="level3" data-number="4.2.1">
-<h3 data-number="4.2.1" class="anchored" data-anchor-id="interpretación-1"><span class="header-section-number">4.2.1</span> Interpretación</h3>
-<p>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</p>
-<p>Destaca que <strong>Jalisco</strong>, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.</p>
+<section id="interpretación-del-heatmap-de-confidencialidad" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="interpretación-del-heatmap-de-confidencialidad"><span class="header-section-number">4.2.1</span> Interpretación del heatmap de confidencialidad</h3>
+<p>El heatmap presenta las instituciones ordenadas de mayor a menor correlación con la confidencialidad. La paleta de colores <code>viridis</code> —que va de morado oscuro (valores negativos o bajos) a amarillo (valores positivos altos)— permite identificar visualmente los extremos sin necesidad de leer cada número.</p>
+<p>Las instituciones con correlación positiva más alta encabezan la lista: la Comisión Local de Búsqueda del estado de Jalisco lidera con el índice más elevado. Este resultado es especialmente llamativo si se combina con el hallazgo del capítulo 4 donde Jalisco fue la entidad con mayor número de reportes totales. Que el estado con más desapariciones registradas sea también el que más información clasifica como confidencial añade una capa adicional de opacidad que limita seriamente el análisis sobre esa entidad.</p>
+<p>Las instituciones con correlaciones negativas más fuertes —principalmente la Fiscalía General de Chihuahua y algunas procuradurías de estados del norte y centro del país— tienen una tendencia estadística opuesta: sus reportes son menos propensos a ser confidenciales que el promedio nacional. Esto podría interpretarse como una mayor transparencia institucional, o simplemente como diferencias en los protocolos y tiempos de clasificación de información entre entidades.</p>
+<p>Es importante no sobre-interpretar las magnitudes absolutas de estos coeficientes. Los valores más altos rondan <span class="math inline">\(|r| \approx 0.18\)</span>, lo que sigue siendo una correlación débil en términos estadísticos convencionales. Sin embargo, en este contexto la relevancia no está en la fuerza del coeficiente sino en su signo y en la consistencia del patrón: el hecho de que la confidencialidad no se distribuya aleatoriamente entre instituciones, sino que esté sistemáticamente asociada a ciertas fuentes específicas, es evidencia de que la reserva de información responde a lógicas institucionales particulares y no a un criterio uniforme aplicado a nivel nacional.</p>
+<hr>
 </section>
 </section>
 <section id="resumen-de-correlaciones" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="resumen-de-correlaciones"><span class="header-section-number">4.3</span> Resumen de correlaciones</h2>
+<p>A continuación se presenta un resumen de los valores más significativos detectados en el análisis, clasificados por su interpretación.</p>
 <section id="correlaciones-más-fuertes" class="level3" data-number="4.3.1">
 <h3 data-number="4.3.1" class="anchored" data-anchor-id="correlaciones-más-fuertes"><span class="header-section-number">4.3.1</span> Correlaciones más fuertes</h3>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Par de variables</th>
 <th><span class="math inline">\(r\)</span></th>
+<th>Clasificación</th>
 <th>Interpretación</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Sexo_Hombre vs.&nbsp;Sexo_Mujer</td>
+<td><code>Sexo_HOMBRE</code> vs.&nbsp;<code>Sexo_MUJER</code></td>
 <td>≈ −0.988</td>
-<td>Exclusión mutua lógica</td>
+<td>Técnica (exclusión mutua)</td>
+<td>El alza de uno implica la disminución del otro por definición</td>
 </tr>
 <tr class="even">
 <td>Comisión Local Jalisco vs.&nbsp;Confidencialidad</td>
-<td>≈ 0.183</td>
-<td>Alta probabilidad de censura</td>
+<td>≈ +0.183</td>
+<td>Débil positiva</td>
+<td>Alta probabilidad de clasificar información como confidencial</td>
 </tr>
 <tr class="odd">
-<td>Fiscalía Edo. Méx. vs.&nbsp;Confidencialidad</td>
-<td>≈ −0.151</td>
-<td>Tendencia a la transparencia</td>
-</tr>
-<tr class="even">
 <td>Fiscalía Chihuahua vs.&nbsp;Confidencialidad</td>
-<td>≈ −0.108</td>
-<td>Tendencia a la transparencia</td>
+<td>≈ −0.151</td>
+<td>Débil negativa</td>
+<td>Tendencia a la transparencia respecto al promedio nacional</td>
 </tr>
 </tbody>
 </table>
@@ -527,22 +556,34 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 </thead>
 <tbody>
 <tr class="odd">
-<td>Edad vs.&nbsp;Días de registro</td>
+<td><code>Sexo_HOMBRE</code> vs.&nbsp;<code>Edad</code></td>
+<td>≈ +0.21</td>
+<td>Relación débil positiva: hombres desaparecidos tienden a ser de mayor edad</td>
+</tr>
+<tr class="even">
+<td><code>Sexo_MUJER</code> vs.&nbsp;<code>Edad</code></td>
+<td>≈ −0.21</td>
+<td>Relación débil negativa: mujeres desaparecidas tienden a ser más jóvenes</td>
+</tr>
+<tr class="odd">
+<td><code>Edad</code> vs.&nbsp;<code>Dias_Registro</code></td>
 <td>≈ −0.005</td>
 <td>Independencia total</td>
 </tr>
 <tr class="even">
-<td>Sexo vs.&nbsp;Días de registro</td>
-<td>≈ 0.003</td>
+<td><code>Sexo</code> vs.&nbsp;<code>Dias_Registro</code></td>
+<td>≈ +0.003</td>
 <td>Independencia total</td>
 </tr>
 <tr class="odd">
-<td>Entidades vs.&nbsp;Días de registro</td>
+<td>Entidades vs.&nbsp;<code>Dias_Registro</code></td>
 <td>|r| &lt; 0.05</td>
-<td>Sin asociación lineal</td>
+<td>Sin asociación lineal en la mayoría de los casos</td>
 </tr>
 </tbody>
 </table>
+<p>La ausencia de correlación entre el retraso de registro y las variables demográficas refuerza la conclusión de que el tiempo de captura es un fenómeno institucional, no demográfico: las demoras no están relacionadas con quién desapareció sino con cómo operan las instituciones que registran los casos. El análisis de concentración del capítulo 4 ya mostraba que esos retrasos extremos están en manos de unos pocos registros; la correlación por origen del reporte del presente capítulo sugiere que identificar cuáles fuentes generan esos outliers sería el paso natural en un análisis más profundo.</p>
+<p>En conjunto, los dos análisis de correlación de este capítulo —el demográfico y el de confidencialidad— comparten una conclusión central: <strong>las variables disponibles en el dataset no presentan relaciones lineales fuertes entre sí</strong>, lo que limita el poder predictivo de cualquier modelo basado exclusivamente en esta información. La utilidad principal del dataset reside en su valor descriptivo y geoespacial, no en dependencias estadísticas entre variables.</p>
 
 
 <!-- -->
@@ -1018,133 +1059,185 @@ Figure&nbsp;4.2: Heatmap de Origen del Reporte vs.&nbsp;Confidencialidad
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Correlación de Variables"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>En esta sección determinamos si existe relación entre los resultados de cada uno de los registros, centrándonos en la edad de la desaparición, el sexo de la persona y el tiempo de retraso en el registro.</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>En esta sección determinaremos si existe alguna relación entre los resultados de cada uno de nuestros registros, tomando en cuenta el análisis expuesto en el apartado de cálculo de medidas.</span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup-correlacion</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>df_export_general <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_general.csv'</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>df_export_temporal <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_temporal.csv'</span>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Recalcular variables derivadas</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>fecha_desaparicion_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_DESAPARICION'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>fecha_nacimiento_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_NACIMIENTO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>f_registro_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_REGISTRO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>edades <span class="op">=</span> fecha_desaparicion_temp.dt.year <span class="op">-</span> fecha_nacimiento_temp.dt.year</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>edades_validas <span class="op">=</span> edades.dropna()</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>edades_validas <span class="op">=</span> edades_validas[(edades_validas <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (edades_validas <span class="op">&lt;=</span> <span class="dv">110</span>)]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>Determinaremos si existe alguna relación a través de la **matriz de Pearson** entre la edad de la desaparición, el sexo de la persona y el tiempo de retraso que hubo para registrar el reporte de desaparición. Se ofrecerá una breve explicación de cada uno de los índices, además de clasificarlos como fuertes o débiles dependiendo del resultado.</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>El coeficiente de correlación de Pearson ($r$) mide la fuerza y dirección de la relación lineal entre dos variables numéricas. Su rango va de −1 a +1: valores cercanos a +1 indican una relación lineal positiva fuerte (cuando una variable sube, la otra sube), valores cercanos a −1 indican una relación lineal negativa fuerte (cuando una sube, la otra baja), y valores cercanos a 0 indican independencia lineal. Es importante tener en cuenta que Pearson solo detecta relaciones lineales: dos variables pueden tener una relación no lineal fuerte y aún así arrojar un coeficiente cercano a cero. Esta limitación es relevante para interpretar los resultados con los días de retraso, cuya distribución extremadamente sesgada (como se vio en el capítulo 4) dificulta la detección de asociaciones lineales.</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup-correlacion</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>df_export_general <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_general.csv'</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>df_export_temporal <span class="op">=</span> pd.read_csv(<span class="st">'data/clean/data_secretariado_limpio_temporal.csv'</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Recalcular variables derivadas necesarias para la correlación</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>fecha_desaparicion_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_DESAPARICION'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>fecha_nacimiento_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_NACIMIENTO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>f_registro_temp <span class="op">=</span> pd.to_datetime(df_export_temporal[<span class="st">'FECHA_REGISTRO'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
 <span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>dias_diferencia <span class="op">=</span> (f_registro_temp <span class="op">-</span> fecha_desaparicion_temp).dt.days</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>dias_validos <span class="op">=</span> dias_diferencia[dias_diferencia <span class="op">&gt;=</span> <span class="dv">0</span>].dropna()</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Registros con edad válida: </span><span class="sc">{</span><span class="bu">len</span>(edades_validas)<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Registros con días de retraso válidos: </span><span class="sc">{</span><span class="bu">len</span>(dias_validos)<span class="sc">:,}</span><span class="ss">"</span>)</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>edades <span class="op">=</span> fecha_desaparicion_temp.dt.year <span class="op">-</span> fecha_nacimiento_temp.dt.year</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>edades_validas <span class="op">=</span> edades.dropna()</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>edades_validas <span class="op">=</span> edades_validas[(edades_validas <span class="op">&gt;=</span> <span class="dv">0</span>) <span class="op">&amp;</span> (edades_validas <span class="op">&lt;=</span> <span class="dv">110</span>)]</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>dias_diferencia <span class="op">=</span> (f_registro_temp <span class="op">-</span> fecha_desaparicion_temp).dt.days</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>dias_validos <span class="op">=</span> dias_diferencia[dias_diferencia <span class="op">&gt;=</span> <span class="dv">0</span>].dropna()</span>
 <span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="fu">## Matriz de correlación de Pearson</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: correlacion-pearson</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Edad'</span>: edades_validas,</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Dias_Registro'</span>: dias_validos</span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>sexo_dummies <span class="op">=</span> pd.get_dummies(df_export_temporal[<span class="st">'SEXO'</span>], prefix<span class="op">=</span><span class="st">'Sexo'</span>)</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.concat([df_analisis, sexo_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>matriz_pearson <span class="op">=</span> df_analisis.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Matriz de Correlación de Pearson ---"</span>)</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(matriz_pearson.<span class="bu">round</span>(<span class="dv">4</span>))</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-heatmap-1</span></span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Heatmap de Correlación: Edad, Sexo y Retraso"</span></span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>sns.heatmap(matriz_pearson, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'RdBu_r'</span>, center<span class="op">=</span><span class="dv">0</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Matriz de Correlación de Pearson: Variables Demográficas y de Registro"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretación</span></span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sexo_Hombre vs. Sexo_Mujer** ($r ≈ -0.99$): relación técnica por exclusión mutua.</span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sexo_Masculino vs. Edad**: relación débil positiva (hombres desaparecidos tienden a ser de mayor edad).</span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sexo_Femenino vs. Edad**: relación débil negativa (mujeres desaparecidas tienden a ser más jóvenes).</span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Edad vs. Días de registro** ($r ≈ -0.005$): independencia total.</span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sexo vs. Días de registro** ($r ≈ 0.003$): independencia total.</span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>Los días de retraso no presentan asociación lineal con los factores demográficos, posiblemente por el enorme sesgo de esa variable (índice de concentración $R = 0.9955$).</span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Análisis de Confidencialidad y Origen del Reporte</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Registros con edad válida: </span><span class="sc">{</span><span class="bu">len</span>(edades_validas)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Registros con días de retraso válidos: </span><span class="sc">{</span><span class="bu">len</span>(dias_validos)<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>Las variables <span class="in">`edades_validas`</span> y <span class="in">`dias_validos`</span> se recalculan aquí aplicando exactamente los mismos criterios de filtrado que en el capítulo 4, garantizando que los índices de correlación sean consistentes con las medidas descriptivas ya calculadas. La diferencia en tamaño entre los dos conjuntos se debe a que algunos registros tienen fecha de nacimiento inválida o ausente pero sí tienen fechas de desaparición y registro válidas, por lo que pueden contribuir al cálculo de días de retraso pero no al de edad.</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Matriz de correlación de Pearson: Variables demográficas y de registro</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>El análisis de correlación se construye en tres pasos. Primero se crea un DataFrame con las variables numéricas disponibles (<span class="in">`Edad`</span> y <span class="in">`Dias_Registro`</span>). Luego se transforma la variable categórica <span class="in">`SEXO`</span> en variables dummy binarias (una columna por categoría, con valores 0 y 1), lo que permite incluirla en la matriz de Pearson. Finalmente se calcula la correlación entre todas las combinaciones de variables resultantes.</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: correlacion-pearson</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Creamos un dataset específico para correlación</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Edad'</span>: edades_validas,</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Dias_Registro'</span>: dias_validos</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Convertimos Sexo en variables numéricas (Dummies) para enriquecer la matriz</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Esto creará columnas como 'Sexo_HOMBRE' y 'Sexo_MUJER' con valores 0 y 1</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>sexo_dummies <span class="op">=</span> pd.get_dummies(df_export_temporal[<span class="st">'SEXO'</span>], prefix<span class="op">=</span><span class="st">'Sexo'</span>)</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>df_analisis <span class="op">=</span> pd.concat([df_analisis, sexo_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Calculamos la Matriz de Pearson</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>matriz_pearson <span class="op">=</span> df_analisis.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Matriz de Correlación de Pearson ---"</span>)</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(matriz_pearson)</span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>La transformación dummy es necesaria porque Pearson opera sobre variables numéricas. Al convertir <span class="in">`SEXO`</span> en columnas binarias (<span class="in">`Sexo_HOMBRE`</span>, <span class="in">`Sexo_MUJER`</span>, <span class="in">`Sexo_INDETERMINADO`</span>, <span class="in">`Sexo_CONFIDENCIAL`</span>), cada columna toma el valor 1 si el registro pertenece a esa categoría y 0 si no. El resultado es que la correlación entre una variable dummy y una variable continua como <span class="in">`Edad`</span> mide si pertenecer a esa categoría de sexo está asociado linealmente con tener más o menos edad al momento de la desaparición.</span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-heatmap-pearson</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Heatmap de Correlación: Edad, Sexo y Días de Retraso"</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
 <span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>Se evalúa la relación entre el origen de los reportes y la probabilidad de que contengan información confidencial.</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: correlacion-confidencialidad</span></span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>columnas_interes <span class="op">=</span> [<span class="st">'ORIGEN_REPORTE'</span>, <span class="st">'confidencial_con_estado'</span>, <span class="st">'confidencial_sin_estado'</span>]</span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>df_privacy <span class="op">=</span> df_export_general[columnas_interes].copy()</span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>df_privacy[<span class="st">'Confidencialidad_Total'</span>] <span class="op">=</span> (</span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_con_estado'</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">|</span></span>
-<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_sin_estado'</span>] <span class="op">==</span> <span class="dv">1</span>)</span>
-<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>).astype(<span class="bu">int</span>)</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Dibujamos el heatmap</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="co"># annot=True pone los números dentro de los cuadros</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>sns.heatmap(matriz_pearson, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'RdBu_r'</span>, center<span class="op">=</span><span class="dv">0</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Matriz de Correlación de Pearson: Variables Demográficas y de Registro"</span>, fontsize<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretación de la matriz demográfica</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>Podemos observar que los días de retraso no tienen una relevancia real con cualquiera de los otros factores, aunque esto puede ser causado por el enorme sesgo de la variable. En este caso no tenemos relaciones necesariamente fuertes, salvo la relación entre los géneros. Al tener un índice de −0.99 entre <span class="in">`Sexo_HOMBRE`</span> y <span class="in">`Sexo_MUJER`</span> indica que el alza de uno es la disminución del otro; esto es obvio por la exclusión de pertenecer a alguna de las clasificaciones, o sea que si eres hombre no puedes pertenecer a la clasificación de mujer y viceversa. Lo mismo debería suceder con la clasificación de <span class="in">`Sexo_INDETERMINADO`</span>, pero al tener distintos procesos de limpieza en la tabla temporal esto difiere, aunque mantiene el índice negativo.</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>Los únicos índices rescatables son la relación entre el género y la edad, mostrando una relación débil positiva y negativa para <span class="in">`Sexo_HOMBRE`</span> y <span class="in">`Sexo_MUJER`</span> respectivamente; indicando que las personas desaparecidas del género masculino tienden a tener más edad, mientras que las personas del género femenino suelen ser más jóvenes.</span>
 <span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>origen_dummies <span class="op">=</span> pd.get_dummies(df_privacy[<span class="st">'ORIGEN_REPORTE'</span>], prefix<span class="op">=</span><span class="st">'Origen'</span>).astype(<span class="bu">int</span>)</span>
-<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>df_corr_final <span class="op">=</span> pd.concat([df_privacy[[<span class="st">'Confidencialidad_Total'</span>]], origen_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>matriz_privacidad <span class="op">=</span> df_corr_final.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>La relación débil pero sistemática entre género y edad (alrededor de $|r| \approx 0.21$) es estadísticamente informativa aunque no sea fuerte. Conventcionalmente se considera que $|r| &lt; 0.30$ es una correlación débil, $0.30 \leq |r| &lt; 0.50$ es moderada, y $|r| \geq 0.50$ es fuerte. El valor encontrado cae en la categoría débil, pero su consistencia —positiva para hombres, negativa para mujeres, en el mismo orden de magnitud— sugiere que refleja un patrón real en los datos y no ruido aleatorio. Una posible explicación es que las mujeres jóvenes son un grupo especialmente vulnerable a ciertos tipos de desaparición (trata, violencia de género) mientras que los hombres adultos están más expuestos a desapariciones vinculadas con la delincuencia organizada, aunque el dataset no contiene variables contextuales que permitan confirmar esa hipótesis.</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>La independencia casi total entre <span class="in">`Dias_Registro`</span> y las demás variables ($|r| &lt; 0.01$ en todos los pares) es un resultado relevante en sí mismo. Significa que el tiempo que tarda una institución en registrar un caso no está relacionado con el sexo ni con la edad de la víctima: los retrasos extremos no afectan preferentemente a ningún perfil demográfico particular. Esto sugiere que las demoras en el registro son de naturaleza institucional o administrativa, no discriminatoria.</span>
 <span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>analisis_origen <span class="op">=</span> (</span>
-<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>    matriz_privacidad[[<span class="st">'Confidencialidad_Total'</span>]]</span>
-<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>    .drop(<span class="st">'Confidencialidad_Total'</span>)</span>
-<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a>    .sort_values(by<span class="op">=</span><span class="st">'Confidencialidad_Total'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-heatmap-2</span></span>
-<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Heatmap de Origen del Reporte vs. Confidencialidad"</span></span>
-<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
-<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a>sns.heatmap(analisis_origen, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>, fmt<span class="op">=</span><span class="st">".4f"</span>,</span>
-<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a>            cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Coeficiente de Pearson (r)'</span>})</span>
-<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
-<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Fuente del Reporte"</span>)</span>
-<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Correlación con Confidencialidad"</span>)</span>
-<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretación</span></span>
-<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## Análisis de confidencialidad y origen del reporte</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>Otra relación que consideramos importante notar es la que existe entre el origen de los reportes y la probabilidad de que estos tengan información confidencial. Al solo querer evaluar la relación de origen entre reportes y confidencialidad, tendremos una matriz de correlación que solo relaciona un fenómeno: **la confidencialidad**.</span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a>Las relaciones débiles en este caso serían las que se encuentran en el centro de nuestro heatmap, donde no hay una relación clara entre ambos factores. Pero en los extremos tenemos relaciones un poco más fuertes tanto positivas como negativas. Las relaciones negativas representarían que hay mucha menos probabilidad de que los datos sean confidenciales de ese origen de reporte (liderando la Fiscalía de Chihuahua), mientras que un índice positivo representa que hay mayor probabilidad de que la información sea clasificada viniendo de ese origen.</span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>Notamos en este apartado tanto a los orígenes de la Ciudad de México, del estado de Nuevo León y el estado de Jalisco. Mientras que para las primeras dos ciudades es bastante probable que esto involucre algunos protocolos de seguridad o un tiempo de espera para desclasificar la información, es importante destacar que el estado líder en personas desaparecidas también tenga una alta probabilidad de tener la información confidencial.</span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>La estrategia técnica de esta segunda matriz es distinta a la primera. Aquí se construye una variable binaria unificada <span class="in">`Confidencialidad_Total`</span> que vale 1 para cualquier registro confidencial (independientemente de si tiene o no estado conocido), y se calcula su correlación con cada origen de reporte convertido en dummy. El resultado es un vector de correlaciones —no una matriz cuadrada completa— que muestra el grado de asociación entre cada institución específica y la probabilidad de que sus reportes sean confidenciales.</span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: correlacion-confidencialidad</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Selección de columnas necesarias</span></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>columnas_interes <span class="op">=</span> [<span class="st">'ORIGEN_REPORTE'</span>, <span class="st">'confidencial_con_estado'</span>, <span class="st">'confidencial_sin_estado'</span>]</span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>df_privacy <span class="op">=</span> df_export_general[columnas_interes].copy()</span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="co"># Si cualquiera de las dos es 1 (o True), la 'Confidencialidad_Total' será 1</span></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>df_privacy[<span class="st">'Confidencialidad_Total'</span>] <span class="op">=</span> (</span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_con_estado'</span>] <span class="op">==</span> <span class="dv">1</span>) <span class="op">|</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>    (df_privacy[<span class="st">'confidencial_sin_estado'</span>] <span class="op">==</span> <span class="dv">1</span>)</span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>).astype(<span class="bu">int</span>)</span>
 <span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a>Destaca que **Jalisco**, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.</span>
-<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resumen de correlaciones</span></span>
-<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más fuertes</span></span>
-<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
-<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sexo_Hombre vs. Sexo_Mujer <span class="pp">|</span> ≈ −0.988 <span class="pp">|</span> Exclusión mutua lógica <span class="pp">|</span></span>
-<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Comisión Local Jalisco vs. Confidencialidad <span class="pp">|</span> ≈ 0.183 <span class="pp">|</span> Alta probabilidad de censura <span class="pp">|</span></span>
-<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Edo. Méx. vs. Confidencialidad <span class="pp">|</span> ≈ −0.151 <span class="pp">|</span> Tendencia a la transparencia <span class="pp">|</span></span>
-<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Chihuahua vs. Confidencialidad <span class="pp">|</span> ≈ −0.108 <span class="pp">|</span> Tendencia a la transparencia <span class="pp">|</span></span>
-<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más débiles</span></span>
-<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
-<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Edad vs. Días de registro <span class="pp">|</span> ≈ −0.005 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
-<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sexo vs. Días de registro <span class="pp">|</span> ≈ 0.003 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
-<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Entidades vs. Días de registro <span class="pp">|</span> <span class="sc">\|</span>r<span class="sc">\|</span> &lt; 0.05 <span class="pp">|</span> Sin asociación lineal <span class="pp">|</span></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Convertimos el ORIGEN_REPORTE en variables Dummies</span></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a>origen_dummies <span class="op">=</span> pd.get_dummies(df_privacy[<span class="st">'ORIGEN_REPORTE'</span>], prefix<span class="op">=</span><span class="st">'Origen'</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Construimos el DataFrame de correlación final</span></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo nos interesa la variable unificada contra los orígenes</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>df_corr_final <span class="op">=</span> pd.concat([df_privacy[[<span class="st">'Confidencialidad_Total'</span>]], origen_dummies], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Calculamos la Matriz de Pearson</span></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a>matriz_privacidad <span class="op">=</span> df_corr_final.corr(method<span class="op">=</span><span class="st">'pearson'</span>)</span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Extraemos la correlación específica de la variable</span></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>analisis_origen <span class="op">=</span> (</span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a>    matriz_privacidad[[<span class="st">'Confidencialidad_Total'</span>]]</span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>    .drop(<span class="st">'Confidencialidad_Total'</span>)</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a>    .sort_values(by<span class="op">=</span><span class="st">'Confidencialidad_Total'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb8-137"><a href="#cb8-137" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-138"><a href="#cb8-138" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-heatmap-confidencialidad</span></span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Heatmap de Origen del Reporte vs. Confidencialidad"</span></span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Visualización</span></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>sns.heatmap(analisis_origen, annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>, fmt<span class="op">=</span><span class="st">".4f"</span>,</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>            cbar_kws<span class="op">=</span>{<span class="st">'label'</span>: <span class="st">'Coeficiente de Pearson (r)'</span>})</span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad"</span>, fontsize<span class="op">=</span><span class="dv">14</span>)</span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Fuente del Reporte (Origen)"</span>)</span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Grado de Correlación con Confidencialidad"</span>)</span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interpretación del heatmap de confidencialidad</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a>El heatmap presenta las instituciones ordenadas de mayor a menor correlación con la confidencialidad. La paleta de colores <span class="in">`viridis`</span> —que va de morado oscuro (valores negativos o bajos) a amarillo (valores positivos altos)— permite identificar visualmente los extremos sin necesidad de leer cada número.</span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a>Las instituciones con correlación positiva más alta encabezan la lista: la Comisión Local de Búsqueda del estado de Jalisco lidera con el índice más elevado. Este resultado es especialmente llamativo si se combina con el hallazgo del capítulo 4 donde Jalisco fue la entidad con mayor número de reportes totales. Que el estado con más desapariciones registradas sea también el que más información clasifica como confidencial añade una capa adicional de opacidad que limita seriamente el análisis sobre esa entidad.</span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a>Las instituciones con correlaciones negativas más fuertes —principalmente la Fiscalía General de Chihuahua y algunas procuradurías de estados del norte y centro del país— tienen una tendencia estadística opuesta: sus reportes son menos propensos a ser confidenciales que el promedio nacional. Esto podría interpretarse como una mayor transparencia institucional, o simplemente como diferencias en los protocolos y tiempos de clasificación de información entre entidades.</span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a>Es importante no sobre-interpretar las magnitudes absolutas de estos coeficientes. Los valores más altos rondan $|r| \approx 0.18$, lo que sigue siendo una correlación débil en términos estadísticos convencionales. Sin embargo, en este contexto la relevancia no está en la fuerza del coeficiente sino en su signo y en la consistencia del patrón: el hecho de que la confidencialidad no se distribuya aleatoriamente entre instituciones, sino que esté sistemáticamente asociada a ciertas fuentes específicas, es evidencia de que la reserva de información responde a lógicas institucionales particulares y no a un criterio uniforme aplicado a nivel nacional.</span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resumen de correlaciones</span></span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a>A continuación se presenta un resumen de los valores más significativos detectados en el análisis, clasificados por su interpretación.</span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más fuertes</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Clasificación <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-177"><a href="#cb8-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`Sexo_HOMBRE`</span> vs. <span class="in">`Sexo_MUJER`</span> <span class="pp">|</span> ≈ −0.988 <span class="pp">|</span> Técnica (exclusión mutua) <span class="pp">|</span> El alza de uno implica la disminución del otro por definición <span class="pp">|</span></span>
+<span id="cb8-178"><a href="#cb8-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Comisión Local Jalisco vs. Confidencialidad <span class="pp">|</span> ≈ +0.183 <span class="pp">|</span> Débil positiva <span class="pp">|</span> Alta probabilidad de clasificar información como confidencial <span class="pp">|</span></span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fiscalía Chihuahua vs. Confidencialidad <span class="pp">|</span> ≈ −0.151 <span class="pp">|</span> Débil negativa <span class="pp">|</span> Tendencia a la transparencia respecto al promedio nacional <span class="pp">|</span></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="fu">### Correlaciones más débiles</span></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Par de variables <span class="pp">|</span> $r$ <span class="pp">|</span> Interpretación <span class="pp">|</span></span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`Sexo_HOMBRE`</span> vs. <span class="in">`Edad`</span> <span class="pp">|</span> ≈ +0.21 <span class="pp">|</span> Relación débil positiva: hombres desaparecidos tienden a ser de mayor edad <span class="pp">|</span></span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`Sexo_MUJER`</span> vs. <span class="in">`Edad`</span> <span class="pp">|</span> ≈ −0.21 <span class="pp">|</span> Relación débil negativa: mujeres desaparecidas tienden a ser más jóvenes <span class="pp">|</span></span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`Edad`</span> vs. <span class="in">`Dias_Registro`</span> <span class="pp">|</span> ≈ −0.005 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`Sexo`</span> vs. <span class="in">`Dias_Registro`</span> <span class="pp">|</span> ≈ +0.003 <span class="pp">|</span> Independencia total <span class="pp">|</span></span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Entidades vs. <span class="in">`Dias_Registro`</span> <span class="pp">|</span> <span class="sc">\|</span>r<span class="sc">\|</span> &lt; 0.05 <span class="pp">|</span> Sin asociación lineal en la mayoría de los casos <span class="pp">|</span></span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>La ausencia de correlación entre el retraso de registro y las variables demográficas refuerza la conclusión de que el tiempo de captura es un fenómeno institucional, no demográfico: las demoras no están relacionadas con quién desapareció sino con cómo operan las instituciones que registran los casos. El análisis de concentración del capítulo 4 ya mostraba que esos retrasos extremos están en manos de unos pocos registros; la correlación por origen del reporte del presente capítulo sugiere que identificar cuáles fuentes generan esos outliers sería el paso natural en un análisis más profundo.</span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a>En conjunto, los dos análisis de correlación de este capítulo —el demográfico y el de confidencialidad— comparten una conclusión central: **las variables disponibles en el dataset no presentan relaciones lineales fuertes entre sí**, lo que limita el poder predictivo de cualquier modelo basado exclusivamente en esta información. La utilidad principal del dataset reside en su valor descriptivo y geoespacial, no en dependencias estadísticas entre variables.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
