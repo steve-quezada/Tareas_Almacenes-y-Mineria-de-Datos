@@ -2,7 +2,7 @@
 title: "Medidas Descriptivas y EDA"
 ---
 
-Este capítulo carga los datasets limpios generados en el capítulo anterior y calcula las medidas estadísticas descriptivas con sus visualizaciones correspondientes.
+Este capítulo carga los datasets limpios generados en el capítulo anterior y calcula las medidas estadísticas descriptivas con sus visualizaciones correspondientes. Al tener dos tablas con distinto formato y un objetivo distinto, se cambiará de tabla cuando la medida evaluada así lo requiera: `df_export_general` se usará cuando se necesite el mayor volumen posible de registros, y `df_export_temporal` cuando el análisis dependa de variables temporales consistentes y sin confidenciales.
 
 ```{python}
 #| label: setup-medidas
@@ -19,14 +19,21 @@ print(f"Dataset general: {total_registros:,} filas")
 print(f"Dataset temporal: {len(df_export_temporal):,} filas")
 ```
 
+La diferencia en el número de filas entre ambos datasets refleja exactamente el bloque de registros confidenciales: los ~49,000 registros excluidos del temporal son precisamente los que tienen todas sus variables sensibles reservadas y cuyas fechas no pueden interpretarse de forma confiable.
+
+---
+
 ## Medidas de localización
+
+Las medidas de localización buscan identificar los valores más representativos o centrales de cada variable. Para variables categóricas la medida relevante es la **moda** —el valor que aparece con mayor frecuencia—, mientras que para variables numéricas continuas como la edad se calculan la **media** y la **mediana**, que capturan el centro de la distribución desde perspectivas distintas y se complementan especialmente cuando hay valores atípicos.
 
 ### Moda
 
-Para las medidas de localización, extraemos los datos de `df_export_general` ya que cuenta con mayor cantidad de información.
+Al contar con mayor cantidad de información en `df_export_general`, extraeremos los datos directamente de esta tabla para las medidas de localización. Al hacer el proceso de extracción de los resultados más repetidos en cada una de las columnas, encontramos la moda de cada una de las entradas. Podemos notar que el sexo masculino es el más registrado en los reportes de desaparición, Jalisco es el estado en el que más reportes se generan junto con su procuraduría. Esto se debe a la alta presencia de grupos delictivos en la zona y los conflictos que son generados gracias a estos.
 
 ```{python}
 #| label: tabla-moda
+# Creamos un diccionario con los valores predominantes
 datos_moda = {
     "Variable": ["Sexo", "Entidad", "Estatus", "Origen del Reporte"],
     "Valor más frecuente": [
@@ -35,27 +42,31 @@ datos_moda = {
         df_export_general['ESTATUS_VICTIMA'].mode()[0],
         df_export_general['ORIGEN_REPORTE'].mode()[0]
     ],
-    "Ocurrencias": [
+    "Número de ocurrencias": [
         df_export_general['SEXO'].value_counts().max(),
         df_export_general['ENTIDAD'].value_counts().max(),
         df_export_general['ESTATUS_VICTIMA'].value_counts().max(),
         df_export_general['ORIGEN_REPORTE'].value_counts().max()
     ],
-    "% del total": [
-        f"{df_export_general['SEXO'].value_counts().max() / total_registros * 100:.1f}%",
-        f"{df_export_general['ENTIDAD'].value_counts().max() / total_registros * 100:.1f}%",
-        f"{df_export_general['ESTATUS_VICTIMA'].value_counts().max() / total_registros * 100:.1f}%",
-        f"{df_export_general['ORIGEN_REPORTE'].value_counts().max() / total_registros * 100:.1f}%"
+    "Porcentaje del total de ocurrencias": [
+        (df_export_general['SEXO'].value_counts().max() / total_registros) * 100,
+        (df_export_general['ENTIDAD'].value_counts().max() / total_registros) * 100,
+        (df_export_general['ESTATUS_VICTIMA'].value_counts().max() / total_registros) * 100,
+        (df_export_general['ORIGEN_REPORTE'].value_counts().max() / total_registros) * 100
     ]
 }
-pd.DataFrame(datos_moda)
+tabla_resumen = pd.DataFrame(datos_moda)
+print(tabla_resumen)
 ```
 
-El sexo masculino es el más registrado en los reportes. Jalisco lidera en entidad y su procuraduría en origen de reporte, lo cual se asocia a la alta presencia de grupos delictivos.
+La tabla anterior resume los valores modales de las variables categóricas más relevantes del dataset. Vale la pena destacar que la moda de `ESTATUS_VICTIMA` siendo `DESAPARECIDA` con un porcentaje tan alto refleja que el dataset ya viene filtrado por ese estatus —o bien que la variación en esta variable es mínima— lo cual limita su utilidad analítica independiente. La moda de `SEXO` (HOMBRE) y de `ENTIDAD` (JALISCO) anticipan dos de los hallazgos más relevantes del análisis: el predominio masculino en los registros y la concentración geográfica en ciertos estados.
+
+En las siguientes gráficas podemos observar las medidas más contundentes, ya que el porcentaje de hombres desaparecidos respecto al de mujeres es notable; además de la no tan remarcable diferencia entre las entidades federativas con más reportes, ya que las primeras tres presentan la misma problemática de altas tasas de delincuencia.
 
 ```{python}
 #| label: fig-pie-sexo
 #| fig-cap: "Distribución porcentual por sexo"
+import matplotlib.pyplot as plt
 plt.figure(figsize=(8, 8))
 df_export_general['SEXO'].value_counts().plot.pie(autopct='%1.1f%%', startangle=90, cmap='Pastel1')
 plt.title('Distribución Porcentual por Sexo')
@@ -63,9 +74,12 @@ plt.ylabel('')
 plt.show()
 ```
 
+La gráfica de pastel incluye la categoría `CONFIDENCIAL` como un segmento propio, lo cual es importante para la interpretación: el porcentaje visible de hombres y mujeres está calculado sobre el total de registros incluyendo los confidenciales. Esto significa que las proporciones reales entre sexos —calculadas solo sobre los registros con sexo conocido— son considerablemente más altas que los porcentajes que muestra la gráfica. Esta distinción se aborda con mayor precisión en el capítulo 7 de hallazgos.
+
 ```{python}
 #| label: fig-barras-entidades
 #| fig-cap: "Top 5 entidades con más reportes"
+import seaborn as sns
 plt.figure(figsize=(10, 6))
 sns.countplot(data=df_export_general, y='ENTIDAD',
               order=df_export_general['ENTIDAD'].value_counts().index[:5],
@@ -74,185 +88,301 @@ plt.title('Top 5 Entidades con más reportes')
 plt.show()
 ```
 
+La gráfica de barras muestra que Jalisco, Estado de México y Tamaulipas concentran una proporción desproporcionada de los reportes a nivel nacional. Sin embargo, este dato debe interpretarse con cautela: una mayor cantidad de reportes no implica necesariamente mayor incidencia real de desapariciones, sino que puede reflejar también diferencias en la capacidad institucional de registro, en los criterios de captura o en la proporción de casos confidenciales por entidad. El análisis de heterogeneidad en la sección siguiente abordará si esa concentración es estadísticamente notable o si las desapariciones se distribuyen de forma más uniforme en el territorio nacional.
+
+---
+
 ### Media y Mediana
 
-Para evitar sesgos por registros confidenciales, cambiamos a `df_export_temporal` para análisis con fechas.
+Al contar con registros fuertemente relacionados al tiempo y necesitar el menor sesgo posible que pueda afectar a nuestros resultados, cambiamos a la tabla `df_export_temporal`. Podemos extraer información relevante de las fechas de nacimiento, como las edades de las personas al momento de su desaparición o el tiempo que transcurrió entre la fecha de la desaparición y la fecha de creación del reporte.
+
+La edad al momento de la desaparición es la resta entre la fecha de desaparición y la fecha de nacimiento. Se hace un pequeño filtrado con únicamente las entradas de fechas válidas, permitiendo eliminar el sesgo de los registros generales sin perder la consistencia. El filtro excluye edades negativas (que corresponden a inconsistencias de captura donde la fecha de nacimiento es posterior a la de desaparición) y edades mayores a 110 años (límite razonable para filtrar valores extremos no plausibles biológicamente).
 
 ```{python}
 #| label: media-mediana
+# Convertimos a datetime solo para el cálculo
 fecha_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')
 fecha_nacimiento_temp = pd.to_datetime(df_export_temporal['FECHA_NACIMIENTO'], errors='coerce')
 
-edades = fecha_desaparicion_temp.dt.year - fecha_nacimiento_temp.dt.year
+edades = (
+    fecha_desaparicion_temp.dt.year -
+    fecha_nacimiento_temp.dt.year
+)
+
+# Filtramos valores nulos (NaT) que pudieron surgir de la conversión y edades irreales
+# Nota: Este valor será usado numerosas veces en las siguientes medidas.
 edades_validas = edades.dropna()
 edades_validas = edades_validas[(edades_validas >= 0) & (edades_validas <= 110)]
 
+# Medidas de Localización
 media_e = edades_validas.mean()
 mediana_e = edades_validas.median()
 
 print(f"--- Edades al desaparecer ---")
-print(f"Promedio: {media_e:.2f} años")
-print(f"Mediana: {mediana_e:.2f} años")
+print(f"Promedio de edades: {media_e:.2f} años")
+print(f"Mediana de edades: {mediana_e:.2f} años")
 
 f_registro_temp = pd.to_datetime(df_export_temporal['FECHA_REGISTRO'], errors='coerce')
 f_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')
+
+# Calculamos la diferencia de días en una variable aparte
 dias_diferencia = (f_registro_temp - f_desaparicion_temp).dt.days
+
+# Filtramos valores nulos (NaT) que pudieron surgir de la conversión y diferencias negativas
 dias_validos = dias_diferencia[dias_diferencia >= 0].dropna()
 
+# Medidas de Localización
 media_tramite = dias_validos.mean()
 mediana_tramite = dias_validos.median()
 
-print(f"\n--- Días entre desaparición y registro ---")
-print(f"Promedio: {media_tramite:.2f} días")
-print(f"Mediana: {mediana_tramite:.0f} días")
+print(f"Días transcurridos entre la desaparición y el registro:")
+print(f"Promedio de días: {media_tramite:.2f}")
+print(f"Mediana de días: {mediana_tramite}")
 ```
 
-La mediana de 0 días indica que la mitad de los registros se realizaron el mismo día. La media elevada refleja el impacto de valores atípicos con tiempos de espera de meses o años.
+No encontramos mucha diferencia entre el promedio de edad entre las personas y su mediana, ya que indican que la edad media de las personas desaparecidas es de un poco más de 30 años. Pero el resultado más interesante es el que podemos observar entre el promedio y la mediana entre el tiempo de desaparición y de registro: una gran cantidad de datos (la mitad inferior, por definición de la mediana) indica que el registro se hizo el mismo día que la desaparición, pero la media indica que en algunos casos la espera fue bastante considerable, siendo estos valores atípicos los que afectaron nuestros resultados.
+
+Esta brecha entre media y mediana en los días de retraso es estadísticamente relevante: la mediana de 0 días representa el comportamiento típico del sistema (la mayoría de los casos se registran de forma inmediata), mientras que la media elevada refleja la influencia de un subconjunto pequeño pero extremo de casos con retrasos de meses o años. Esto anticipa directamente el hallazgo del índice de concentración R que se calcula en la sección de medidas de concentración.
+
+La gráfica a continuación muestra el número de días entre el registro y la desaparición. Es claro que hay una mayor cantidad de personas que fueron registradas el mismo día por los vacíos entre las barras, pero hay algunos registros con tiempos de espera superiores a varios años. Se incluyen gráficos adicionales con el número de meses y años para poder apreciar mejor el rango entre las fechas.
 
 ```{python}
 #| label: fig-tiempo-registro
-#| fig-cap: "Tiempo de registro en distintas escalas"
+#| fig-cap: "Tiempo de registro en tres escalas: días, meses y años"
+# Preparación de datos en las tres escalas
 y_dias = dias_validos.values
 y_meses = y_dias / 30
+y_años = y_dias / 365
 x_casos = np.arange(len(y_dias))
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+# --- 1. GRÁFICA EN DÍAS
+plt.figure(figsize=(12, 5))
+plt.vlines(x_casos, ymin=0, ymax=y_dias, color='skyblue', alpha=0.3, label='Días por caso')
 
-# Escala de días
-axes[0].vlines(x_casos, ymin=0, ymax=y_dias, color='skyblue', alpha=0.3)
-axes[0].axhline(y_dias.mean(), color="red", linestyle="--", linewidth=2, label=f"Media = {y_dias.mean():.1f} días")
-axes[0].axhline(np.median(y_dias), color="darkorange", linestyle="-", linewidth=2, label=f"Mediana = {np.median(y_dias):.0f} días")
-axes[0].set_ylim(-2, 200)
-axes[0].set_title("Escala de Días")
-axes[0].set_xlabel("Índice del registro")
-axes[0].set_ylabel("Días de diferencia")
-axes[0].legend()
-axes[0].grid(axis='y', alpha=0.2)
+media = y_dias.mean()
+mediana = np.median(y_dias)
 
-# Escala de meses
-axes[1].vlines(x_casos, ymin=0, ymax=y_meses, color='lightgreen', alpha=0.3)
-axes[1].set_title("Escala de Meses")
-axes[1].set_xlabel("Índice del registro")
-axes[1].set_ylabel("Meses de diferencia")
-axes[1].grid(axis='y', alpha=0.2)
+plt.axhline(media, color="red", linestyle="--", linewidth=2.5,
+            label=f"Media = {media:.2f} días")
+plt.axhline(mediana, color="darkorange", linestyle="-", linewidth=2.5,
+            label=f"Mediana = {mediana:.1f} días")
 
+plt.ylim(-2, 200)  # Límite conservado para resaltar el comportamiento base
+plt.title("Tiempo de Registro: Escala de Días")
+plt.xlabel("Índice del registro")
+plt.ylabel("Días de diferencia")
+plt.legend(loc='upper right')
+plt.grid(axis='y', alpha=0.2)
+plt.tight_layout()
+plt.show()
+
+# --- 2. GRÁFICA EN MESES
+plt.figure(figsize=(12, 5))
+plt.vlines(x_casos, ymin=0, ymax=y_meses, color='lightgreen', alpha=0.3)
+plt.title("Tiempo de Registro: Escala de Meses (Visualización de Magnitud)")
+plt.xlabel("Índice del registro")
+plt.ylabel("Meses de diferencia")
+plt.grid(axis='y', alpha=0.2)
+plt.tight_layout()
+plt.show()
+
+# --- 3. GRÁFICA EN AÑOS
+plt.figure(figsize=(12, 5))
+plt.vlines(x_casos, ymin=0, ymax=y_años, color='salmon', alpha=0.3)
+plt.title("Tiempo de Registro: Escala de Años (Casos de Larga Data)")
+plt.xlabel("Índice del registro")
+plt.ylabel("Años de diferencia")
+plt.grid(axis='y', alpha=0.2)
 plt.tight_layout()
 plt.show()
 ```
 
+Las tres escalas sirven propósitos distintos. La escala de días (con el eje truncado en 200) permite ver la distribución típica y la posición relativa de media y mediana. La escala de meses revela la magnitud real de los casos extremos que quedarían invisibles en la primera gráfica. La escala de años permite identificar los registros de "larga data": casos que tardaron varios años en ser ingresados al sistema, cuya existencia podría deberse tanto a demoras institucionales reales como a errores de captura, de ahí la precaución señalada en las validaciones del capítulo 3.
+
+---
+
 ## Medidas de variabilidad
+
+Las medidas de variabilidad describen qué tan dispersos están los datos alrededor de su centro. Mientras que la media y la mediana nos dicen dónde se concentra la distribución, el rango, el IQR, la varianza y la desviación estándar nos dicen cuánta variabilidad existe y si esa variabilidad está distribuida uniformemente o concentrada en los extremos.
 
 ### Rango, IQR, Varianza y Desviación Estándar
 
+En estas mediciones continuaremos lo propuesto en la sección anterior sobre la edad de las personas desaparecidas. En este caso se salteará el análisis de los días de diferencia en registro, ya que la diferencia es lo suficientemente alta como para hacer su análisis completamente impreciso. El rango es la diferencia entre el valor mínimo y el valor máximo; como observamos en las operaciones anteriores, encontramos una gran cantidad de valores atípicos que alteran el comportamiento de diversas medidas, incluyendo el rango. El IQR, en cambio, nos dará información más relevante respecto a la concentración de información: los valores centrales de los registros de edad.
+
 ```{python}
-#| label: variabilidad
+#| label: variabilidad-rango-iqr
 rango_e = edades_validas.max() - edades_validas.min()
 q75, q25 = np.percentile(edades_validas, [75, 25])
 iqr_e = q75 - q25
-varianza_e = edades_validas.var()
-std_e = edades_validas.std()
 
-print(f"--- Variabilidad de Edades ---")
-print(f"Rango: {rango_e:.0f} años")
-print(f"IQR: {iqr_e:.0f} años (Q25={q25:.0f}, Q75={q75:.0f})")
-print(f"Varianza: {varianza_e:.2f}")
-print(f"Desviación Estándar: {std_e:.2f} años")
-```
-
-```{python}
-#| label: fig-boxplot
-#| fig-cap: "Boxplot de edades al desaparecer"
+print(f"--- Análisis de Variabilidad (Rango e IQR) ---")
+print(f"Rango: {rango_e:.2f} años")
+print(f"IQR: {iqr_e:.2f} años")
 plt.figure(figsize=(8, 6))
+
+# Creamos el boxplot
 sns.boxplot(y=edades_validas, color="skyblue", width=0.4)
-plt.plot(0, media_e, marker='o', color='red', label=f'Media: {media_e:.1f}')
+
+# Añadimos detalles estéticos y títulos
 plt.title("Boxplot de Edades al Desaparecer (Dataset Temporal)")
 plt.ylabel("Edad (Años)")
 plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+# Marcamos la media
+plt.plot(0, edades_validas.mean(), marker='o', color='red', label=f'Media: {edades_validas.mean():.1f}')
+
 plt.legend()
 plt.tight_layout()
 plt.show()
 ```
 
-La concentración entre 20 y 40 años confirma que las desapariciones afectan principalmente a adultos jóvenes.
+Lo anterior es un boxplot. Sabiendo el valor de IQR podemos dar un espacio en el cual se puede apreciar la concentración de nuestros registros, además de la detección de valores atípicos con los conocidos *whiskers* inferiores y superiores que son calculados mediante el IQR. Podemos observar la tendencia de edad en personas desaparecidas: rangos de edad entre 20 y 40 años, lo cual nos guía hacia un grupo de personas en su mayoría del género masculino —por lo visto en las mediciones anteriores— que en su mayoría son adultos. Pero antes de poder sacar conclusiones, es necesario revisar otras mediciones importantes como la varianza y la desviación estándar, las cuales presentan la consistencia de información extraída en las edades.
+
+De una manera un tanto coloquial, la desviación estándar nos indicará en qué rango caen la mayoría de edades de gente desaparecida; mientras más grande sea la desviación, más grupos de edades se ven afectados por las desapariciones.
+
+En el boxplot, la caja central representa el IQR (del percentil 25 al 75), la línea dentro de la caja es la mediana, el punto rojo es la media, y los whiskers se extienden hasta 1.5 veces el IQR. Los puntos fuera de los whiskers son los valores atípicos. Que la media (punto rojo) esté por encima de la mediana (línea) confirma la asimetría positiva de la distribución: hay más casos con edades elevadas jalando el promedio hacia arriba que casos con edades muy bajas.
 
 ```{python}
-#| label: fig-dispersion-edades
-#| fig-cap: "Dispersión de edades con desviación estándar"
+#| label: variabilidad-varianza-std
+varianza_e = edades_validas.var()
+std_e = edades_validas.std()
+print(f"Varianza: {varianza_e:.2f}")
+print(f"Desviación Estándar (σ): {std_e:.2f}")
 plt.figure(figsize=(10, 6))
+
+# Dibujamos la distribución (KDE es la línea de densidad)
 sns.histplot(edades_validas, kde=True, color="skyblue", stat="density", alpha=0.4)
+
+# Dibujamos la Media como eje central
 plt.axvline(media_e, color="red", linestyle="--", linewidth=2, label=f"Media ({media_e:.1f})")
+
+# Dibujamos las áreas de Desviación Estándar (±1 sigma)
 plt.axvspan(media_e - std_e, media_e + std_e, color='gray', alpha=0.15,
-            label=f"±1σ ({std_e:.1f} años)")
-plt.title("Dispersión de Edades al Desaparecer")
-plt.xlabel("Edad")
-plt.ylabel("Densidad")
+            label=f"1 Desviación Estándar (±{std_e:.1f} años)")
+
+plt.title("Visualización de la Variabilidad: Dispersión de Edades")
+plt.xlabel("Edad al momento de la desaparición")
+plt.ylabel("Densidad de Casos")
 plt.legend()
 plt.grid(axis='y', alpha=0.2)
 plt.show()
 ```
 
-### Verificación de limpieza: comparativa General vs Temporal
+Después de calcular la varianza y la desviación, presentamos esta gráfica que arroja conclusiones mucho más sólidas al respecto del grupo de edades. Es claro ahora que en su mayoría las personas desaparecidas son mayores de edad. Pero también esta gráfica nos permite "agrandar" un poco este grupo y llegar a una conclusión mucho más contundente: **las desapariciones afectan fuertemente a los adultos jóvenes y los adolescentes**. Volviendo a las observaciones hechas en anteriores mediciones como los estados y sexo con más desapariciones, es muy probable que esto se deba a la delincuencia organizada; personas en rango de ser fuerza laboral se ven forzadas a unirse a estos grupos delictivos y sufrir las consecuencias que esto conlleva. Esta es una conclusión bastante aventurada, ya que sería necesaria una investigación más a fondo de la situación económica en estos lugares.
+
+La región sombreada en gris cubre exactamente un sigma por encima y por debajo de la media, lo que en una distribución normal capturaría el 68% de los datos. En este caso, la asimetría de la distribución hace que esa región no sea perfectamente simétrica alrededor del pico del histograma, lo que visualmente confirma que la media no es la mejor representación del "caso típico" —de nuevo, la mediana es más informativa.
+
+---
+
+### Un pequeño agregado: Verificación de Limpieza
+
+Esto es un pequeño agregado, ya que se consideró insuficiente solo el análisis de edad en el rubro anterior, así que aquí presentamos algo bastante interesante para nuestro trabajo: **hemos hecho correctamente nuestro proceso de limpieza**. Si recordamos, la tabla con los registros generales contiene mucha más información que la temporal, pero en numerosas ocasiones se expresó la preocupación de tener información sesgada al no poseer consistencia en las fechas; mientras que en la tabla de registros temporal tenemos muchos menos registros, pero garantizamos un mejor proceso de limpieza con las edades.
+
+¿Cómo podríamos representar el cambio entre ambas tablas? A continuación tenemos la respuesta. Recordemos que el IQR y los boxplots, además de la desviación estándar, ofrecen una manera de medir la consistencia de los registros. Claramente podemos ver la diferencia entre la tabla general y temporal al tener muchos más valores atípicos en la primera, además de valores de varianza y desviación estándar mucho más disparados que apuntan a sectores de edad mucho más grandes de forma inconsistente. Por el contrario, la tabla temporal presenta unos whiskers ligeramente más centralizados que tienen mayor capacidad de detectar valores atípicos (un ejemplo lo tenemos con la nula presencia de valores negativos) y una desviación más pequeña que focaliza mejor la información. La diferencia puede observarse en los boxplots generados.
 
 ```{python}
 #| label: fig-comparativa-boxplots
-#| fig-cap: "Comparativa de boxplots: Dataset General vs Temporal"
+#| fig-cap: "Comparativa de variabilidad: Dataset General vs. Dataset Temporal"
+# Calculamos edad en el General (información sesgada)
 f_nac_gen = pd.to_datetime(df_export_general['FECHA_NACIMIENTO_LIMPIA'], errors='coerce')
 f_des_gen = pd.to_datetime(df_export_general['FECHA_DESAPARICION_LIMPIA'], errors='coerce')
 edades_general = (f_des_gen.dt.year - f_nac_gen.dt.year).dropna()
 
-def analizar_variabilidad(datos, nombre):
+# 'edades_validas' ya la tenemos del proceso anterior (Dataset Temporal Limpio)
+
+def analizar_variabilidad_edad(datos, nombre):
     rango = datos.max() - datos.min()
     iqr = np.percentile(datos, 75) - np.percentile(datos, 25)
-    print(f"--- {nombre} ---")
-    print(f"  Rango: {rango:.0f} | IQR: {iqr:.0f} | σ: {datos.std():.2f} | Var: {datos.var():.2f}")
+    varianza = datos.var()
+    desviacion = datos.std()
 
-analizar_variabilidad(edades_general, "Dataset General")
-analizar_variabilidad(edades_validas, "Dataset Temporal")
+    print(f"--- Medidas de Variabilidad: {nombre} ---")
+    print(f"Rango: {rango:.2f} años")
+    print(f"IQR (Rango Intercuartílico): {iqr:.2f} años")
+    print(f"Varianza: {varianza:.2f}")
+    print(f"Desviación Estándar (σ): {desviacion:.2f}")
+    print("-" * 35)
 
+# Ejecutar comparativa
+analizar_variabilidad_edad(edades_general, "Edad (Dataset General)")
+analizar_variabilidad_edad(edades_validas, "Edad (Dataset Temporal)")
+
+# Visualización Comparativa con Boxplots
 fig, axes = plt.subplots(1, 2, figsize=(15, 6), sharey=True)
+
+# Boxplot General
 sns.boxplot(y=edades_general, ax=axes[0], color="lightgray")
-axes[0].set_title("Dataset General\n(Sin filtros de consistencia)")
+axes[0].set_title("Variabilidad Edad: Dataset General\n(Sin filtros de consistencia)")
 axes[0].set_ylabel("Años")
 
+# Boxplot Temporal
 sns.boxplot(y=edades_validas, ax=axes[1], color="skyblue")
-axes[1].set_title("Dataset Temporal\n(Datos limpios/válidos)")
+axes[1].set_title("Variabilidad Edad: Dataset Temporal\n(Datos Limpios/Válidos)")
 axes[1].set_ylabel("")
 
 plt.tight_layout()
 plt.show()
 ```
 
-La comparativa confirma que la limpieza redujo los valores atípicos y centralizó mejor los whiskers, eliminando edades negativas y focalizando la información.
+La comparación numérica entre las dos tablas es contundente. El rango del dataset general es mayor porque incluye edades negativas (error de captura) y edades extremadamente altas provenientes de fechas de nacimiento inválidas que se convirtieron a valores numéricos fuera de rango. El IQR del temporal es más pequeño y más preciso, lo que confirma que el dataset temporal identifica mejor los outliers reales. La diferencia en desviación estándar entre ambos datasets cuantifica directamente el efecto de la limpieza: una desviación más pequeña en el temporal significa que los datos están más concentrados alrededor de la media, no porque haya menos variabilidad real en las edades, sino porque se eliminaron los ruidos de captura que inflaban artificialmente esa dispersión.
+
+---
 
 ## Medidas de heterogeneidad
 
-### Índice de Gini e Índice de Entropía de Shannon
+Las medidas de heterogeneidad permiten cuantificar cuán diversa o uniforme es la distribución de los datos entre las categorías de una variable. A diferencia de la moda —que solo indica cuál categoría domina— estas medidas capturan la estructura completa de la distribución y responden a preguntas como: ¿están los registros concentrados en unos pocos estados o distribuidos uniformemente en todo el país?
 
-Se analiza la proporción de reportes por entidad para determinar si las desapariciones son un problema generalizado o concentrado en pocos estados.
+Ahora se analizará con más detalle la proporción de reportes de desaparición por cada uno de los estados de la república para llegar a conclusiones importantes respecto a la proporción de los casos: ya sea que es una problemática generalizada en toda la república mexicana o solo es una preocupación que afecta a un solo grupo de estados.
+
+Se podría dar el caso de aplicar estas medidas a los grupos de género y edad al momento de desaparecer, pero ambas proporciones fueron extensamente evaluadas en las mediciones anteriores. Además, las gráficas de proporción de género presentadas en las primeras secciones nos dan una idea concreta respecto a la distribución por edades, siendo ahora necesario ahondar en una sección no tan explorada con anterioridad.
+
+Pasaremos a la tabla `df_export_general` para hacer nuestras evaluaciones, ya que en esta ocasión requerimos de un panorama más general de la información.
+
+### Índice de Impureza de Gini e Índice de Entropía de Shannon
+
+Las siguientes medidas calculan la misma proporción pero de diferentes formas. Ambas emplean la misma escala para indicar la información de interés: valores cercanos a 0 indican una alta concentración de los datos, mientras que valores cercanos a 1 indican una distribución uniforme de cada uno de los registros. Al aplicar esto a los estados de la república, podremos observar si la cantidad de registros de desapariciones es una problemática generalizada en todo el país o solo un caso grave para unos cuantos estados.
+
+La diferencia entre ambas mediciones radica en la definición y metodología: mientras que el índice de Gini mide **diversidad** (qué tan probable es que dos registros elegidos al azar pertenezcan a categorías distintas), el índice de entropía mide **incertidumbre** —en este caso, el nivel de incertidumbre que se tiene al extraer un registro cualquiera y que este pertenezca a una categoría u otra.
 
 ```{python}
 #| label: heterogeneidad
-def calcular_indices(serie):
+def calcular_indices_completos(serie):
+    # 1. Proporciones
     proporciones = serie.value_counts(normalize=True)
     p = proporciones[proporciones > 0]
     n = len(p)
-    gini = 1 - np.sum(p**2)
+
+    # 2. Gini
+    gini = 1 - np.sum(proporciones**2)
+
+    # 3. Entropía de Shannon (H)
     h_shannon = -np.sum(p * np.log2(p))
+
+    # 4. Entropía Normalizada (J' - Equidad de Pielou)
     h_max = np.log2(n)
-    h_norm = h_shannon / h_max if n > 1 else 0
-    return gini, h_shannon, h_norm, n, proporciones
+    h_normalizada = h_shannon / h_max if n > 1 else 0
 
-entidades_limpias = df_export_general[df_export_general['ENTIDAD'] != 'SE DESCONOCE']['ENTIDAD']
-gini, h_sha, h_norm, n_cat, dist_e = calcular_indices(entidades_limpias)
+    return gini, h_shannon, h_normalizada, n, proporciones
 
-print(f"--- Heterogeneidad por Entidad ---")
-print(f"Categorías: {n_cat}")
-print(f"Índice de Gini: {gini:.4f}")
-print(f"Entropía de Shannon (H): {h_sha:.4f}")
-print(f"Equidad de Pielou (J'): {h_norm:.4f}")
+entidades_limpias_gen = df_export_general[df_export_general['ENTIDAD'] != 'SE DESCONOCE']['ENTIDAD']
+
+# Ejecutar
+gini_e, h_sha_e, h_norm_e, n_e, dist_e = calcular_indices_completos(entidades_limpias_gen)
+
+print(f"--- Análisis de Heterogeneidad: ENTIDAD ---")
+print(f"Número de categorías detectadas: {n_e}")
+print(f"Índice de Gini: {gini_e:.4f}")
+print(f"Entropía de Shannon (H): {h_sha_e:.4f}")
+print(f"Entropía Normalizada (J'): {h_norm_e:.4f} (Equidad de Pielou)")
 ```
 
-Ambos índices cercanos a 1 confirman una distribución **ampliamente generalizada** de los reportes en todo el país, aunque con picos marcados en ciertos estados.
+Para comparar directamente tanto Gini como Shannon debemos normalizar la entropía. Recordemos que la entropía máxima de N distribuciones es el logaritmo base 2 de N. Por lo que, para transformar la entropía en una escala de 0 a 1, debemos dividir la entropía resultante por la máxima. Esto es una medida adicional conocida como la **equidad de Pielou**.
+
+Aquí observamos información reveladora para esta investigación. Tanto el índice de Gini como el de entropía son muy altos y cercanos al valor de 1 que indica diversidad máxima. Esto nos indica que es un problema generalizado en todo el país al tener una distribución un tanto uniforme de los reportes.
+
+Esto se visualiza mejor al revisar la entropía por cada uno de los estados. En el siguiente gráfico podemos apreciar la probabilidad de que un registro cualquiera pertenezca a cada una de las entidades. Se aplica una línea llamada **Distribución Uniforme Teórica** que señaliza la ubicación de las barras si tuviéramos una escala de entropía máxima.
+
+Con esto podemos hacer una conclusión mucho más acertada de este fenómeno: **las desapariciones son una problemática que asola de manera generalizada a todos los estados de la república, pero es una problemática aún más grave para un grupo específico de estados**. Esto sirve como base y complemento contundente para las conclusiones hechas en secciones anteriores.
 
 ```{python}
 #| label: fig-entropia
@@ -267,54 +397,104 @@ plt.tight_layout()
 plt.show()
 ```
 
+La línea punteada negra representa la distribución perfectamente uniforme: si todos los estados tuvieran exactamente el mismo número de reportes, cada barra estaría en ese nivel. Las barras que sobresalen significativamente por encima de la línea son las entidades con sobre-representación de reportes respecto a lo esperado en un escenario de igualdad perfecta. Las que quedan por debajo corresponden a estados con relativamente pocos reportes. La distancia entre las barras más altas y la línea teórica es la "huella" de la concentración geográfica que ya anticipaba la gráfica de las top 5 entidades.
+
+---
+
 ## Medidas de concentración
+
+En esta sección volveremos a analizar el número de días de diferencia entre la desaparición y el registro de dicha desaparición, que ahora denominaremos como **retraso**. Esto con el objetivo de conocer si la presencia de valores atípicos realmente está afectando las posibles conclusiones extraídas de estos días de retraso.
 
 ### Índice de Concentración (R) y Curva de Lorenz
 
-Se analiza la concentración de días de retraso entre desaparición y registro.
+La siguiente medición es una herramienta poderosa, ya que su principal función es indicar si unos pocos individuos (en este caso, los registros de desaparición) concentran la mayor cantidad de resultados (número de días de retraso). Esto para determinar si existe un sesgo en nuestra información, ya que puede ser posible que generalmente las desapariciones sean registradas de manera inmediata, pero existan unos pocos casos los cuales se registran mucho después, logrando cambiar la percepción de eficiencia en los procesos de registro.
+
+Para usar el índice de concentración debemos definir el índice de acumulación de registros y el índice de acumulación de resultados, que tienen asignadas las nomenclaturas **Fi** y **Qi** respectivamente, las cuales representan el porcentaje de la información acumulada al momento.
+
+El índice de concentración **R** sería la suma de las diferencias de cada uno de los porcentajes por cada registro realizado, dándose un resultado entre la escala de 0 y 1 que indica el nivel de concentración (0 siendo una concentración mínima con resultados equilibrados por cada registro, mientras que 1 representa una concentración máxima donde unos pocos resultados acumulan la mayoría de resultados).
 
 ```{python}
 #| label: concentracion
 def calcular_indice_concentracion(datos):
+    # 1. Ordenar datos de menor a mayor
     x = np.sort(datos)
     N = len(x)
+
+    # 2. Calcular Fi (Proporción acumulada de unidades)
+    # i / N para i desde 1 hasta N
     i = np.arange(1, N + 1)
     fi = i / N
+
+    # 3. Calcular Qi (Proporción acumulada de la característica)
+    # Suma acumulada de x / Suma total (N * media)
     qi = np.cumsum(x) / np.sum(x)
+
+    # 4. Calcular R (Índice de concentración)
+    # Solo sumamos hasta N-1
     numerador = np.sum(fi[:-1] - qi[:-1])
     denominador = np.sum(fi[:-1])
     R = numerador / denominador
+
     return R, fi, qi
 
+# Aplicamos a los días de diferencia.
 r_valor, fi_vals, qi_vals = calcular_indice_concentracion(dias_validos)
 
 print(f"--- Índice de Concentración (R) ---")
-print(f"R = {r_valor:.4f}")
-print(f"\nInterpretación: concentración extremadamente alta.")
-print(f"Una fracción mínima de los registros acumula la mayor parte del tiempo de retraso.")
+print(f"Valor de R: {r_valor:.4f}")
 ```
+
+Del resultado anterior podemos observar una concentración de 0.9955, una concentración extremadamente alta que indica que unos pocos casos conservan el mayor número de resultados. Esto aplicado a nuestro dataframe indica que unos pocos registros llevan la mayor cantidad de retrasos concentrada. Mientras que la mayoría de los reportes son realizados el mismo día, los reportes con mayor tiempo de retraso sesgan nuestra información y por tanto, pueden llevar a conclusiones incorrectas.
+
+Un valor de R = 0.9955 significa que el 99.55% del área bajo la curva de Lorenz está "desplazada" respecto a la línea de equidad perfecta. En términos prácticos: si el tiempo de retraso estuviera distribuido uniformemente, la curva coincidiría con la diagonal. El hecho de que casi no coincida indica una distribución extremadamente desigual: una fracción mínima de los registros acumula prácticamente todo el tiempo de retraso del sistema. Esto corrobora que la media de días de retraso calculada en la sección anterior es un estadístico engañoso: representa la realidad de unos pocos casos extremos, no del comportamiento típico del sistema.
+
+Esto es más claro de observar en la siguiente **curva de Lorenz**. La distancia entre la línea de equidad perfecta con la proporción de días de retraso acumulados (lo que demarca la curva rosa) demuestra el enorme sesgo que existe entre estos registros. Es decir, un porcentaje muy pequeño de los reportes acumula la mayor cantidad de días de retraso.
 
 ```{python}
 #| label: fig-lorenz
-#| fig-cap: "Curva de Lorenz para días de retraso"
+#| fig-cap: "Curva de Lorenz para días de retraso entre desaparición y registro"
+# 1. Preparación de los datos (Variable: días de diferencia)
 datos_ordenados = np.sort(dias_validos.values)
 n = len(datos_ordenados)
-fi = np.insert(np.arange(1, n + 1) / n, 0, 0)
-qi = np.insert(np.cumsum(datos_ordenados) / np.sum(datos_ordenados), 0, 0)
 
+# Fi: Proporción acumulada de casos (eje X)
+fi = np.arange(1, n + 1) / n
+
+# Qi: Proporción acumulada de la característica (eje Y)
+qi = np.cumsum(datos_ordenados) / np.sum(datos_ordenados)
+
+fi = np.insert(fi, 0, 0)
+qi = np.insert(qi, 0, 0)
+
+# Graficación
 plt.figure(figsize=(9, 9))
-plt.plot([0, 1], [0, 1], color='black', linestyle='--', linewidth=1.5, label='Equidad Perfecta')
-plt.plot(fi, qi, color='#D81B60', linewidth=3, label=f'Curva de Lorenz (R = {r_valor:.4f})')
+
+# Línea de Equidad Perfecta (R = 0)
+plt.plot([0, 1], [0, 1], color='black', linestyle='--', linewidth=1.5,
+         label='Equidad Perfecta (Distribución Uniforme)')
+
+# Curva de Lorenz
+plt.plot(fi, qi, color='#D81B60', linewidth=3,
+         label=f'Curva de Lorenz (R = {r_valor:.4f})')
+
+# Sombreado del área de concentración
 plt.fill_between(fi, fi, qi, color='#D81B60', alpha=0.15)
-plt.title("Curva de Lorenz: Concentración de Tiempos de Registro", fontsize=14)
-plt.xlabel("Proporción acumulada de casos (Fi)")
-plt.ylabel("Proporción acumulada de días de retraso (Qi)")
+
+# Ajustes estéticos
+plt.title("Curva de Lorenz: Concentración de Tiempos de Registro", fontsize=14, pad=20)
+plt.xlabel("Proporción acumulada de casos (Fi)", fontsize=12)
+plt.ylabel("Proporción acumulada de días de retraso (Qi)", fontsize=12)
 plt.grid(True, linestyle=':', alpha=0.6)
 plt.legend(loc='upper left')
-plt.annotate(f'Área de Concentración\nR = {r_valor:.4f}', xy=(0.6, 0.3),
+
+# Anotación técnica
+plt.annotate(f'Área de Concentración\nÍndice R = {r_valor:.4f}', xy=(0.6, 0.3),
              xytext=(0.7, 0.15), arrowprops=dict(arrowstyle='->', color='black'))
+
 plt.tight_layout()
 plt.show()
 ```
 
-La enorme distancia entre la curva y la línea de equidad perfecta confirma que un porcentaje muy pequeño de los reportes acumula la gran mayoría de los días de retraso totales.
+La curva de Lorenz se interpreta leyendo la distancia vertical entre la diagonal (equidad perfecta) y la curva rosa en cualquier punto del eje X. Por ejemplo, en el punto Fi = 0.8 (es decir, el 80% de los registros con menor retraso), el valor de Qi está casi en 0: eso significa que ese 80% de los registros apenas acumula una fracción ínfima del total de días de retraso. El restante 20% de registros —los de mayor retraso— concentra prácticamente todo el tiempo de espera del sistema. El área sombreada entre la diagonal y la curva es proporcional al índice R: cuanto más grande es esa área, mayor es la concentración. En este caso, el área es enorme, lo que confirma visualmente el valor R = 0.9955 calculado numéricamente.
+
+Este hallazgo tiene implicaciones directas para el análisis institucional: el problema no es que el sistema de registro sea lento en general, sino que existe un subconjunto específico de casos que experimentan retrasos extremos. Identificar qué instituciones o circunstancias producen esos casos es el paso lógico siguiente, y es precisamente lo que aborda el análisis de correlación del capítulo 5.
