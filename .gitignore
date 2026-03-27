@@ -342,19 +342,19 @@ Tarea02/data/clean/*
 Tarea02/_book/
 Tarea02/_book.rar
 Tarea02/_freeze/
+# freeze/ #tracked en git para que CI pueda renderizar sin Python
 Tarea02/.quarto/
 Tarea02/**/*.quarto_ipynb
 Tarea02/presentacion.html
 Tarea02/presentacion/presentacion.html
+# presentacion/presentacion.html tracked en git para que CI lo copie al _book
 
 # Auxiliares LaTeX
-Tarea02/LaTex/build/
-Tarea02/LaTex/src/build/
+/Tarea02/LaTex
 
 # Python
 Tarea02/__pycache__/
 Tarea02/*.pyc
-/Tarea02/LaTex
 
 /.quarto/
 **/*.quarto_ipynb

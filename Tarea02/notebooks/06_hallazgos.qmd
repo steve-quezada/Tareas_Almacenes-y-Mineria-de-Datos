@@ -34,7 +34,7 @@ La reserva de información depende fuertemente de cómo reporta cada entidad o i
 
 ### 2. Anomalías temporales concentradas en pocas fuentes
 
-En el dataset temporal, 1,121 casos (1.52% de los registros con fechas calculables) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.8% de los registros válidos.
+En el dataset temporal, 1,121 casos (1.52% de los registros con fechas calculables) presentan fecha de registro anterior a la fecha de desaparición. Las fuentes Portal, Fiscalía General de Veracruz y Procuraduría/Fiscalía de Michoacán concentran el 65.4% de estas anomalías, pese a representar solo el 15.2% de los registros válidos.
 
 - El 64% de estos desfases son de 1 día o menos (posibles errores de captura).
 - Se detectaron 64 registros con desfases mayores a un año ().

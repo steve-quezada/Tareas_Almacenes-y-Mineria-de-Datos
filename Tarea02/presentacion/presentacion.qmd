@@ -374,7 +374,7 @@ plt.show()
 
 - **Desigualdad territorial** en la censura: Jalisco 67.5%, Guanajuato 58.7%, CDMX 58.4%.
 
-- **1,121 anomalías temporales** concentradas en pocas instituciones (65.4% provienen del 15.8% de las fuentes).
+- **1,121 anomalías temporales** concentradas en pocas instituciones (65.4% provienen del 15.2% de las fuentes).
 
 :::
 ::::
