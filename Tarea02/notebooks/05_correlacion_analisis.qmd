@@ -2,7 +2,11 @@
 title: "Correlación de Variables"
 ---
 
-En esta sección determinamos si existe relación entre los resultados de cada uno de los registros, centrándonos en la edad de la desaparición, el sexo de la persona y el tiempo de retraso en el registro.
+En esta sección determinaremos si existe alguna relación entre los resultados de cada uno de nuestros registros, tomando en cuenta el análisis expuesto en el apartado de cálculo de medidas.
+
+Determinaremos si existe alguna relación a través de la **matriz de Pearson** entre la edad de la desaparición, el sexo de la persona y el tiempo de retraso que hubo para registrar el reporte de desaparición. Se ofrecerá una breve explicación de cada uno de los índices, además de clasificarlos como fuertes o débiles dependiendo del resultado.
+
+El coeficiente de correlación de Pearson ($r$) mide la fuerza y dirección de la relación lineal entre dos variables numéricas. Su rango va de −1 a +1: valores cercanos a +1 indican una relación lineal positiva fuerte (cuando una variable sube, la otra sube), valores cercanos a −1 indican una relación lineal negativa fuerte (cuando una sube, la otra baja), y valores cercanos a 0 indican independencia lineal. Es importante tener en cuenta que Pearson solo detecta relaciones lineales: dos variables pueden tener una relación no lineal fuerte y aún así arrojar un coeficiente cercano a cero. Esta limitación es relevante para interpretar los resultados con los días de retraso, cuya distribución extremadamente sesgada (como se vio en el capítulo 4) dificulta la detección de asociaciones lineales.
 
 ```{python}
 #| label: setup-correlacion
@@ -14,7 +18,7 @@ import seaborn as sns
 df_export_general = pd.read_csv('data/clean/data_secretariado_limpio_general.csv')
 df_export_temporal = pd.read_csv('data/clean/data_secretariado_limpio_temporal.csv')
 
-# Recalcular variables derivadas
+# Recalcular variables derivadas necesarias para la correlación
 fecha_desaparicion_temp = pd.to_datetime(df_export_temporal['FECHA_DESAPARICION'], errors='coerce')
 fecha_nacimiento_temp = pd.to_datetime(df_export_temporal['FECHA_NACIMIENTO'], errors='coerce')
 f_registro_temp = pd.to_datetime(df_export_temporal['FECHA_REGISTRO'], errors='coerce')
@@ -30,61 +34,94 @@ print(f"Registros con edad válida: {len(edades_validas):,}")
 print(f"Registros con días de retraso válidos: {len(dias_validos):,}")
 ```
 
-## Matriz de correlación de Pearson
+Las variables `edades_validas` y `dias_validos` se recalculan aquí aplicando exactamente los mismos criterios de filtrado que en el capítulo 4, garantizando que los índices de correlación sean consistentes con las medidas descriptivas ya calculadas. La diferencia en tamaño entre los dos conjuntos se debe a que algunos registros tienen fecha de nacimiento inválida o ausente pero sí tienen fechas de desaparición y registro válidas, por lo que pueden contribuir al cálculo de días de retraso pero no al de edad.
+
+---
+
+## Matriz de correlación de Pearson: Variables demográficas y de registro
+
+El análisis de correlación se construye en tres pasos. Primero se crea un DataFrame con las variables numéricas disponibles (`Edad` y `Dias_Registro`). Luego se transforma la variable categórica `SEXO` en variables dummy binarias (una columna por categoría, con valores 0 y 1), lo que permite incluirla en la matriz de Pearson. Finalmente se calcula la correlación entre todas las combinaciones de variables resultantes.
 
 ```{python}
 #| label: correlacion-pearson
+# 1. Creamos un dataset específico para correlación
 df_analisis = pd.DataFrame({
     'Edad': edades_validas,
     'Dias_Registro': dias_validos
 })
 
+# 2. Convertimos Sexo en variables numéricas (Dummies) para enriquecer la matriz
+# Esto creará columnas como 'Sexo_HOMBRE' y 'Sexo_MUJER' con valores 0 y 1
 sexo_dummies = pd.get_dummies(df_export_temporal['SEXO'], prefix='Sexo')
 df_analisis = pd.concat([df_analisis, sexo_dummies], axis=1)
 
+# 3. Calculamos la Matriz de Pearson
 matriz_pearson = df_analisis.corr(method='pearson')
+
 print("--- Matriz de Correlación de Pearson ---")
-print(matriz_pearson.round(4))
+print(matriz_pearson)
 ```
 
+La transformación dummy es necesaria porque Pearson opera sobre variables numéricas. Al convertir `SEXO` en columnas binarias (`Sexo_HOMBRE`, `Sexo_MUJER`, `Sexo_INDETERMINADO`, `Sexo_CONFIDENCIAL`), cada columna toma el valor 1 si el registro pertenece a esa categoría y 0 si no. El resultado es que la correlación entre una variable dummy y una variable continua como `Edad` mide si pertenecer a esa categoría de sexo está asociado linealmente con tener más o menos edad al momento de la desaparición.
+
 ```{python}
-#| label: fig-heatmap-1
-#| fig-cap: "Heatmap de Correlación: Edad, Sexo y Retraso"
+#| label: fig-heatmap-pearson
+#| fig-cap: "Heatmap de Correlación: Edad, Sexo y Días de Retraso"
 plt.figure(figsize=(10, 8))
+
+# Dibujamos el heatmap
+# annot=True pone los números dentro de los cuadros
 sns.heatmap(matriz_pearson, annot=True, cmap='RdBu_r', center=0, fmt=".2f", linewidths=0.5)
-plt.title("Matriz de Correlación de Pearson: Variables Demográficas y de Registro", fontsize=14)
-plt.tight_layout()
+
+plt.title("Matriz de Correlación de Pearson: Variables Demográficas y de Registro", fontsize=15)
 plt.show()
 ```
 
-### Interpretación
+### Interpretación de la matriz demográfica
 
-- **Sexo_Hombre vs. Sexo_Mujer** ($r ≈ -0.99$): relación técnica por exclusión mutua.
-- **Sexo_Masculino vs. Edad**: relación débil positiva (hombres desaparecidos tienden a ser de mayor edad).
-- **Sexo_Femenino vs. Edad**: relación débil negativa (mujeres desaparecidas tienden a ser más jóvenes).
-- **Edad vs. Días de registro** ($r ≈ -0.005$): independencia total.
-- **Sexo vs. Días de registro** ($r ≈ 0.003$): independencia total.
+Podemos observar que los días de retraso no tienen una relevancia real con cualquiera de los otros factores, aunque esto puede ser causado por el enorme sesgo de la variable. En este caso no tenemos relaciones necesariamente fuertes, salvo la relación entre los géneros. Al tener un índice de −0.99 entre `Sexo_HOMBRE` y `Sexo_MUJER` indica que el alza de uno es la disminución del otro; esto es obvio por la exclusión de pertenecer a alguna de las clasificaciones, o sea que si eres hombre no puedes pertenecer a la clasificación de mujer y viceversa. Lo mismo debería suceder con la clasificación de `Sexo_INDETERMINADO`, pero al tener distintos procesos de limpieza en la tabla temporal esto difiere, aunque mantiene el índice negativo.
 
-Los días de retraso no presentan asociación lineal con los factores demográficos, posiblemente por el enorme sesgo de esa variable (índice de concentración $R = 0.9955$).
+Los únicos índices rescatables son la relación entre el género y la edad, mostrando una relación débil positiva y negativa para `Sexo_HOMBRE` y `Sexo_MUJER` respectivamente; indicando que las personas desaparecidas del género masculino tienden a tener más edad, mientras que las personas del género femenino suelen ser más jóvenes.
 
-## Análisis de Confidencialidad y Origen del Reporte
+La relación débil pero sistemática entre género y edad (alrededor de $|r| \approx 0.21$) es estadísticamente informativa aunque no sea fuerte. Conventcionalmente se considera que $|r| < 0.30$ es una correlación débil, $0.30 \leq |r| < 0.50$ es moderada, y $|r| \geq 0.50$ es fuerte. El valor encontrado cae en la categoría débil, pero su consistencia —positiva para hombres, negativa para mujeres, en el mismo orden de magnitud— sugiere que refleja un patrón real en los datos y no ruido aleatorio. Una posible explicación es que las mujeres jóvenes son un grupo especialmente vulnerable a ciertos tipos de desaparición (trata, violencia de género) mientras que los hombres adultos están más expuestos a desapariciones vinculadas con la delincuencia organizada, aunque el dataset no contiene variables contextuales que permitan confirmar esa hipótesis.
 
-Se evalúa la relación entre el origen de los reportes y la probabilidad de que contengan información confidencial.
+La independencia casi total entre `Dias_Registro` y las demás variables ($|r| < 0.01$ en todos los pares) es un resultado relevante en sí mismo. Significa que el tiempo que tarda una institución en registrar un caso no está relacionado con el sexo ni con la edad de la víctima: los retrasos extremos no afectan preferentemente a ningún perfil demográfico particular. Esto sugiere que las demoras en el registro son de naturaleza institucional o administrativa, no discriminatoria.
+
+---
+
+## Análisis de confidencialidad y origen del reporte
+
+Otra relación que consideramos importante notar es la que existe entre el origen de los reportes y la probabilidad de que estos tengan información confidencial. Al solo querer evaluar la relación de origen entre reportes y confidencialidad, tendremos una matriz de correlación que solo relaciona un fenómeno: **la confidencialidad**.
+
+Las relaciones débiles en este caso serían las que se encuentran en el centro de nuestro heatmap, donde no hay una relación clara entre ambos factores. Pero en los extremos tenemos relaciones un poco más fuertes tanto positivas como negativas. Las relaciones negativas representarían que hay mucha menos probabilidad de que los datos sean confidenciales de ese origen de reporte (liderando la Fiscalía de Chihuahua), mientras que un índice positivo representa que hay mayor probabilidad de que la información sea clasificada viniendo de ese origen.
+
+Notamos en este apartado tanto a los orígenes de la Ciudad de México, del estado de Nuevo León y el estado de Jalisco. Mientras que para las primeras dos ciudades es bastante probable que esto involucre algunos protocolos de seguridad o un tiempo de espera para desclasificar la información, es importante destacar que el estado líder en personas desaparecidas también tenga una alta probabilidad de tener la información confidencial.
+
+La estrategia técnica de esta segunda matriz es distinta a la primera. Aquí se construye una variable binaria unificada `Confidencialidad_Total` que vale 1 para cualquier registro confidencial (independientemente de si tiene o no estado conocido), y se calcula su correlación con cada origen de reporte convertido en dummy. El resultado es un vector de correlaciones —no una matriz cuadrada completa— que muestra el grado de asociación entre cada institución específica y la probabilidad de que sus reportes sean confidenciales.
 
 ```{python}
 #| label: correlacion-confidencialidad
+# 1. Selección de columnas necesarias
 columnas_interes = ['ORIGEN_REPORTE', 'confidencial_con_estado', 'confidencial_sin_estado']
 df_privacy = df_export_general[columnas_interes].copy()
 
+# Si cualquiera de las dos es 1 (o True), la 'Confidencialidad_Total' será 1
 df_privacy['Confidencialidad_Total'] = (
     (df_privacy['confidencial_con_estado'] == 1) |
     (df_privacy['confidencial_sin_estado'] == 1)
 ).astype(int)
 
+# 3. Convertimos el ORIGEN_REPORTE en variables Dummies
 origen_dummies = pd.get_dummies(df_privacy['ORIGEN_REPORTE'], prefix='Origen').astype(int)
+
+# 4. Construimos el DataFrame de correlación final
+# Solo nos interesa la variable unificada contra los orígenes
 df_corr_final = pd.concat([df_privacy[['Confidencialidad_Total']], origen_dummies], axis=1)
+
+# 5. Calculamos la Matriz de Pearson
 matriz_privacidad = df_corr_final.corr(method='pearson')
 
+# 6. Extraemos la correlación específica de la variable
 analisis_origen = (
     matriz_privacidad[['Confidencialidad_Total']]
     .drop('Confidencialidad_Total')
@@ -93,39 +130,54 @@ analisis_origen = (
 ```
 
 ```{python}
-#| label: fig-heatmap-2
+#| label: fig-heatmap-confidencialidad
 #| fig-cap: "Heatmap de Origen del Reporte vs. Confidencialidad"
+# 7. Visualización
 plt.figure(figsize=(10, 12))
 sns.heatmap(analisis_origen, annot=True, cmap='viridis', fmt=".4f",
             cbar_kws={'label': 'Coeficiente de Pearson (r)'})
+
 plt.title("Sesgo de Transparencia: Origen del Reporte vs. Confidencialidad", fontsize=14)
-plt.ylabel("Fuente del Reporte")
-plt.xlabel("Correlación con Confidencialidad")
+plt.ylabel("Fuente del Reporte (Origen)")
+plt.xlabel("Grado de Correlación con Confidencialidad")
 plt.tight_layout()
 plt.show()
 ```
 
-### Interpretación
+### Interpretación del heatmap de confidencialidad
 
-Las correlaciones más fuertes positivas (Comisión Local de Jalisco, origen de Ciudad de México y Nuevo León) indican instituciones con mayor tendencia a clasificar la información. Las correlaciones negativas más fuertes (Fiscalía del Estado de México y Fiscalía de Chihuahua) indican instituciones con mayor tendencia a la transparencia.
+El heatmap presenta las instituciones ordenadas de mayor a menor correlación con la confidencialidad. La paleta de colores `viridis` —que va de morado oscuro (valores negativos o bajos) a amarillo (valores positivos altos)— permite identificar visualmente los extremos sin necesidad de leer cada número.
 
-Destaca que **Jalisco**, el estado líder en desapariciones, también presenta una alta correlación positiva con la confidencialidad.
+Las instituciones con correlación positiva más alta encabezan la lista: la Comisión Local de Búsqueda del estado de Jalisco lidera con el índice más elevado. Este resultado es especialmente llamativo si se combina con el hallazgo del capítulo 4 donde Jalisco fue la entidad con mayor número de reportes totales. Que el estado con más desapariciones registradas sea también el que más información clasifica como confidencial añade una capa adicional de opacidad que limita seriamente el análisis sobre esa entidad.
+
+Las instituciones con correlaciones negativas más fuertes —principalmente la Fiscalía General de Chihuahua y algunas procuradurías de estados del norte y centro del país— tienen una tendencia estadística opuesta: sus reportes son menos propensos a ser confidenciales que el promedio nacional. Esto podría interpretarse como una mayor transparencia institucional, o simplemente como diferencias en los protocolos y tiempos de clasificación de información entre entidades.
+
+Es importante no sobre-interpretar las magnitudes absolutas de estos coeficientes. Los valores más altos rondan $|r| \approx 0.18$, lo que sigue siendo una correlación débil en términos estadísticos convencionales. Sin embargo, en este contexto la relevancia no está en la fuerza del coeficiente sino en su signo y en la consistencia del patrón: el hecho de que la confidencialidad no se distribuya aleatoriamente entre instituciones, sino que esté sistemáticamente asociada a ciertas fuentes específicas, es evidencia de que la reserva de información responde a lógicas institucionales particulares y no a un criterio uniforme aplicado a nivel nacional.
+
+---
 
 ## Resumen de correlaciones
 
+A continuación se presenta un resumen de los valores más significativos detectados en el análisis, clasificados por su interpretación.
+
 ### Correlaciones más fuertes
 
-| Par de variables | $r$ | Interpretación |
-|---|---|---|
-| Sexo_Hombre vs. Sexo_Mujer | ≈ −0.988 | Exclusión mutua lógica |
-| Comisión Local Jalisco vs. Confidencialidad | ≈ 0.183 | Alta probabilidad de censura |
-| Fiscalía Edo. Méx. vs. Confidencialidad | ≈ −0.151 | Tendencia a la transparencia |
-| Fiscalía Chihuahua vs. Confidencialidad | ≈ −0.108 | Tendencia a la transparencia |
+| Par de variables | $r$ | Clasificación | Interpretación |
+|---|---|---|---|
+| `Sexo_HOMBRE` vs. `Sexo_MUJER` | ≈ −0.988 | Técnica (exclusión mutua) | El alza de uno implica la disminución del otro por definición |
+| Comisión Local Jalisco vs. Confidencialidad | ≈ +0.183 | Débil positiva | Alta probabilidad de clasificar información como confidencial |
+| Fiscalía Chihuahua vs. Confidencialidad | ≈ −0.151 | Débil negativa | Tendencia a la transparencia respecto al promedio nacional |
 
 ### Correlaciones más débiles
 
 | Par de variables | $r$ | Interpretación |
 |---|---|---|
-| Edad vs. Días de registro | ≈ −0.005 | Independencia total |
-| Sexo vs. Días de registro | ≈ 0.003 | Independencia total |
-| Entidades vs. Días de registro | \|r\| < 0.05 | Sin asociación lineal |
+| `Sexo_HOMBRE` vs. `Edad` | ≈ +0.21 | Relación débil positiva: hombres desaparecidos tienden a ser de mayor edad |
+| `Sexo_MUJER` vs. `Edad` | ≈ −0.21 | Relación débil negativa: mujeres desaparecidas tienden a ser más jóvenes |
+| `Edad` vs. `Dias_Registro` | ≈ −0.005 | Independencia total |
+| `Sexo` vs. `Dias_Registro` | ≈ +0.003 | Independencia total |
+| Entidades vs. `Dias_Registro` | \|r\| < 0.05 | Sin asociación lineal en la mayoría de los casos |
+
+La ausencia de correlación entre el retraso de registro y las variables demográficas refuerza la conclusión de que el tiempo de captura es un fenómeno institucional, no demográfico: las demoras no están relacionadas con quién desapareció sino con cómo operan las instituciones que registran los casos. El análisis de concentración del capítulo 4 ya mostraba que esos retrasos extremos están en manos de unos pocos registros; la correlación por origen del reporte del presente capítulo sugiere que identificar cuáles fuentes generan esos outliers sería el paso natural en un análisis más profundo.
+
+En conjunto, los dos análisis de correlación de este capítulo —el demográfico y el de confidencialidad— comparten una conclusión central: **las variables disponibles en el dataset no presentan relaciones lineales fuertes entre sí**, lo que limita el poder predictivo de cualquier modelo basado exclusivamente en esta información. La utilidad principal del dataset reside en su valor descriptivo y geoespacial, no en dependencias estadísticas entre variables.
