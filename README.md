@@ -22,3 +22,4 @@
 |---|--------|---------|
 | 01 | Data Warehouse | [Tarea01/](Tarea01/) |
 | 02 | Análisis de Personas Desaparecidas en México — EDA con CRISP-DM | [Tarea02/](Tarea02/) |
+| 03 | Reglas de asociación y clasificación | [Tarea03/](Tarea03/) |
