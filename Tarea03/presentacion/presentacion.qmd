@@ -1,0 +1,658 @@
+---
+title: "Minería de Datos: Personas Desaparecidas en México"
+subtitle: "Tarea 03 — Almacenes y Minería de Datos (2026-2)"
+author:
+  - Omar Fernando Gramer Muñoz
+  - Kevin Steve Quezada Ordoñez
+  - Jesús Antonio Romero Godoy
+  - Edgar Salgado González
+date: "2026-05-05"
+format:
+  revealjs:
+    theme: [default, presentacion-theme.scss]
+    slide-number: true
+    transition: slide
+    width: 1280
+    height: 720
+    margin: 0.06
+    logo: https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png
+    footer: "Facultad de Ciencias, UNAM · Almacenes y Minería de Datos 2026-2"
+    code-fold: true
+    fig-align: center
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  fig-dpi: 96
+  fig-width: 9
+  fig-height: 4.5
+---
+
+```{python}
+#| label: setup
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import matplotlib.patches as mpatches
+import seaborn as sns
+
+# ── Paleta Teal oscuro ────────────────────────────────────────────────────────
+BLUE_DARK  = '#004D40'
+BLUE       = '#00695C'
+BLUE_MID   = '#00796B'
+BLUE_LIGHT = '#26A69A'
+BLUE_PALE  = '#B2DFDB'
+BLUE_BG    = '#E0F2F1'
+ACCENT     = '#FF6F00'
+ACCENT2    = '#E53935'
+
+PALETTE = [BLUE_DARK, BLUE, BLUE_MID, BLUE_LIGHT, BLUE_PALE,
+           '#4DB6AC', '#80CBC4', ACCENT, ACCENT2]
+
+sns.set_theme(style='whitegrid', palette=PALETTE,
+              rc={'axes.edgecolor': BLUE_DARK, 'axes.labelcolor': BLUE_DARK,
+                  'xtick.color': BLUE_DARK, 'ytick.color': BLUE_DARK,
+                  'text.color': '#263238', 'figure.facecolor': 'white'})
+
+# ── Datos exploratorios ──
+
+# Distribución por sexo (n=84,738 tras filtrar CONFIDENCIAL)
+sexo_labels = ['HOMBRE', 'MUJER', 'INDETERMINADO']
+sexo_vals   = [64666, 19716, 356]
+
+# Top 10 entidades por número de registros
+top_ent_nombres = ['ESTADO DE MÉXICO', 'TAMAULIPAS', 'MICHOACÁN', 'JALISCO', 'SINALOA',
+                   'VERACRUZ', 'SONORA', 'GUERRERO', 'CHIHUAHUA', 'NUEVO LEÓN']
+top_ent_vals = [11103, 8172, 5888, 4811, 4710, 4509, 4477, 4015, 3761, 3667]
+
+# Desapariciones por sexenio (fecha de desaparición, mismo orden cronológico)
+SEXENIOS_LABELS = ["Zedillo\n(1994-2000)", "Fox\n(2000-2006)",
+                   "Calderón\n(2006-2012)", "Peña Nieto\n(2012-2018)",
+                   "AMLO\n(2018-2024)", "Sheinbaum\n(2024-2030)"]
+sexenio_vals    = [167, 403, 10978, 22927, 26265, 14906]
+
+# ── Reglas de asociación ──
+
+# Patrón 1: SEXENIO_DESAPARICION → SEXENIO_REGISTRO (lift máximo por sexenio)
+p1_names  = ["Calderón\n(2006-2012)", "Sheinbaum\n(2024-2030)",
+             "Peña Nieto\n(2012-2018)", "AMLO\n(2018-2024)"]
+p1_values = [7.67, 5.64, 3.75, 2.90]
+
+# Patrón 2: ENTIDAD → SEXENIO (top 8 reglas por lift)
+p2_labels = [
+    "TAMAULIPAS \u2192 Calderón",
+    "EDOMEX \u2192 Sheinbaum",
+    "JALISCO \u2192 Peña Nieto",
+    "EDOMEX \u2192 Peña Nieto",
+    "TAMAULIPAS \u2192 Peña Nieto",
+    "TABASCO \u2192 AMLO",
+    "SONORA \u2192 AMLO",
+    "MICHOACÁN \u2192 AMLO",
+]
+p2_lifts = [7.72, 5.67, 3.75, 3.75, 3.69, 3.22, 3.20, 3.18]
+
+# Patrón 3: GRUPO_EDAD + SEXENIO → SEXENIO_REG (max lift por sexenio)
+_p3_groups = pd.DataFrame({
+    'sexenio':  ["Calderón (2006-2012)", "Sheinbaum (2024-2030)",
+                 "Peña Nieto (2012-2018)", "AMLO (2018-2024)"],
+    'lift_max': [7.72, 5.65, 3.69, 3.21],
+    'grupos':   ['18-29, 30-44, 45-59, 60+', '18-29, 30-44, 45-59',
+                 '18-29, 30-44, 45-59, 60+', '18-29, 30-44, 45-59, 60+'],
+})
+```
+
+---
+
+## El dataset {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+- Datos del **Secretariado Ejecutivo del SESNSP**: registros de personas desaparecidas en México.
+- Dataset limpio generado en la **Tarea 02**.
+- Se filtran registros **CONFIDENCIAL** en columnas clave para garantizar la calidad de las reglas.
+- **Variables usadas:** SEXO, ENTIDAD, MUNICIPIO, fechas discretizadas (sexenio + mes), grupo de edad.
+
+:::
+::: {.column width="45%"}
+
+::: {.stat-box}
+[133,887]{.stat-number}
+[registros originales]{.stat-label}
+:::
+
+::: {.stat-box}
+[84,738]{.stat-number}
+[registros tras filtrar CONFIDENCIAL]{.stat-label}
+:::
+
+::: {.stat-box}
+[7 variables]{.stat-number}
+[usadas como ítems en Apriori]{.stat-label}
+:::
+
+:::
+::::
+
+---
+
+## Distribución por sexo y entidad {.smaller}
+
+```{python}
+#| fig-height: 4.2
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
+
+# Sexo
+colors_sexo = [BLUE_DARK, BLUE_LIGHT, BLUE_PALE]
+axes[0].pie(sexo_vals, labels=sexo_labels,
+            autopct='%1.1f%%', colors=colors_sexo,
+            startangle=140, textprops={'fontsize': 11})
+axes[0].set_title('Distribución por Sexo', fontsize=13, fontweight='bold', color=BLUE_DARK)
+
+# Top 10 entidades
+axes[1].barh(top_ent_nombres[::-1], top_ent_vals[::-1], color=BLUE)
+axes[1].set_xlabel('Registros', color=BLUE_DARK)
+axes[1].set_title('Top 10 Entidades', fontsize=13, fontweight='bold', color=BLUE_DARK)
+for i, v in enumerate(top_ent_vals[::-1]):
+    axes[1].text(v + 200, i, f'{v:,}', va='center', fontsize=9, color=BLUE_DARK)
+
+plt.tight_layout()
+plt.show()
+```
+
+---
+
+## Desapariciones por sexenio {.smaller}
+
+```{python}
+#| fig-height: 4.0
+fig, ax = plt.subplots(figsize=(11, 4.0))
+bars = ax.bar(SEXENIOS_LABELS, sexenio_vals, color=PALETTE[:len(SEXENIOS_LABELS)], edgecolor='white', linewidth=0.5)
+ax.set_ylabel('Registros', color=BLUE_DARK)
+ax.set_title('Registros de desaparición por sexenio', fontsize=13,
+             fontweight='bold', color=BLUE_DARK)
+for bar, val in zip(bars, sexenio_vals):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 200,
+            f'{val:,}', ha='center', va='bottom', fontsize=9, color=BLUE_DARK)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f'{int(x):,}'))
+plt.tight_layout()
+plt.show()
+```
+
+---
+
+## Sección 1: Apriori desde cero {background-color="#004D40" color="white"}
+
+### Implementación en Python puro
+
+---
+
+## Resultados de Apriori {.smaller}
+
+:::: {.columns}
+::: {.column width="48%"}
+
+**Parámetros**
+
+- `min_support = 0.02` (2% → 1,695 transacciones)
+- `max_k = 3`
+- Dataset: **84,738 transacciones**
+
+**Itemsets encontrados**
+
+| Nivel | Candidatos | Frecuentes | Poda |
+|---|---|---|---|
+| F1 | — | **51** | — |
+| F2 | 1,275 | **149** | **88%** |
+| F3 | 180 | **86** | 52% |
+| **Total** | | **286** | |
+
+:::
+::: {.column width="52%"}
+
+```{python}
+#| fig-height: 3.5
+fig, ax = plt.subplots(figsize=(6, 3.5))
+niveles = ['F1\n(tamaño 1)', 'F2\n(tamaño 2)', 'F3\n(tamaño 3)']
+valores = [51, 149, 86]
+bars = ax.bar(niveles, valores, color=[BLUE_DARK, BLUE, BLUE_LIGHT],
+              edgecolor='white', width=0.5)
+ax.set_ylabel('Itemsets frecuentes', color=BLUE_DARK)
+ax.set_title('Itemsets por nivel', fontsize=12, fontweight='bold', color=BLUE_DARK)
+for bar, val in zip(bars, valores):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1.5,
+            str(val), ha='center', fontweight='bold', fontsize=13, color=BLUE_DARK)
+ax.set_ylim(0, 175)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::::
+
+---
+
+## Comparación de algoritmos {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+```{python}
+#| fig-height: 3.5
+algoritmos = ['Apriori\npropio', 'Apriori\nmlxtend', 'FP-Growth\nmlxtend']
+tiempos    = [11.29, 0.44, 3.01]
+colores    = [ACCENT, BLUE_DARK, BLUE_MID]
+
+fig, ax = plt.subplots(figsize=(6, 3.5))
+bars = ax.bar(algoritmos, tiempos, color=colores, edgecolor='white', width=0.5)
+ax.set_ylabel('Tiempo (segundos)', color=BLUE_DARK)
+ax.set_title('Tiempo de ejecución', fontsize=12, fontweight='bold', color=BLUE_DARK)
+for bar, val in zip(bars, tiempos):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.15,
+            f'{val:.2f} s', ha='center', fontweight='bold', fontsize=11, color=BLUE_DARK)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::: {.column width="50%"}
+
+**Los tres generan exactamente los mismos 286 itemsets**
+
+| | Itemsets | Reglas |
+|---|---|---|
+| Apriori propio | 286 | — |
+| Apriori mlxtend | 286 | 196 |
+| FP-Growth | 286 | 196 |
+
+- **Apriori propio** es ~25× más lento: Python puro, sin vectorización
+- **mlxtend** opera sobre matrices NumPy booleanas
+- **FP-Growth** construye un árbol compacto — más lento aquí porque con solo 286 itemsets el costo del árbol supera su beneficio
+
+:::
+::::
+
+---
+
+## Sección 2: Reglas de asociación {background-color="#004D40" color="white"}
+
+### 196 reglas · filtradas a 113 útiles
+
+---
+
+## Filtrado de reglas {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+**Criterios aplicados**
+
+1. `min_confidence = 0.70`
+2. `lift ≥ 1.2` — descarta asociaciones triviales
+3. **Eliminar reglas geográficas triviales** — MUNICIPIO → ENTIDAD tiene confianza = 1.0 por definición (Tijuana siempre es Baja California)
+4. Excluir ítems `SE DESCONOCE`
+
+**Resultado: 113 reglas limpias**
+
+:::
+::: {.column width="45%"}
+
+```{python}
+#| fig-height: 3.2
+etapas = ['Total\ngeneradas', 'lift ≥ 1.2', 'Sin triviales\ngeográficas']
+valores = [196, 120, 113]
+colores_e = [BLUE_PALE, BLUE_MID, BLUE_DARK]
+
+fig, ax = plt.subplots(figsize=(5, 3.2))
+bars = ax.bar(etapas, valores, color=colores_e, edgecolor='white', width=0.5)
+for bar, val in zip(bars, valores):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1.5,
+            str(val), ha='center', fontweight='bold', fontsize=13, color=BLUE_DARK)
+ax.set_ylabel('Número de reglas', color=BLUE_DARK)
+ax.set_title('Embudo de filtrado de reglas', fontsize=11,
+             fontweight='bold', color=BLUE_DARK)
+ax.set_ylim(0, 230)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::::
+
+---
+
+## Patrón 1 — Sexenio desaparición → Sexenio registro {.smaller}
+
+> Las desapariciones tienden a registrarse **dentro del mismo sexenio** en que ocurren
+
+```{python}
+#| fig-height: 3.8
+_n = len(p1_names)
+_cols_p1 = ([BLUE_DARK, BLUE, BLUE_MID, BLUE_LIGHT, BLUE_PALE] * 2)[:_n]
+
+fig, ax = plt.subplots(figsize=(10, 3.8))
+bars = ax.barh(p1_names[::-1], p1_values[::-1], color=_cols_p1[::-1], edgecolor='white')
+ax.axvline(x=1.0, color='gray', linestyle='--', alpha=0.6, label='lift = 1 (independencia)')
+ax.set_xlabel('Lift', color=BLUE_DARK)
+ax.set_title('Lift: SEXENIO_DESAPARICION → SEXENIO_REGISTRO', fontsize=12,
+             fontweight='bold', color=BLUE_DARK)
+for bar, val in zip(bars, p1_values[::-1]):
+    ax.text(val + 0.05, bar.get_y() + bar.get_height()/2,
+            f'{val:.2f}', va='center', fontweight='bold', fontsize=11, color=BLUE_DARK)
+ax.legend(loc='lower right')
+plt.tight_layout()
+plt.show()
+```
+
+**Calderón tiene el lift más alto (~7.7)**: coincide con el inicio de la "guerra contra el narcotráfico" y el aumento en visibilidad institucional de las desapariciones.
+
+---
+
+## Patrón 2 — Entidad → Sexenio {.smaller}
+
+```{python}
+#| fig-height: 4.8
+_max_l = max(p2_lifts) if p2_lifts else 10
+colors_e2 = [BLUE_DARK if v > _max_l*0.7 else BLUE if v > _max_l*0.4 else BLUE_MID
+             for v in p2_lifts]
+
+fig, ax = plt.subplots(figsize=(11, 4.8))
+# Usamos las etiquetas sin saltos de línea y acortadas
+bars = ax.barh(p2_labels[::-1], p2_lifts[::-1], color=colors_e2[::-1], edgecolor='white')
+ax.axvline(x=1.0, color='gray', linestyle='--', alpha=0.5)
+ax.set_xlabel('Lift', color=BLUE_DARK)
+ax.tick_params(axis='y', labelsize=10) # Restauramos la fuente un poco más legible
+ax.set_title('Asociaciones Entidad → Sexenio más relevantes', fontsize=12,
+             fontweight='bold', color=BLUE_DARK)
+for bar, val in zip(bars, p2_lifts[::-1]):
+    ax.text(val + 0.05, bar.get_y() + bar.get_height()/2,
+            f'{val:.2f}', va='center', fontweight='bold', fontsize=10, color=BLUE_DARK)
+plt.tight_layout()
+plt.show()
+```
+
+---
+
+## Patrón 3 — Sexo y Grupo de edad {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Sexo → Entidad o Sexenio**
+
+- **No hay asociaciones directas** SEXO → ENTIDAD con lift ≥ 1.2
+- El sexo aparece solo como modificador del Patrón 1:
+
+$$\text{SEXO, SEXENIO\_DES=X} \Rightarrow \text{SEXENIO\_REG=X}$$
+
+→ El comportamiento de registro por sexenio es **igual para hombres y mujeres**
+
+:::
+::: {.column width="50%"}
+
+**Grupos de edad → Sexenio**
+
+```{python}
+#| fig-height: 3.0
+_sex_short = [s.split(' (')[0] for s in _p3_groups['sexenio']]
+_lifts_p3  = _p3_groups['lift_max'].tolist()
+_cols_p3 = [BLUE_DARK if v > 5 else BLUE if v > 3.5 else BLUE_MID for v in _lifts_p3]
+fig, ax = plt.subplots(figsize=(6, 3.0))
+ax.barh(_sex_short[::-1], _lifts_p3[::-1], color=_cols_p3[::-1], edgecolor='white')
+ax.axvline(1.0, color='gray', linestyle='--', alpha=0.5)
+ax.set_xlabel('Lift máximo', color=BLUE_DARK)
+ax.set_title('GRUPO_EDAD + SEXENIO → SEXENIO_REG', fontsize=9,
+             fontweight='bold', color=BLUE_DARK)
+for i, val in enumerate(_lifts_p3[::-1]):
+    ax.text(val + 0.05, i, f'{val:.2f}', va='center', fontsize=9,
+            fontweight='bold', color=BLUE_DARK)
+plt.tight_layout()
+plt.show()
+```
+
+→ Grupos **0-11** y **12-17** no superan el umbral del 2%  
+→ Los lifts son casi idénticos entre grupos dentro de un mismo sexenio
+
+:::
+::::
+
+---
+
+## Sección 3: Clasificación {background-color="#004D40" color="white"}
+
+### Predecir `ESTATUS_VICTIMA` con Random Forest
+
+---
+
+## El problema de clasificación {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+**Variable objetivo: `ESTATUS_VICTIMA`**
+
+- Dataset extremadamente desbalanceado
+- Un modelo "tonto" que siempre predijera DESAPARECIDA tendría **94% de accuracy** sin aprender nada
+- Por eso se priorizan **Recall y Macro F1**
+
+**Modelo elegido: Random Forest**
+
+- Robusto con `class_weight='balanced'`
+- Maneja alta cardinalidad (1,553 municipios tras filtrar CONFIDENCIAL)
+- Produce importancia de features nativa
+
+:::
+::: {.column width="45%"}
+
+```{python}
+#| fig-height: 3.5
+clases  = ['DESAPARECIDA\n79,881', 'NO LOCALIZADA\n4,857']
+valores_c = [79881, 4857]
+colores_c = [BLUE_DARK, ACCENT]
+
+fig, ax = plt.subplots(figsize=(5, 3.5))
+wedges, texts, autotexts = ax.pie(
+    valores_c, labels=clases, autopct='%1.1f%%',
+    colors=colores_c, startangle=80,
+    textprops={'fontsize': 11}
+)
+autotexts[0].set_fontweight('bold')
+autotexts[1].set_fontweight('bold')
+ax.set_title('Distribución de clases', fontsize=12, fontweight='bold', color=BLUE_DARK)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::::
+
+---
+
+## Modelo 1 — Con ENTIDAD + MUNICIPIO {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Métricas (test set: 16,948 registros)**
+
+| Clase | Precision | Recall | F1 |
+|---|---|---|---|
+| DESAPARECIDA | 0.97 | 0.95 | **0.96** |
+| NO LOCALIZADA | 0.39 | 0.48 | **0.43** |
+| Accuracy | | | **0.93** |
+| **Macro F1** | | | **0.70** |
+
+> El accuracy del 93% es **engañoso** — el Macro F1 = 0.70 es el indicador honesto
+
+:::
+::: {.column width="50%"}
+
+```{python}
+#| fig-height: 3.8
+features_m1 = ['ENTIDAD', 'MUNICIPIO', 'MES_DESAP.', 'SEXENIO_REG.',
+                'GRUPO_EDAD', 'SEXENIO_DES.', 'SEXO']
+importancias_m1 = [0.3689, 0.2531, 0.1268, 0.1230, 0.0696, 0.0440, 0.0145]
+colores_imp = [BLUE_DARK if v > 0.25 else BLUE if v > 0.1 else BLUE_MID for v in importancias_m1]
+
+fig, ax = plt.subplots(figsize=(6, 3.8))
+ax.barh(features_m1[::-1], importancias_m1[::-1], color=colores_imp[::-1], edgecolor='white')
+ax.set_xlabel('Importancia', color=BLUE_DARK)
+ax.set_title('Importancia de features — Modelo 1', fontsize=11,
+             fontweight='bold', color=BLUE_DARK)
+for i, (feat, val) in enumerate(zip(features_m1[::-1], importancias_m1[::-1])):
+    ax.text(val + 0.003, i, f'{val:.1%}', va='center', fontsize=10, color=BLUE_DARK)
+ax.set_xlim(0, 0.45)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::::
+
+**ENTIDAD + MUNICIPIO = 62.2% de importancia combinada** → redundancia geográfica
+
+---
+
+## Modelo 2 — Solo ENTIDAD (sin MUNICIPIO) {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Motivación:** MUNICIPIO y ENTIDAD son colineales por definición — cada municipio pertenece a exactamente una entidad.
+
+```{python}
+#| fig-height: 3.2
+features_m2 = ['ENTIDAD', 'SEXENIO_REG.', 'MES_DESAP.',
+                'GRUPO_EDAD', 'SEXENIO_DES.', 'SEXO']
+importancias_m2 = [0.5811, 0.1524, 0.1289, 0.0738, 0.0481, 0.0156]
+colores_imp2 = [BLUE_DARK if v > 0.4 else BLUE if v > 0.1 else BLUE_MID for v in importancias_m2]
+
+fig, ax = plt.subplots(figsize=(6, 3.2))
+ax.barh(features_m2[::-1], importancias_m2[::-1], color=colores_imp2[::-1], edgecolor='white')
+ax.set_xlabel('Importancia', color=BLUE_DARK)
+ax.set_title('Importancia de features — Modelo 2', fontsize=11,
+             fontweight='bold', color=BLUE_DARK)
+for i, (feat, val) in enumerate(zip(features_m2[::-1], importancias_m2[::-1])):
+    ax.text(val + 0.003, i, f'{val:.1%}', va='center', fontsize=10, color=BLUE_DARK)
+ax.set_xlim(0, 0.7)
+plt.tight_layout()
+plt.show()
+```
+
+:::
+::: {.column width="50%"}
+
+**Comparación de modelos**
+
+| Métrica | Modelo 1 | Modelo 2 |
+|---|---|---|
+| Accuracy | 0.93 | 0.86 |
+| F1 DESAPARECIDA | 0.96 | 0.92 |
+| F1 NO LOCALIZADA | 0.43 | 0.39 |
+| **Recall NO LOC.** | **0.48** | **0.74 ↑** |
+
+> Al quitar MUNICIPIO, el Recall de NO LOCALIZADA **sube de 0.48 → 0.74**
+> El modelo 2 detecta **3 de cada 4** personas no localizadas (vs 1 de cada 2 antes)
+
+:::
+::::
+
+---
+
+## ¿Por qué sube el Recall en el Modelo 2? {.smaller}
+
+```{python}
+#| fig-height: 3.8
+fig, axes = plt.subplots(1, 2, figsize=(12, 3.8))
+
+metricas = ['Accuracy', 'F1 DESAP.', 'F1 NO LOC.', 'Recall NO LOC.']
+m1_vals  = [0.93, 0.96, 0.43, 0.48]
+m2_vals  = [0.86, 0.92, 0.39, 0.74]
+
+x = np.arange(len(metricas))
+width = 0.35
+
+bars1 = axes[0].bar(x - width/2, m1_vals, width, label='Modelo 1 (ENTIDAD+MUN.)',
+                    color=BLUE_MID, edgecolor='white')
+bars2 = axes[0].bar(x + width/2, m2_vals, width, label='Modelo 2 (solo ENTIDAD)',
+                    color=ACCENT, edgecolor='white')
+axes[0].set_xticks(x)
+axes[0].set_xticklabels(metricas, fontsize=9)
+axes[0].set_ylim(0, 1.1)
+axes[0].set_ylabel('Valor', color=BLUE_DARK)
+axes[0].set_title('Comparación de métricas', fontsize=11, fontweight='bold', color=BLUE_DARK)
+axes[0].legend(fontsize=8)
+for bar in list(bars1) + list(bars2):
+    axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                 f'{bar.get_height():.2f}', ha='center', fontsize=8, color=BLUE_DARK)
+
+# Recall comparison destacado
+axes[1].bar(['Modelo 1', 'Modelo 2'], [0.48, 0.74],
+            color=[BLUE_MID, BLUE_DARK], edgecolor='white', width=0.4)
+axes[1].set_ylim(0, 1.0)
+axes[1].set_title('Recall de NO LOCALIZADA', fontsize=11, fontweight='bold', color=BLUE_DARK)
+axes[1].text(0, 0.50, '0.48\n1 de cada 2', ha='center', fontsize=11, fontweight='bold', color='white')
+axes[1].text(1, 0.76, '0.74\n3 de cada 4', ha='center', fontsize=11, fontweight='bold', color='white')
+axes[1].axhline(0.5, color=ACCENT, linestyle='--', alpha=0.6)
+
+plt.tight_layout()
+plt.show()
+```
+
+**MUNICIPIO con ~1,553 valores únicos causaba sobreajuste** en municipios con pocos registros → el modelo 1 "memorizaba" DESAPARECIDA en esos municipios
+
+---
+
+## Discusión crítica {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**¿Captura el modelo el fenómeno real?**
+
+- **ENTIDAD y MUNICIPIO** dominan el modelo, pero no porque la geografía *cause* el estatus
+- Más probable: **el sistema de registro funciona distinto en cada estado**
+- Las reglas de asociación reflejan **cuándo se registró**, no cuándo ocurrió
+
+**Limitaciones**
+
+- Recall de NO LOCALIZADA = 0.48 (Modelo 1) → **inútil para predicción individual**
+- Desbalance 94/6 limita el aprendizaje aunque se use `class_weight='balanced'`
+- Registros CONFIDENCIAL (~49K) excluidos por calidad — contienen sesgo institucional
+
+:::
+::: {.column width="50%"}
+
+**Conexión con Tarea 02**
+
+> Las anomalías y sesgos encontrados en el proceso de limpieza de la Tarea 2 se propagan directamente a los modelos de la Tarea 3
+
+- Fechas incoherentes → distorsionan los sexenios asignados
+- Opacidad institucional (CONFIDENCIAL) → sesga las reglas de asociación
+- El **bajo recall de NO LOCALIZADA** no es solo un problema matemático: es una consecuencia de la calidad de los datos en el origen
+
+:::
+::::
+
+---
+
+## Conclusiones {.smaller}
+
+::: {.incremental}
+
+- **Apriori propio** implementado en Python puro: 286 itemsets correctos, mismos que mlxtend y FP-Growth. La eficiencia escala ~25× peor sin vectorización.
+
+- **El patrón más fuerte** en las reglas: desapariciones registradas dentro del mismo sexenio en que ocurren (lift ~7.7 para Calderón). Refleja el registro, no necesariamente la ocurrencia real.
+
+- **Tamaulipas → Calderón** y **Estado de México → Sheinbaum** son las asociaciones geográfico-temporales más significativas, consistentes con contexto histórico.
+
+- **No hay sesgo por sexo ni edad** a nivel nacional con soporte ≥ 2% — el fenómeno es geográficamente distribuido.
+
+- **La geografía explica el 62% del modelo** (ENTIDAD + MUNICIPIO), pero es un proxy de diferencias institucionales en el registro, no del fenómeno real.
+
+- **Modelo 2 es más útil en la práctica**: menor accuracy pero Recall de NO LOCALIZADA = 0.74 vs 0.48 del Modelo 1. En búsqueda de personas, detectar más casos es prioritario.
+
+- **Takeaway de política pública**: la probabilidad de ser localizado depende más del estado donde ocurrió la desaparición que de las características de la víctima → necesidad de estandarización nacional de protocolos.
+
+:::
