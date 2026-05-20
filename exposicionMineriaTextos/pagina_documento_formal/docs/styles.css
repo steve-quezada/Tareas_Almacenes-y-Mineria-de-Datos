@@ -1,0 +1,147 @@
+:root {
+  --mt-blue: #1e3a8a;
+  --mt-mid: #2563eb;
+  --mt-light: #dbeafe;
+  --mt-ink: #1e293b;
+  --mt-muted: #64748b;
+  --mt-border: #e2e8f0;
+  --mt-surface: #f8fafc;
+  --mt-accent: #0f766e;
+  --mt-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mt-serif: "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+body {
+  color: var(--mt-ink);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--mt-ink);
+}
+
+h2 {
+  border-bottom: 1px solid var(--mt-border);
+  padding-bottom: 0.25rem;
+}
+
+.mt-hero {
+  background: linear-gradient(140deg, var(--mt-surface) 0%, #eff6ff 100%);
+  border: 1px solid var(--mt-border);
+  border-radius: 13px;
+  padding: 2.2rem 2rem;
+  margin: 1rem 0 2rem;
+}
+
+.mt-eyebrow {
+  color: var(--mt-mid);
+  font-family: var(--mt-ui);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+
+.mt-title {
+  color: var(--mt-ink);
+  font-family: var(--mt-serif);
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.12;
+  margin: 0 0 0.75rem;
+}
+
+.mt-subtitle {
+  color: var(--mt-muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  max-width: 760px;
+}
+
+.mt-stat-grid,
+.mt-card-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  margin: 1.2rem 0 2rem;
+}
+
+.mt-stat,
+.mt-card {
+  background: #fff;
+  border: 1px solid var(--mt-border);
+  border-radius: 11px;
+  padding: 1rem 1.1rem;
+}
+
+.mt-stat {
+  text-align: center;
+}
+
+.mt-stat-num {
+  color: var(--mt-blue);
+  font-family: var(--mt-ui);
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mt-stat-lbl {
+  color: var(--mt-muted);
+  font-family: var(--mt-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+.mt-card {
+  border-left: 4px solid var(--mt-mid);
+}
+
+.mt-card-title {
+  color: var(--mt-ink);
+  font-family: var(--mt-ui);
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.mt-card-body {
+  color: var(--mt-muted);
+  font-family: var(--mt-ui);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.formula-box {
+  background: #fff;
+  border: 1px solid var(--mt-border);
+  border-left: 4px solid var(--mt-accent);
+  border-radius: 10px;
+  margin: 1rem 0;
+  padding: 1rem 1.2rem;
+}
+
+.compact-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.compact-table th:first-child,
+.compact-table td:first-child {
+  text-align: right;
+  white-space: nowrap;
+  width: 4rem;
+}
+
+.result-table table {
+  font-size: 0.92rem;
+}
+
+.sourceCode {
+  border-radius: 10px;
+}

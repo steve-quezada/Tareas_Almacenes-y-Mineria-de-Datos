@@ -1,0 +1,322 @@
+---
+title: "Minería de Texto Avanzada"
+author: "Almacenes y Minería de Datos"
+lang: es
+---
+
+```{=html}
+<div class="mt-hero">
+  <div class="mt-eyebrow">Minería de textos</div>
+  <div class="mt-title">Minería de Texto Avanzada</div>
+  <div class="mt-subtitle">TF-IDF: ponderar términos para representar documentos</div>
+</div>
+```
+
+## Introduccion a la Mineria de Texto Avanzada
+[Omar]
+
+
+
+## TF-IDF
+
+### Planteamiento del problema
+
+En minería de textos, los documentos no pueden analizarse directamente como cadenas de caracteres. Un algoritmo de clasificación, agrupamiento o similitud necesita una representación numérica. TF-IDF (*Term Frequency - Inverse Document Frequency*) resuelve este paso convirtiendo cada documento en un vector donde cada componente representa el peso de un término.
+
+La idea central es distinguir entre dos tipos de palabras:
+
+- Palabras frecuentes pero poco informativas: por ejemplo, "el", "de", "para", "en".
+- Palabras frecuentes dentro de un documento y menos comunes en el corpus: por ejemplo, "filas", "ductos", "muro fronterizo", "investigación".
+
+::: {.callout-note appearance="minimal"}
+TF-IDF no asigna temas directamente. Lo que genera es una matriz de ponderaciones. La interpretación temática se obtiene después, observando qué términos tienen mayor peso en cada documento.
+:::
+
+### Representación vectorial del texto
+
+Supongamos un corpus con $N$ documentos:
+
+$$
+\mathcal{D} = \{d_1, d_2, \ldots, d_N\}
+$$
+
+Después de limpiar y tokenizar los textos, se construye un vocabulario:
+
+$$
+V = \{t_1, t_2, \ldots, t_m\}
+$$
+
+Cada documento se representa como un vector de longitud $m$:
+
+$$
+d_i = (w_{i1}, w_{i2}, \ldots, w_{im})
+$$
+
+donde $w_{ij}$ es el peso TF-IDF del término $t_j$ en el documento $d_i$. Si un término no aparece en un documento, su peso es cero.
+
+```{=html}
+<div class="mt-card-grid">
+  <div class="mt-card">
+    <div class="mt-card-title">Filas</div>
+    <div class="mt-card-body">Cada fila de la matriz representa un documento del CSV.</div>
+  </div>
+  <div class="mt-card">
+    <div class="mt-card-title">Columnas</div>
+    <div class="mt-card-body">Cada columna representa una palabra o frase del vocabulario.</div>
+  </div>
+  <div class="mt-card">
+    <div class="mt-card-title">Celdas</div>
+    <div class="mt-card-body">Cada celda contiene el peso TF-IDF de un término en un documento.</div>
+  </div>
+</div>
+```
+
+### Frecuencia del término
+
+La frecuencia del término, o TF, mide la importancia local de una palabra dentro de un documento.
+
+::: {.formula-box}
+$$
+TF(t,d) = \frac{f(t,d)}{\sum_{t' \in d} f(t',d)}
+$$
+:::
+
+Aquí $f(t,d)$ es el número de veces que el término $t$ aparece en el documento $d$.
+
+Una palabra repetida varias veces dentro del mismo documento obtiene un TF mayor. Por eso en el ejemplo, términos como `filas` en el documento 2 o `discurso` en el documento 6 empiezan a destacar frente a otros términos que solo aparecen una vez.
+
+### Frecuencia inversa en documentos
+
+El IDF mide la especificidad global de un término dentro del corpus. Penaliza términos que aparecen en muchos documentos y favorece términos que aparecen en pocos.
+
+::: {.formula-box}
+$$
+IDF(t) = \log\left(\frac{N}{DF(t)}\right)
+$$
+:::
+
+Donde:
+
+- $N$ es el número total de documentos.
+- $DF(t)$ es el número de documentos donde aparece el término $t$.
+
+En la implementación de `scikit-learn` se usa suavizado:
+
+::: {.formula-box}
+$$
+IDF(t) = \log\left(\frac{1 + N}{1 + DF(t)}\right) + 1
+$$
+:::
+
+El suavizado evita divisiones problemáticas y estabiliza el cálculo cuando el corpus es pequeño.
+
+### Peso TF-IDF
+
+El peso final combina ambas ideas:
+
+::: {.formula-box}
+$$
+TF\text{-}IDF(t,d) = TF(t,d) \times IDF(t)
+$$
+:::
+
+Un término recibe peso alto cuando cumple dos condiciones:
+
+- Aparece con fuerza dentro del documento.
+- No aparece de forma excesiva en todos los documentos.
+
+Esto explica por qué `gasolina` puede ser importante, pero no siempre queda en primer lugar: aparece en varios documentos, así que su IDF baja. En cambio, términos como `filas`, `ductos` o `muro fronterizo` ayudan más a distinguir textos específicos.
+
+### Corpus usado en el ejemplo
+
+El archivo `ejemplo/datos.csv` contiene diez documentos cortos. Fueron escritos con suficiente longitud para que el algoritmo pueda distinguir mejor frecuencia local y rareza global.
+
+::: {.compact-table}
+| ID | Documento |
+|---:|---|
+| 1 | El presidente anunció nuevas medidas para mejorar el abasto de gasolina... El plan de abasto incluye distribución de gasolina... |
+| 2 | La falta de gasolina provocó largas filas... En varias estaciones las filas crecieron porque la gasolina llegó tarde... |
+| 3 | Universidades públicas solicitaron mayor presupuesto... proyectos de investigación y programas de becas. |
+| 6 | Trump defendió la construcción del muro fronterizo... Trump insistió en que el muro fronterizo era necesario... |
+| 9 | Autoridades investigan una red dedicada al robo de gasolina en ductos... venta ilegal de gasolina... |
+:::
+
+### Preprocesamiento aplicado
+
+Antes de calcular TF-IDF, el vectorizador realiza varias transformaciones.
+
+```{=html}
+<div class="mt-card-grid">
+  <div class="mt-card">
+    <div class="mt-card-title">Minúsculas</div>
+    <div class="mt-card-body">Todo el texto se normaliza con <code>lowercase=True</code>.</div>
+  </div>
+  <div class="mt-card">
+    <div class="mt-card-title">Stopwords</div>
+    <div class="mt-card-body">Se eliminan palabras como "el", "de", "para", "con".</div>
+  </div>
+  <div class="mt-card">
+    <div class="mt-card-title">Tokenización</div>
+    <div class="mt-card-body">Se extraen palabras con letras, incluyendo acentos y ñ.</div>
+  </div>
+  <div class="mt-card">
+    <div class="mt-card-title">N-gramas</div>
+    <div class="mt-card-body">Se usan palabras individuales y frases de dos palabras.</div>
+  </div>
+</div>
+```
+
+La lista de *stopwords* no cambia el significado central del corpus; su función es retirar términos gramaticales que aparecen mucho pero distinguen poco.
+
+### Implementación en el ejemplo
+
+El script principal es `ejemplo/tfidf.py`. La parte esencial es la construcción de `TfidfVectorizer`.
+
+```{python}
+#| eval: false
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizador = TfidfVectorizer(
+    lowercase=True,
+    stop_words=STOPWORDS,
+    token_pattern=r"(?u)\b[a-záéíóúñü][a-záéíóúñü]+\b",
+    ngram_range=(1, 2),
+    sublinear_tf=True,
+    smooth_idf=True,
+    norm="l2",
+)
+```
+
+#### Parámetros relevantes
+
+| Parámetro | Función técnica | Efecto en el ejemplo |
+|---|---|---|
+| `lowercase=True` | Normaliza mayúsculas y minúsculas | `Trump` y `trump` se tratan igual |
+| `stop_words=STOPWORDS` | Elimina palabras poco informativas | Reduce ruido en la matriz |
+| `token_pattern` | Define qué cuenta como token | Conserva palabras con acentos |
+| `ngram_range=(1, 2)` | Usa unigramas y bigramas | Permite términos como `muro fronterizo` |
+| `sublinear_tf=True` | Usa escala logarítmica para TF | Evita que una repetición domine demasiado |
+| `smooth_idf=True` | Suaviza el IDF | Estabiliza el cálculo con pocos documentos |
+| `norm="l2"` | Normaliza cada vector | Hace comparables documentos de distinta longitud |
+
+::: {.callout-tip appearance="minimal"}
+El uso de bigramas es importante: no solo aparecen palabras como `muro` o `fronterizo`, sino frases como `muro fronterizo`, que suelen ser más descriptivas.
+:::
+
+### Flujo del programa
+
+El programa sigue una secuencia corta pero muy típica en minería de textos.
+
+```{python}
+#| eval: false
+datos = cargar_datos(ARCHIVO_DATOS)
+matriz_tfidf, terminos = calcular_tfidf(datos)
+
+matriz_completa = crear_matriz_completa(datos, matriz_tfidf, terminos)
+matriz_completa.to_csv(ARCHIVO_MATRIZ, encoding="utf-8")
+
+palabras_representativas = obtener_palabras_representativas(
+    datos,
+    matriz_tfidf,
+    terminos,
+    top_n=5,
+)
+palabras_representativas.to_csv(ARCHIVO_TOP, index=False, encoding="utf-8")
+```
+
+El primer archivo de salida, `matriz_tfidf.csv`, contiene toda la matriz documento-término. El segundo, `palabras_representativas.csv`, resume los cinco términos con mayor peso por documento.
+
+### Resultados principales
+
+Los resultados muestran que los pesos ya no son idénticos para todas las palabras. Al ampliar los documentos, algunos términos se repiten dentro de un mismo texto y otros aparecen en más de un documento, lo que modifica TF e IDF.
+
+::: {.result-table}
+| Documento | Término | TF-IDF | Lectura |
+|---:|---|---:|---|
+| 1 | abasto | 0.277280 | El documento enfatiza la política de abasto |
+| 2 | filas | 0.282687 | La consecuencia visible del desabasto domina el texto |
+| 3 | investigación | 0.199350 | La demanda universitaria gira alrededor de investigación, presupuesto y becas |
+| 6 | discurso | 0.298094 | El contexto discursivo se repite y diferencia el documento |
+| 9 | ductos | 0.231510 | El robo de gasolina se ubica en infraestructura específica |
+:::
+
+### Interpretación técnica de tres documentos
+
+#### Documento 2
+
+El texto habla de falta de gasolina, filas y estaciones. El término con mayor peso es `filas`:
+
+::: {.formula-box}
+`filas` obtiene peso alto porque aparece más de una vez en el documento y no aparece como término dominante en los demás textos.
+:::
+
+| Término | TF-IDF |
+|---|---:|
+| filas | 0.282687 |
+| estaciones | 0.210243 |
+| gasolina | 0.186921 |
+| tarde conductores | 0.166960 |
+| tarde | 0.166960 |
+
+Aunque `gasolina` es importante, aparece en otros documentos del corpus. Por eso su IDF es menor que el de términos más específicos.
+
+#### Documento 3
+
+El documento combina educación superior, presupuesto, investigación y becas.
+
+| Término | TF-IDF |
+|---|---:|
+| investigación | 0.199350 |
+| presupuesto | 0.199350 |
+| becas | 0.199350 |
+| sostiene laboratorios | 0.178061 |
+| solicitaron mayor | 0.178061 |
+
+Los tres primeros términos tienen el mismo peso porque aparecen con frecuencia comparable y tienen una rareza global parecida dentro del corpus.
+
+#### Documento 6
+
+El texto se centra en Trump, un discurso y el muro fronterizo.
+
+| Término | TF-IDF |
+|---|---:|
+| discurso | 0.298094 |
+| muro fronterizo | 0.298094 |
+| muro | 0.298094 |
+| fronterizo | 0.298094 |
+| trump | 0.253407 |
+
+`Trump` aparece también en el documento 7, por eso su IDF baja ligeramente. En cambio, `muro fronterizo` es más específico del documento 6 y conserva un peso mayor.
+
+### Qué produce exactamente el algoritmo
+
+El resultado de TF-IDF no es una clasificación ni un resumen automático. Es una transformación:
+
+$$
+\text{texto crudo} \longrightarrow \text{matriz numérica documento-término}
+$$
+
+Esa matriz puede usarse después para:
+
+- buscar documentos similares;
+- entrenar clasificadores;
+- hacer agrupamiento;
+- extraer palabras clave;
+- comparar documentos por distancia coseno.
+
+::: {.callout-warning appearance="minimal"}
+TF-IDF no entiende sinónimos ni contexto profundo. Si dos documentos usan palabras distintas para expresar la misma idea, TF-IDF puede tratarlos como diferentes. Por eso funciona bien como representación clásica e interpretable, pero no sustituye a modelos semánticos modernos.
+:::
+
+### Conclusión
+
+TF-IDF es una técnica central en minería de textos porque convierte documentos en vectores interpretables. Su fuerza está en equilibrar frecuencia local y rareza global: una palabra importa si aparece dentro del documento, pero importa más si además ayuda a diferenciarlo del resto.
+
+En este ejemplo, la implementación con `TfidfVectorizer` permite pasar de un CSV con noticias cortas a dos salidas útiles: una matriz completa de pesos y una tabla con los términos más representativos de cada documento.
+
+## Modelado de tópicos (LDA)
+[Edgar]
+
+
+## Análisis de sentimientos
+[Steve]

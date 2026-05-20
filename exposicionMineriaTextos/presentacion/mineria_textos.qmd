@@ -1,0 +1,368 @@
+---
+title: "Análisis TF-IDF"
+subtitle: "Minería de textos: de palabras a valores numéricos"
+author: "Almacenes y Minería de Datos"
+date: "2026-05-20"
+format:
+  revealjs:
+    theme: [simple, tfidf-theme.scss]
+    slide-number: true
+    transition: slide
+    width: 1280
+    height: 720
+    margin: 0.06
+    footer: "Minería de Textos · TF-IDF"
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+---
+
+## ¿Qué es TF-IDF?
+
+:::: {.columns}
+::: {.column width="58%"}
+
+**TF-IDF** es una técnica de minería de texto que mide qué tan importante es una palabra dentro de un documento, comparándola con los demás documentos de una colección.
+
+Convierte texto en **valores numéricos**, lo que permite analizar documentos con algoritmos de minería de datos y aprendizaje automático.
+
+:::
+::: {.column width="42%"}
+
+::: {.formula-card}
+**TF-IDF**
+
+`TF` = Frecuencia del término  
+`IDF` = Frecuencia inversa en documentos
+:::
+
+:::
+::::
+
+---
+
+## ¿Qué problema resuelve?
+
+Si solo contamos frecuencia, podemos pensar que la palabra más repetida siempre es la más importante.
+
+Pero eso no siempre es cierto:
+
+::: {.problem-box}
+Una palabra puede aparecer muchas veces porque es común en todos los textos, no porque describa bien un documento específico.
+:::
+
+**Problema central:** la frecuencia simple dice qué palabras se repiten más, pero no cuáles son realmente representativas.
+
+---
+
+## Idea principal
+
+TF-IDF no busca solo la palabra más repetida.
+
+Busca la palabra que mejor representa a un documento frente a los demás.
+
+::: {.equation-flow}
+::: {.flow-item}
+Aparece mucho  
+en este documento
+:::
+
+::: {.flow-symbol}
++
+:::
+
+::: {.flow-item}
+Aparece poco  
+en los demás
+:::
+
+::: {.flow-symbol}
+=
+:::
+
+::: {.flow-item .highlight}
+Palabra  
+representativa
+:::
+:::
+
+---
+
+## ¿Qué hace TF-IDF?
+
+::: {.incremental}
+
+- Identifica palabras representativas de cada documento.
+- Da menos peso a palabras comunes en toda la colección.
+- Da más peso a palabras frecuentes en un documento, pero raras en los demás.
+- Transforma texto en vectores numéricos para poder analizarlo.
+
+:::
+
+---
+
+## Pasos previos al algoritmo
+
+Antes de calcular TF-IDF, el texto debe prepararse.
+
+:::: {.columns}
+::: {.column width="50%"}
+
+1. Recopilar los documentos.
+2. Limpiar el contenido.
+3. Convertir todo a un formato consistente.
+4. Dividir el texto en palabras o términos.
+
+:::
+::: {.column width="50%"}
+
+5. Eliminar palabras poco útiles.
+6. Normalizar palabras si es necesario.
+7. Construir el vocabulario.
+8. Convertir el texto en datos analizables.
+
+:::
+::::
+
+---
+
+## TF: frecuencia del término
+
+**TF** mide cuántas veces aparece una palabra en un documento.
+
+Por ejemplo:
+
+::: {.example-box}
+Si la palabra **"gasolina"** aparece muchas veces en un texto, su `TF` será alto.
+:::
+
+Una forma simple de calcularlo es:
+
+$$
+TF(t,d) = \frac{\text{número de veces que aparece } t \text{ en } d}{\text{total de términos en } d}
+$$
+
+---
+
+## IDF: frecuencia inversa en documentos
+
+**IDF** mide qué tan común o rara es una palabra en toda la colección de documentos.
+
+::: {.example-box}
+Si **"gasolina"** aparece en pocos documentos, su `IDF` será alto.
+:::
+
+Una forma común de calcularlo es:
+
+$$
+IDF(t) = \log \left(\frac{N}{DF(t)}\right)
+$$
+
+Donde `N` es el número total de documentos y `DF(t)` es el número de documentos que contienen el término.
+
+---
+
+## Fórmula general
+
+El peso final combina las dos ideas:
+
+::: {.big-formula}
+$$
+TF\text{-}IDF(t,d) = TF(t,d) \times IDF(t)
+$$
+:::
+
+**Idea clave:** una palabra tiene mayor peso si aparece mucho en un documento, pero aparece poco en los demás.
+
+---
+
+## Ejemplo: documentos originales {.smaller}
+
+Primero se parte del texto completamente crudo.
+
+::: {.compact-doc-table}
+| ID | Documento |
+|---:|---|
+| 1 | El presidente anunció nuevas medidas para mejorar el abasto de gasolina en varias ciudades del país. El plan de abasto incluye distribución de gasolina, supervisión de precios y coordinación con estaciones de servicio. |
+| 2 | La falta de gasolina provocó largas filas en estaciones de servicio durante la mañana. En varias estaciones las filas crecieron porque la gasolina llegó tarde y los conductores esperaron durante horas. |
+| 3 | Universidades públicas solicitaron mayor presupuesto para investigación, educación y becas estudiantiles. Los rectores señalaron que el presupuesto universitario sostiene laboratorios, proyectos de investigación y programas de becas. |
+| 4 | El presupuesto nacional contempla apoyos para universidades, hospitales y programas sociales. La propuesta de presupuesto aumenta recursos para hospitales públicos, becas sociales y programas de atención comunitaria. |
+| 5 | La Guardia Nacional reforzó la seguridad en carreteras y zonas con reportes de robo de combustible. El operativo de seguridad vigila carreteras, ductos y estaciones para reducir el robo de gasolina. |
+:::
+
+---
+
+## Ejemplo: documentos originales {.smaller}
+
+::: {.compact-doc-table}
+| ID | Documento |
+|---:|---|
+| 6 | Trump defendió la construcción del muro fronterizo durante un discurso ante sus simpatizantes. En el discurso, Trump insistió en que el muro fronterizo era necesario para controlar la migración. |
+| 7 | El gobierno mexicano respondió a las declaraciones de Trump sobre migración y seguridad fronteriza. La respuesta del gobierno señaló que la migración debe atenderse con cooperación, seguridad fronteriza y diálogo diplomático. |
+| 8 | Estudiantes universitarios protestaron por recortes al presupuesto de educación pública. La protesta estudiantil exigió más presupuesto, becas, investigación y apoyo para universidades públicas. |
+| 9 | Autoridades investigan una red dedicada al robo de gasolina en ductos del centro del país. La investigación ubicó ductos clandestinos, venta ilegal de gasolina y vehículos usados para transportar combustible robado. |
+| 10 | El presidente se reunió con rectores para discutir presupuesto, investigación y desarrollo tecnológico. En la reunión se habló de presupuesto universitario, proyectos de investigación, innovación tecnológica y becas para estudiantes. |
+:::
+
+---
+
+## Palabras poco útiles
+
+Antes de calcular pesos, se eliminan palabras que aparecen mucho pero aportan poco significado.
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Ejemplos del corpus**
+
+- el
+- la
+- de
+- del
+- en
+- y
+
+:::
+::: {.column width="50%"}
+
+**¿Por qué quitarlas?**
+
+Estas palabras ayudan a construir frases, pero no suelen distinguir un documento de otro.
+
+Si no se eliminan, pueden ocupar espacio en la matriz sin explicar realmente el contenido.
+
+:::
+::::
+
+---
+
+## Después de limpiar: términos candidatos
+
+El texto se queda con palabras y frases más informativas.
+
+| Documento | Antes | Después de limpiar |
+|---:|---|---|
+| 2 | La falta de gasolina provocó largas filas en estaciones de servicio... | falta, gasolina, filas, estaciones, gasolina, tarde, conductores, horas |
+| 3 | Universidades públicas solicitaron mayor presupuesto para investigación... | universidades, públicas, presupuesto, investigación, becas, rectores, laboratorios |
+| 6 | Trump defendió la construcción del muro fronterizo durante un discurso... | trump, defendió, construcción, muro, fronterizo, discurso, migración |
+
+Aquí todavía no hay importancia: solo tenemos términos listos para ponderar.
+
+---
+
+## Resultados TF-IDF: documento 2
+
+::: {.example-box}
+La falta de gasolina provocó largas filas en estaciones de servicio durante la mañana. En varias estaciones las filas crecieron porque la gasolina llegó tarde y los conductores esperaron durante horas.
+:::
+
+| Término | TF-IDF |
+|---|---:|
+| filas | 0.282687 |
+| estaciones | 0.210243 |
+| gasolina | 0.186921 |
+| tarde conductores | 0.166960 |
+| tarde | 0.166960 |
+
+---
+
+## Resultados TF-IDF: documento 3
+
+::: {.example-box}
+Universidades públicas solicitaron mayor presupuesto para investigación, educación y becas estudiantiles. Los rectores señalaron que el presupuesto universitario sostiene laboratorios, proyectos de investigación y programas de becas.
+:::
+
+| Término | TF-IDF |
+|---|---:|
+| investigación | 0.199350 |
+| presupuesto | 0.199350 |
+| becas | 0.199350 |
+| sostiene laboratorios | 0.178061 |
+| solicitaron mayor | 0.178061 |
+
+
+---
+
+## Resultados TF-IDF: documento 6
+
+::: {.example-box}
+Trump defendió la construcción del muro fronterizo durante un discurso ante sus simpatizantes. En el discurso, Trump insistió en que el muro fronterizo era necesario para controlar la migración.
+:::
+
+| Término | TF-IDF |
+|---|---:|
+| discurso | 0.298094 |
+| muro fronterizo | 0.298094 |
+| muro | 0.298094 |
+| fronterizo | 0.298094 |
+| trump | 0.253407 |
+
+
+---
+
+## Qué nos dicen las ponderaciones
+
+Estan basadas en estos 3 aspectos:
+
+::: {.interpretation-grid}
+::: {.interpret-card}
+**Frecuencia local**
+
+Términos repetidos dentro del documento suben de peso.
+:::
+
+::: {.interpret-card}
+**Rareza global**
+
+Términos que aparecen en pocos documentos conservan más importancia.
+:::
+
+::: {.interpret-card}
+**Diferenciación**
+
+Los pesos más altos muestran qué distingue a cada texto.
+:::
+:::
+
+**Conclusión del ejemplo:** TF-IDF transforma documentos completos en una lista de términos ponderados que permiten leer de qué trata cada texto y qué lo vuelve distinto.
+
+---
+
+## Lo que TF-IDF no hace por sí solo
+
+TF-IDF genera **ponderaciones numéricas**, pero no interpreta automáticamente el significado completo del texto.
+
+No hace por sí solo:
+
+::: {.incremental}
+
+- Clasificación de temas.
+- Agrupamiento de documentos.
+- Detección semántica profunda.
+- Comprensión del contexto como lo haría un modelo de lenguaje.
+
+:::
+
+---
+
+## ¿Para qué se usa después?
+
+Los pesos TF-IDF pueden alimentar otros modelos o tareas:
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Clasificación de documentos.
+- Búsqueda de similitud.
+- Sistemas de recomendación.
+
+:::
+::: {.column width="50%"}
+
+- Agrupamiento de textos.
+- Extracción de palabras clave.
+- Detección de temas.
+
+:::
+::::

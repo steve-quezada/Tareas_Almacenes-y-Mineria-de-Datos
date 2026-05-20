@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Minería de Texto Avanzada"
+  search: true
+  navbar:
+    background: primary
+    left:
+      - text: "Minería de Texto Avanzada"
+        href: index.qmd
+
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-title: "Contenido"
+    number-sections: true
+    anchor-sections: true
+    code-fold: true
+    code-tools: true
+    code-summary: "Mostrar código"
+    code-overflow: wrap
+    theme: cosmo
+    highlight-style: github
+    css: styles.css
+    smooth-scroll: true
+    fig-align: center
+    fontsize: "16px"
+    linestretch: 1.6
+    mainfont: "Palatino"
+    monofont: "Fira Mono"
+
+execute:
+  echo: true
+  warning: false
+  message: false
