@@ -351,7 +351,8 @@ Cuando estamos manejando una gran cantidad de textos, casi siempre urge la neces
 
 El análisis de tópicos es un caso particular de los recursos vistos con anterioridad. La frecuencia de patrones en los textos se usan para armar agrupamientos arbitrarios en los que agrupar los textos.
 
-#### ¿Qué es un tópico?
+## ¿Qué es un tópico?
+
 
 Se define a un tópico como el tema de una conversación o una discusión. En este caso del procesado de textos, cuando hablemos de tópicos nos referiremos al tema del que trata un texto.
 
@@ -361,11 +362,11 @@ Se define a un tópico como el tema de una conversación o una discusión. En es
 
 En casos reales, los textos no tienen solo un tópico, tienen varios.
 
-Los textos no siempre están limpios; todo esta bien mal "escribido".
+Los textos no siempre están limpios; todo está bien mal "escribido".
 
-Al ser esto una introducción al análisis de tópicos, tomamos un ejemplo simple y se omite un paso no tan pedagogicamente importante.
+Al ser esto una introducción al análisis de tópicos, tomamos un ejemplo simple y se omite un paso no tan pedagógicamente importante.
 
-### Escenario de Ejemplo: Página de tutoriales.
+## Escenario de Ejemplo: Página de tutoriales.
 
 Una página web de tutoriales quiere clasificar sus guías en 4 categorías: **Recetas de cocina**, **papiroflexia**, **alfarería** y **carpintería**. Esta página cuenta con todos sus documentos en el mismo formato y sin ningún error ortográfico, ya que se lleva a cabo un proceso de revisión antes de la publicación de tutoriales.
 
@@ -381,13 +382,13 @@ Una página web de tutoriales quiere clasificar sus guías en 4 categorías: **R
 | 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. |
 | 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. |
 
-### Preprocesado
+## Preprocesado
 
 Antes de hacer nuestro modelo, debemos de deshacernos de las cosas indeseables.
 
-**Parrafos/Saltos de línea/caracteres especiales:** Ninguno nos revela nada acerca del texto
+**Párrafos/Saltos de línea/caracteres especiales:** Ninguno nos revela nada acerca del texto
 
-**Stopwords:** Palabras que le dan sentido al texto al conjugarse con otras palabras, pero solas no tienen sentidos
+**Stopwords:** Palabras que le dan sentido al texto al conjugarse con otras palabras, pero solas no tienen sentido
 
 Después del "podado" de cosas indeseables tenemos
 
@@ -403,19 +404,19 @@ Después del "podado" de cosas indeseables tenemos
 | 7 | carpinteria necesitas madera pino tablon utiliza martillo madera armar mueble carpinteria |
 | 8 | construye mueble madera habitacion carpinteria debes lijar tablon madera mueble |
 
-### Extracción de palabras puras
+## Extracción de palabras puras
 
 Hacemos un DTM (una matriz con todas las incidencias de una palabra sobre todos los textos) y extraemos las columnas para saber todas las palabras usadas en los textos.
 
 **En el ejemplo tenemos 47 palabras puras.**
 
-### Función LDA
+## Función LDA
 
-Es un método que nos permité hacer la agrupación de textos desde 0.
+Es un método que nos permite hacer la agrupación de textos desde 0.
 
 Recibe todas las palabras puras únicas que se recopilaron, además de recibir como parámetro una K que es el número de categorías.
 
-LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoria "X") aleatorios en las palabras.
+LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoría "X") aleatorios en las palabras.
 
 Pasa palabra por palabra, documento por documento, recalculando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
 
@@ -423,7 +424,7 @@ Repite este escaneo miles de veces hasta que las palabras se agrupan de forma l�
 
 Además, se puede configurar tanto el **número de pasadas** que se le darán a los textos para ajustar los pesos, una **semilla** que haga la asignación de pesos inicial a las palabras, y la **forma de análisis** de los textos, siendo `batch` un análisis completo de todo el lote de información, mientras que `online` lo hace por partes.
 
-#### En nuestro ejemplo ...
+### En nuestro ejemplo ...
 
 ``` python
         n_components=k,
@@ -432,7 +433,7 @@ Además, se puede configurar tanto el **número de pasadas** que se le darán a 
         random_state=42,          # Semilla 
 ```
 
-### Aplicar LDA al ejemplo
+## Aplicar LDA al ejemplo
 
 Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar cuáles fueron las palabras más relevantes para asignar tópico.
 
@@ -443,7 +444,7 @@ Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar c
 | Tópico 3 (Recetas de cocina) |  receta, pastel, dulce, harina, horno |
 | Tópico 4 (Papiroflexia) | papel, origami, papiroflexia, pliegue, figura |
 
-### ¿A qué tópico pertenecen nuestros textos?
+## ¿A qué tópico pertenecen nuestros textos?
 
 |  |  |  |
 |----|----|----|
@@ -457,7 +458,7 @@ Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar c
 | 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. | Tópico 2 (Carpintería) |
 | 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. | Tópico 2 (Carpintería) |
 
-### Algunos errores que se pueden presentar
+## Algunos errores que se pueden presentar
 
 **Nunca es buena idea entrenar modelos con poca información:** Pocos datos implican mayor incertidumbre para el modelo.
 
