@@ -1,6 +1,6 @@
 ---
-title: "Análisis TF-IDF"
-subtitle: "Minería de textos: de palabras a valores numéricos"
+title: "Mineria de Textos Avanzada"
+subtitle: "Almacenes y Mineria de Datos"
 author: "Almacenes y Minería de Datos"
 date: "2026-05-20"
 format:
@@ -17,6 +17,9 @@ execute:
   echo: false
   warning: false
 ---
+
+# TF-IDF
+Term Frequency - Inverse Document Frequency
 
 ## ¿Qué es TF-IDF?
 
@@ -49,7 +52,6 @@ Pero eso no siempre es cierto:
 Una palabra puede aparecer muchas veces porque es común en todos los textos, no porque describa bien un documento específico.
 :::
 
-**Problema central:** la frecuencia simple dice qué palabras se repiten más, pero no cuáles son realmente representativas.
 
 ------------------------------------------------------------------------
 
@@ -83,39 +85,6 @@ Palabra\
 representativa
 :::
 ::::::::
-
-------------------------------------------------------------------------
-
-## ¿Qué hace TF-IDF?
-
-::: incremental
-- Identifica palabras representativas de cada documento.
-- Da menos peso a palabras comunes en toda la colección.
-- Da más peso a palabras frecuentes en un documento, pero raras en los demás.
-- Transforma texto en vectores numéricos para poder analizarlo.
-:::
-
-------------------------------------------------------------------------
-
-## Pasos previos al algoritmo
-
-Antes de calcular TF-IDF, el texto debe prepararse.
-
-::::: columns
-::: {.column width="50%"}
-1.  Recopilar los documentos.
-2.  Limpiar el contenido.
-3.  Convertir todo a un formato consistente.
-4.  Dividir el texto en palabras o términos.
-:::
-
-::: {.column width="50%"}
-5.  Eliminar palabras poco útiles.
-6.  Normalizar palabras si es necesario.
-7.  Construir el vocabulario.
-8.  Convertir el texto en datos analizables.
-:::
-:::::
 
 ------------------------------------------------------------------------
 
@@ -163,7 +132,7 @@ $$TF\text{-}IDF(t,d) = TF(t,d) \times IDF(t)$$
 
 ------------------------------------------------------------------------
 
-## Ejemplo: documentos originales {.smaller}
+## Ejemplo: Tweets de Politica {.smaller}
 
 Primero se parte del texto completamente crudo.
 
@@ -179,7 +148,7 @@ Primero se parte del texto completamente crudo.
 
 ------------------------------------------------------------------------
 
-## Ejemplo: documentos originales {.smaller}
+## Ejemplo: Tweets de Politica {.smaller}
 
 ::: compact-doc-table
 | ID | Documento |
@@ -210,7 +179,7 @@ Antes de calcular pesos, se eliminan palabras que aparecen mucho pero aportan po
 :::
 
 ::: {.column width="50%"}
-**¿Por qué quitarlas?**
+**¿Por qué eliminarlas?**
 
 Estas palabras ayudan a construir frases, pero no suelen distinguir un documento de otro.
 
@@ -232,7 +201,8 @@ El texto se queda con palabras y frases más informativas.
 
 Aquí todavía no hay importancia: solo tenemos términos listos para ponderar.
 
-------------------------------------------------------------------------
+# Ejecucion del Ejemplo
+
 
 ## Resultados TF-IDF: documento 2
 
@@ -284,29 +254,29 @@ Trump defendió la construcción del muro fronterizo durante un discurso ante su
 
 ## Qué nos dicen las ponderaciones
 
-Estan basadas en estos 3 aspectos:
+Una ponderación en TF-IDF no dice si una palabra es "buena" o "mala", nos dice qué tan útil es ese término para **describir un documento específico** dentro de una colección. El valor sube cuando se combinan varias cosas:
 
 :::::: interpretation-grid
 ::: interpret-card
 **Frecuencia local**
 
-Términos repetidos dentro del documento suben de peso.
+El término aparece varias veces dentro del mismo documento.
 :::
 
 ::: interpret-card
 **Rareza global**
 
-Términos que aparecen en pocos documentos conservan más importancia.
+El término no aparece en muchos documentos de la colección.
 :::
 
 ::: interpret-card
 **Diferenciación**
 
-Los pesos más altos muestran qué distingue a cada texto.
+El término ayuda a separar ese documento de los demás.
 :::
 ::::::
 
-**Conclusión del ejemplo:** TF-IDF transforma documentos completos en una lista de términos ponderados que permiten leer de qué trata cada texto y qué lo vuelve distinto.
+**Idea clave:** Un peso alto significa que esa palabra caracteriza bien a ese documento frente al resto.
 
 ------------------------------------------------------------------------
 
@@ -345,20 +315,22 @@ Los pesos TF-IDF pueden alimentar otros modelos o tareas:
 
 # Análisis de tópicos
 
+## Motivación 
+
 Una de las preguntas más simples, pero más importantes a la hora de leer y extraer información de un texto: ¿De qué trata el texto que leí?
 
 Cuando estamos manejando una gran cantidad de textos, casi siempre urge la necesidad de agrupar grandes cantidades de datos en grupos que junten los datos más parecidos entre si. En manejo de textos, ¿Qué mejor que agrupar dichos textos en sus temas centrales?
 
 El análisis de tópicos es un caso particular de los recursos vistos con anterioridad. La frecuencia de patrones en los textos se usan para armar agrupamientos arbitrarios en los que agrupar los textos.
 
-## ¿Qué es un tópico?
+## ¿Qué es un tópico? 
 
 
 Se define a un tópico como el tema de una conversación o una discusión. En este caso del procesado de textos, cuando hablemos de tópicos nos referiremos al tema del que trata un texto.
 
-## Construir un asignador de tópicos
+## Construir un asignador de tópicos 
 
-### Consideraciones
+**Consideraciones**
 
 En casos reales, los textos no tienen solo un tópico, tienen varios.
 
@@ -366,7 +338,7 @@ Los textos no siempre están limpios; todo está bien mal "escribido".
 
 Al ser esto una introducción al análisis de tópicos, tomamos un ejemplo simple y se omite un paso no tan pedagógicamente importante.
 
-## Escenario de Ejemplo: Página de tutoriales.
+## Escenario de ejemplo: página de tutoriales {.topic-compact .topic-table-slide}
 
 Una página web de tutoriales quiere clasificar sus guías en 4 categorías: **Recetas de cocina**, **papiroflexia**, **alfarería** y **carpintería**. Esta página cuenta con todos sus documentos en el mismo formato y sin ningún error ortográfico, ya que se lleva a cabo un proceso de revisión antes de la publicación de tutoriales.
 
@@ -382,7 +354,7 @@ Una página web de tutoriales quiere clasificar sus guías en 4 categorías: **R
 | 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. |
 | 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. |
 
-## Preprocesado
+## Preprocesado {.topic-compact .topic-table-slide}
 
 Antes de hacer nuestro modelo, debemos de deshacernos de las cosas indeseables.
 
@@ -410,7 +382,7 @@ Hacemos un DTM (una matriz con todas las incidencias de una palabra sobre todos 
 
 **En el ejemplo tenemos 47 palabras puras.**
 
-## Función LDA
+## Función LDA 
 
 Es un método que nos permite hacer la agrupación de textos desde 0.
 
@@ -418,13 +390,15 @@ Recibe todas las palabras puras únicas que se recopilaron, además de recibir c
 
 LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoría "X") aleatorios en las palabras.
 
+## ¿Cómo aprende LDA? {.topic-compact .topic-code-slide}
+
 Pasa palabra por palabra, documento por documento, recalculando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
 
 Repite este escaneo miles de veces hasta que las palabras se agrupan de forma lógica. En nuestro ejemplo: Las palabras de cocina se atraen entre sí, las de papiroflexia hacen lo mismo, y las categorías se vuelven nítidas.
 
 Además, se puede configurar tanto el **número de pasadas** que se le darán a los textos para ajustar los pesos, una **semilla** que haga la asignación de pesos inicial a las palabras, y la **forma de análisis** de los textos, siendo `batch` un análisis completo de todo el lote de información, mientras que `online` lo hace por partes.
 
-### En nuestro ejemplo ...
+### En nuestro ejemplo ... 
 
 ``` python
         n_components=k,
@@ -444,7 +418,7 @@ Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar c
 | Tópico 3 (Recetas de cocina) |  receta, pastel, dulce, harina, horno |
 | Tópico 4 (Papiroflexia) | papel, origami, papiroflexia, pliegue, figura |
 
-## ¿A qué tópico pertenecen nuestros textos?
+## ¿A qué tópico pertenecen nuestros textos? {.topic-compact .topic-table-slide}
 
 |  |  |  |
 |----|----|----|
@@ -458,7 +432,7 @@ Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar c
 | 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. | Tópico 2 (Carpintería) |
 | 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. | Tópico 2 (Carpintería) |
 
-## Algunos errores que se pueden presentar
+## Algunos errores que se pueden presentar {.topic-compact .topic-image-slide}
 
 **Nunca es buena idea entrenar modelos con poca información:** Pocos datos implican mayor incertidumbre para el modelo.
 
@@ -466,4 +440,4 @@ Pocas palabras que coincidan pueden confundir al modelo, empeora si son pocas en
 
 Se puede observar en la siguiente gráfica lo certero que estaba el modelo a la hora de asignar un tópico
 
-![](images/paste-1.png)
+![](images/paste-1.png){.r-stretch}
