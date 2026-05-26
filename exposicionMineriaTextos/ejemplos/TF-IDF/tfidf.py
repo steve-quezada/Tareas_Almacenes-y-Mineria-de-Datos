@@ -4,9 +4,11 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-ARCHIVO_DATOS = Path(__file__).with_name("datos.csv")
-ARCHIVO_MATRIZ = Path(__file__).with_name("matriz_tfidf.csv")
-ARCHIVO_TOP = Path(__file__).with_name("palabras_representativas.csv")
+DIRECTORIO_SCRIPT = Path(__file__).resolve().parent
+
+ARCHIVO_DATOS = DIRECTORIO_SCRIPT / "datos.csv"
+ARCHIVO_MATRIZ = DIRECTORIO_SCRIPT / "matriz_tfidf.csv"
+ARCHIVO_TOP = DIRECTORIO_SCRIPT / "palabras_representativas.csv"
 
 # Stopwords basicas en espanol. Se pueden ampliar segun el corpus.
 STOPWORDS = [
