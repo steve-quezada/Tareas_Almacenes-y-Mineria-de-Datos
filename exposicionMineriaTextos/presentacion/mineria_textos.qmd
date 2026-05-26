@@ -52,8 +52,8 @@ Pero eso no siempre es cierto:
 Una palabra puede aparecer muchas veces porque es común en todos los textos, no porque describa bien un documento específico.
 :::
 
-
 ------------------------------------------------------------------------
+
 
 ## Idea principal
 
@@ -120,6 +120,7 @@ Donde `N` es el número total de documentos y `DF(t)` es el número de documento
 
 ------------------------------------------------------------------------
 
+
 ## Fórmula general
 
 El peso final combina las dos ideas:
@@ -131,6 +132,7 @@ $$TF\text{-}IDF(t,d) = TF(t,d) \times IDF(t)$$
 **Idea clave:** una palabra tiene mayor peso si aparece mucho en un documento, pero aparece poco en los demás.
 
 ------------------------------------------------------------------------
+
 
 ## Ejemplo: Tweets de Politica {.smaller}
 
@@ -164,16 +166,17 @@ Primero se parte del texto completamente crudo.
 
 ## Palabras poco útiles
 
-Antes de calcular pesos, se eliminan palabras que aparecen mucho pero aportan poco significado.
+Antes de calcular TF-IDF, normalmente se eliminan **stopwords**: palabras muy comunes que se repiten mucho, pero aportan poco valor para identificar el tema de un documento.
 
 ::::: columns
 ::: {.column width="50%"}
-**Ejemplos del corpus**
+**Ejemplos de stopwords**
 
 - el
 - la
 - de
 - del
+- que
 - en
 - y
 :::
@@ -181,11 +184,13 @@ Antes de calcular pesos, se eliminan palabras que aparecen mucho pero aportan po
 ::: {.column width="50%"}
 **¿Por qué eliminarlas?**
 
-Estas palabras ayudan a construir frases, pero no suelen distinguir un documento de otro.
+Ayudan a construir frases, pero aparecen en casi cualquier texto y no suelen distinguir un documento de otro.
 
-Si no se eliminan, pueden ocupar espacio en la matriz sin explicar realmente el contenido.
+Si se quedan, pueden ocupar espacio en la matriz sin explicar realmente el contenido.
 :::
 :::::
+
+**Idea clave:** quitar estas palabras permite que TF-IDF se enfoque en términos con mayor valor descriptivo.
 
 ------------------------------------------------------------------------
 
@@ -280,36 +285,27 @@ El término ayuda a separar ese documento de los demás.
 
 ------------------------------------------------------------------------
 
-## Lo que TF-IDF no hace por sí solo
+## Qué hace y qué no hace TF-IDF
 
-TF-IDF genera **ponderaciones numéricas**, pero no interpreta automáticamente el significado completo del texto.
+TF-IDF **no entiende el significado completo del texto**: solo transforma documentos en pesos numéricos que indican qué términos los caracterizan mejor.
 
-No hace por sí solo:
-
-::: incremental
-- Clasificación de temas.
-- Agrupamiento de documentos.
-- Detección semántica profunda.
-- Comprensión del contexto como lo haría un modelo de lenguaje.
-:::
-
-------------------------------------------------------------------------
-
-## ¿Para qué se usa después?
-
-Los pesos TF-IDF pueden alimentar otros modelos o tareas:
+Por esta razon, Tf-IDF no clasifica ni genera temas, no agrupa documentos ni detecta contexto profundo por sí solo. Su valor aparece cuando esos pesos se usan como **representación de entrada** para otras tareas:
 
 ::::: columns
 ::: {.column width="50%"}
-- Clasificación de documentos.
-- Búsqueda de similitud.
-- Sistemas de recomendación.
+**Como medida directa**
+
+- Extraer palabras clave.
+- Comparar similitud entre textos.
+- Mejorar búsquedas.
 :::
 
 ::: {.column width="50%"}
-- Agrupamiento de textos.
-- Extracción de palabras clave.
-- Detección de temas.
+**Como insumo para modelos**
+
+- Clasificar documentos.
+- Agrupar textos.
+- Apoyar recomendadores o detección de temas.
 :::
 :::::
 

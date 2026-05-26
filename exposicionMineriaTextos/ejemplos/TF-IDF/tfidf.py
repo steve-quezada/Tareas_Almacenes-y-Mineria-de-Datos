@@ -65,7 +65,6 @@ STOPWORDS = [
 
 
 def cargar_datos(ruta_csv):
-    """Carga el CSV y valida que existan las columnas esperadas."""
     datos = pd.read_csv(ruta_csv)
 
     columnas_necesarias = {"id", "texto"}
@@ -79,15 +78,12 @@ def cargar_datos(ruta_csv):
 
 
 def construir_vectorizador():
-    """
-    Configura TfidfVectorizer.
-
-    Este objeto hace internamente:
-    1. Limpieza basica del texto.
-    2. Tokenizacion.
-    3. Conteo de terminos.
-    4. Calculo de TF-IDF.
-    """
+    
+    # Devuelve un TfidfVectorizer, wste objeto hace internamente:
+    # 1. Limpieza basica del texto.
+    # 2. Tokenizacion.
+    # 3. Conteo de terminos.
+    # 4. Calculo de TF-IDF.
     return TfidfVectorizer(
         lowercase=True,
         stop_words=STOPWORDS,
@@ -100,7 +96,7 @@ def construir_vectorizador():
 
 
 def calcular_tfidf(datos):
-    """Calcula la matriz TF-IDF y regresa tambien los nombres de terminos."""
+    # Calcula la matriz TF-IDF y regresa tambien los nombres de terminos
     vectorizador = construir_vectorizador()
     matriz_tfidf = vectorizador.fit_transform(datos["texto"])
     terminos = vectorizador.get_feature_names_out()
@@ -109,21 +105,19 @@ def calcular_tfidf(datos):
 
 
 def crear_matriz_completa(datos, matriz_tfidf, terminos):
-    """Convierte la matriz dispersa de sklearn en una tabla legible."""
+    # Convierte la matriz dispersa de sklearn en una tabla legible
     matriz = pd.DataFrame(
         matriz_tfidf.toarray(),
         columns=terminos,
         index=datos["id"],
     )
-
     matriz.index.name = "id"
     return matriz.round(6)
 
 
 def obtener_palabras_representativas(datos, matriz_tfidf, terminos, top_n=5):
-    """Obtiene las palabras o frases con mayor TF-IDF en cada documento."""
+    # Obtiene las `top_n` palabras o frases con mayor TF-IDF en cada documento.
     resultados = []
-
     for posicion_documento, documento in datos.iterrows():
         fila = matriz_tfidf[posicion_documento].toarray().ravel()
         indices_ordenados = fila.argsort()[::-1]
@@ -143,10 +137,9 @@ def obtener_palabras_representativas(datos, matriz_tfidf, terminos, top_n=5):
 
 
 def mostrar_palabras_representativas(palabras_representativas):
-    """Imprime resultados resumidos en consola."""
+    # Imprime resultados resumidos en consola
     for id_documento, grupo in palabras_representativas.groupby("id", sort=False):
         texto = grupo["texto"].iloc[0]
-
         print(f"\nDocumento {id_documento}")
         print(f"Texto: {texto}")
         print("Terminos con mayor TF-IDF:")
@@ -169,9 +162,7 @@ def main():
         top_n=5,
     )
     palabras_representativas.to_csv(ARCHIVO_TOP, index=False, encoding="utf-8")
-
     mostrar_palabras_representativas(palabras_representativas)
-
     print(f"\nMatriz TF-IDF guardada en: {ARCHIVO_MATRIZ}")
     print(f"Top terminos por documento guardado en: {ARCHIVO_TOP}")
 
