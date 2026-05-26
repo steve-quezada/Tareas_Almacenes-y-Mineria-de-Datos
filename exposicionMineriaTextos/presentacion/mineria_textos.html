@@ -1229,23 +1229,25 @@ representativa</p>
 </section>
 <section id="palabras-poco-útiles" class="slide level2">
 <h2>Palabras poco útiles</h2>
-<p>Antes de calcular pesos, se eliminan palabras que aparecen mucho pero aportan poco significado.</p>
+<p>Antes de calcular TF-IDF, normalmente se eliminan <strong>stopwords</strong>: palabras muy comunes que se repiten mucho, pero aportan poco valor para identificar el tema de un documento.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Ejemplos del corpus</strong></p>
+<p><strong>Ejemplos de stopwords</strong></p>
 <ul>
 <li>el</li>
 <li>la</li>
 <li>de</li>
 <li>del</li>
+<li>que</li>
 <li>en</li>
 <li>y</li>
 </ul>
 </div><div class="column" style="width:50%;">
 <p><strong>¿Por qué eliminarlas?</strong></p>
-<p>Estas palabras ayudan a construir frases, pero no suelen distinguir un documento de otro.</p>
-<p>Si no se eliminan, pueden ocupar espacio en la matriz sin explicar realmente el contenido.</p>
+<p>Ayudan a construir frases, pero aparecen en casi cualquier texto y no suelen distinguir un documento de otro.</p>
+<p>Si se quedan, pueden ocupar espacio en la matriz sin explicar realmente el contenido.</p>
 </div></div>
+<p><strong>Idea clave:</strong> quitar estas palabras permite que TF-IDF se enfoque en términos con mayor valor descriptivo.</p>
 </section>
 <section id="después-de-limpiar-términos-candidatos" class="slide level2">
 <h2>Después de limpiar: términos candidatos</h2>
@@ -1415,32 +1417,24 @@ representativa</p>
 </div>
 <p><strong>Idea clave:</strong> Un peso alto significa que esa palabra caracteriza bien a ese documento frente al resto.</p>
 </section>
-<section id="lo-que-tf-idf-no-hace-por-sí-solo" class="slide level2">
-<h2>Lo que TF-IDF no hace por sí solo</h2>
-<p>TF-IDF genera <strong>ponderaciones numéricas</strong>, pero no interpreta automáticamente el significado completo del texto.</p>
-<p>No hace por sí solo:</p>
-<ul>
-<li class="fragment">Clasificación de temas.</li>
-<li class="fragment">Agrupamiento de documentos.</li>
-<li class="fragment">Detección semántica profunda.</li>
-<li class="fragment">Comprensión del contexto como lo haría un modelo de lenguaje.</li>
-</ul>
-</section>
-<section id="para-qué-se-usa-después" class="slide level2">
-<h2>¿Para qué se usa después?</h2>
-<p>Los pesos TF-IDF pueden alimentar otros modelos o tareas:</p>
+<section id="qué-hace-y-qué-no-hace-tf-idf" class="slide level2">
+<h2>Qué hace y qué no hace TF-IDF</h2>
+<p>TF-IDF <strong>no entiende el significado completo del texto</strong>: solo transforma documentos en pesos numéricos que indican qué términos los caracterizan mejor.</p>
+<p>Por esta razon, Tf-IDF no clasifica ni genera temas, no agrupa documentos ni detecta contexto profundo por sí solo. Su valor aparece cuando esos pesos se usan como <strong>representación de entrada</strong> para otras tareas:</p>
 <div class="columns">
 <div class="column" style="width:50%;">
+<p><strong>Como medida directa</strong></p>
 <ul>
-<li>Clasificación de documentos.</li>
-<li>Búsqueda de similitud.</li>
-<li>Sistemas de recomendación.</li>
+<li>Extraer palabras clave.</li>
+<li>Comparar similitud entre textos.</li>
+<li>Mejorar búsquedas.</li>
 </ul>
 </div><div class="column" style="width:50%;">
+<p><strong>Como insumo para modelos</strong></p>
 <ul>
-<li>Agrupamiento de textos.</li>
-<li>Extracción de palabras clave.</li>
-<li>Detección de temas.</li>
+<li>Clasificar documentos.</li>
+<li>Agrupar textos.</li>
+<li>Apoyar recomendadores o detección de temas.</li>
 </ul>
 </div></div>
 </section></section>
