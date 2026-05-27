@@ -444,14 +444,22 @@ def ajustar_lda(matriz_conteos):
     matriz_probabilidades = lda_model.fit_transform(matriz_conteos)
     return lda_model, matriz_probabilidades
 ```
+
 ## La fórmula en la que se basa LDA
 ::: big-formula
 $$P(w \mid d) = \sum_{t=1}^{k} P(w \mid t) \times P(t \mid d)$$
 :::
 Donde:
+
+- $k$ es el número de tópicos con los que contamos.
+
 - $P(w \mid d)$ es la probabilidad de que la palabra $w$ aparezca en el documento $d$.
+
 - $P(w \mid t)$ es la probabilidad de que la palabra $w$ esté asociada al tópico $t$.
+
 - $P(t \mid d)$ es la probabilidad de que el tópico $t$ pertenezca al documento $d$.
+
+LDA ocupa este criterio para ajustar los pesos de cada palabra en cada tópico y la asignación de tópicos a cada documento.
 
 ### Evaluación
 
