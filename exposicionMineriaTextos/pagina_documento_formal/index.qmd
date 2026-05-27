@@ -341,11 +341,11 @@ Contamos con los textos en un CSV llamado datos.csv, que contiene los siguientes
 | 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. |
 | 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. |
 
-### Preoprocesado
+### Preprocesado
 
-Antes de enviar los textos a nuestro modelo de tópicos, debemos de asegurarnos que los documentos no contengan ningún caracter especial o elemento adicional que se entrometa en nuestro análisis. Estos objetos indeseables pueden parrafos o saltos de línea que no muestran alguna información relevante acerca de los tópicos por si mismos. además, procedemos a eliminar cualquier caracter especial, pues por si solos tampoco ofrecen ninguna información relevante acerca de los tópicos; también se hace una revisión adicional para eliminar cualquier otro error extraño, tal como dobles espacios o cualquier otro error que pudo haber sido hecho en el proceso de transferencia.
+Antes de enviar los textos a nuestro modelo de tópicos, debemos de asegurarnos que los documentos no contengan ningún caracter especial o elemento adicional que se entrometa en nuestro análisis. Estos objetos indeseables pueden párrafos o saltos de línea que no muestran alguna información relevante acerca de los tópicos por si mismos. además, procedemos a eliminar cualquier caracter especial, pues por si solos tampoco ofrecen ninguna información relevante acerca de los tópicos; también se hace una revisión adicional para eliminar cualquier otro error extraño, tal como dobles espacios o cualquier otro error que pudo haber sido hecho en el proceso de transferencia.
 
-Después viene otro proceso especial conocido como la eliminación de **stopwords** o palabras vacias. Estas stopwords son aquellas palabras que se utilizan para dar más detalle o sentido a una idea al conjugarse con otras palabras, pero por sus propios medios no tienen sentido, es importante eliminarlas justo por ese motivo, ya que son palabras que por si solas no ayudan a determinar los tópicos de un texto y generan un ruido que puede confundir a nuestro modelo.
+Después viene otro proceso especial conocido como la eliminación de **stopwords** o palabras vacías. Estas stopwords son aquellas palabras que se utilizan para dar más detalle o sentido a una idea al conjugarse con otras palabras, pero por sus propios medios no tienen sentido, es importante eliminarlas justo por ese motivo, ya que son palabras que por si solas no ayudan a determinar los tópicos de un texto y generan un ruido que puede confundir a nuestro modelo.
 
 Todo el proceso en conjunto nos devolverá documentos de texto con palabras de significado puro y con las que ya podemos trabajar para construir un modelo.
 
@@ -392,7 +392,7 @@ Así tenemos estos datos después de la poda:
 | 7 | carpinteria necesitas madera pino tablon utiliza martillo madera armar mueble carpinteria |
 | 8 | construye mueble madera habitacion carpinteria debes lijar tablon madera mueble |
 
-### Frecuencia de terminos.
+### Frecuencia de términos.
 
 Ahora hacemos una matriz de frecuencia para recopilar todas las palabras puras de cada uno de los textos y el número de veces que se repiten en cada uno.
 
@@ -416,9 +416,9 @@ def calcular_dtm(datos):
 
 ### Función LDA
 
-La función LDA es el método que nos permite hacer la agrupación de textos desde 0. La función inicialmente recibe todas las palabras puras únicas que se recopilaron en todos los texto, además de recibir como parámetro una K que es la cantidad de categorías en las que queremos clasificar los textos. De manera inicial, LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoria "X") aleatorios en las palabras
+La función LDA es el método que nos permite hacer la agrupación de textos desde 0. La función inicialmente recibe todas las palabras puras únicas que se recopilaron en todos los texto, además de recibir como parámetro una K que es la cantidad de categorías en las que queremos clasificar los textos. De manera inicial, LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoría "X") aleatorios en las palabras
 
-Pasa palabra por palabra, documento por documento, recalculando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
+Pasa palabra por palabra, documento por documento, ajustando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
 
 Repite este escaneo miles de veces hasta que las palabras se agrupan de forma lógica. En nuestro ejemplo: Las palabras de cocina se atraen entre sí, las de papiroflexia hacen lo mismo, y las categorías se vuelven nítidas.
 
@@ -444,6 +444,14 @@ def ajustar_lda(matriz_conteos):
     matriz_probabilidades = lda_model.fit_transform(matriz_conteos)
     return lda_model, matriz_probabilidades
 ```
+## La fórmula en la que se basa LDA
+::: big-formula
+$$P(w \mid d) = \sum_{t=1}^{k} P(w \mid t) \times P(t \mid d)$$
+:::
+Donde:
+- $P(w \mid d)$ es la probabilidad de que la palabra $w$ aparezca en el documento $d$.
+- $P(w \mid t)$ es la probabilidad de que la palabra $w$ esté asociada al tópico $t$.
+- $P(t \mid d)$ es la probabilidad de que el tópico $t$ pertenezca al documento $d$.
 
 ### Evaluación
 

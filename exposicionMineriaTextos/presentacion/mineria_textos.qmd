@@ -313,11 +313,11 @@ Por esta razon, Tf-IDF no clasifica ni genera temas, no agrupa documentos ni det
 
 ## Motivación 
 
-Una de las preguntas más simples, pero más importantes a la hora de leer y extraer información de un texto: ¿De qué trata el texto que leí?
+La pregunta más importante al leer: ¿De qué trata el texto que leí?
 
-Cuando estamos manejando una gran cantidad de textos, casi siempre urge la necesidad de agrupar grandes cantidades de datos en grupos que junten los datos más parecidos entre si. En manejo de textos, ¿Qué mejor que agrupar dichos textos en sus temas centrales?
+Al contar con muchos textos, urge la necesidad de ordenarlos. ¿Qué mejor que organizar dichos textos en sus temas centrales?
 
-El análisis de tópicos es un caso particular de los recursos vistos con anterioridad. La frecuencia de patrones en los textos se usan para armar agrupamientos arbitrarios en los que agrupar los textos.
+La frecuencia de patrones en los textos se usan para asignar un tópico a cada documento.
 
 ## ¿Qué es un tópico? 
 
@@ -338,17 +338,20 @@ Al ser esto una introducción al análisis de tópicos, tomamos un ejemplo simpl
 
 Una página web de tutoriales quiere clasificar sus guías en 4 categorías: **Recetas de cocina**, **papiroflexia**, **alfarería** y **carpintería**. Esta página cuenta con todos sus documentos en el mismo formato y sin ningún error ortográfico, ya que se lleva a cabo un proceso de revisión antes de la publicación de tutoriales.
 
-|  |  |
-|----|----|
-| id_texto | texto |
-| 1 | La receta de reposteria indica batir harina para el pastel. Mete el pastel al horno para terminar la receta. |
-| 2 | Esta receta de chocolate lleva harina en el pastel. Calienta el pastel en el horno para tu receta. |
-| 3 | El origami consiste en realizar un pliegue en el papel. Cada pliegue de papel genera una figura de origami. |
-| 4 | Para el origami asiatico el pliegue de papel es vital. Arma una figura de papel usando el origami. |
-| 5 | La ceramica artesanal usa arcilla en el torno. Tornea la arcilla para hacer una vasija de ceramica. |
-| 6 | Trabajar la ceramica requiere poner arcilla sobre el torno. Gira el torno con arcilla y obtendras tu vasija de ceramica. |
-| 7 | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria. |
-| 8 | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria. |
+
+
+| id_texto | texto                                                                                                                    |
+|----------|--------------------------------------------------------------------------------------------------------------------------|
+| 1        | La receta de reposteria indica batir harina para el pastel. Mete el pastel al horno para terminar la receta.             |
+| 2        | Esta receta de chocolate lleva harina en el pastel. Calienta el pastel en el horno para tu receta.                       |
+| 3        | El origami consiste en realizar un pliegue en el papel. Cada pliegue de papel genera una figura de origami.              |
+| 4        | Para el origami asiatico el pliegue de papel es vital. Arma una figura de papel usando el origami.                       |
+| 5        | La ceramica artesanal usa arcilla en el torno. Tornea la arcilla para hacer una vasija de ceramica.                      |
+| 6        | Trabajar la ceramica requiere poner arcilla sobre el torno. Gira el torno con arcilla y obtendras tu vasija de ceramica. |
+| 7        | La carpinteria trabaja la madera del tablon. Corta el tablon de madera para construir el mueble de carpinteria.          |
+| 8        | En la carpinteria lijas la madera de cada tablon. Arma el mueble de madera en tu taller de carpinteria.                  |
+---------------------------------------------------------------------------------------------------------------------------------------
+
 
 ## Preprocesado {.topic-compact .topic-table-slide}
 
@@ -360,9 +363,8 @@ Antes de hacer nuestro modelo, debemos de deshacernos de las cosas indeseables.
 
 Después del "podado" de cosas indeseables tenemos
 
-|  |  |
-|----|----|
 | id_texto | texto_limpio |
+|----|----|
 | 1 | receta reposteria principal batir azucar harina pastel pastel dulce requiere hornear horno terminar receta |
 | 2 | receta dulce chocolate debes mezclar azucar harina pastel prepara pastel dulce procede hornear horno receta |
 | 3 | origami exige precision cada doblez papel realiza pliegue papel formar figura papiroflexia origami |
@@ -386,20 +388,43 @@ Recibe todas las palabras puras únicas que se recopilaron, además de recibir c
 
 LDA asigna "pesos" (la probabilidad de que si una palabra reside en un texto cualquiera, este pertenezca a la categoría "X") aleatorios en las palabras.
 
+## La fórmula en la que se basa LDA
+::: big-formula
+$$P(w \mid d) = \sum_{t=1}^{k} P(w \mid t) \times P(t \mid d)$$
+:::
+Donde:
+
+- $k$ es el número de tópicos con los que contamos.
+
+- $P(w \mid d)$ es la probabilidad de que la palabra $w$ aparezca en el documento $d$.
+
+- $P(w \mid t)$ es la probabilidad de que la palabra $w$ esté asociada al tópico $t$.
+
+- $P(t \mid d)$ es la probabilidad de que el tópico $t$ pertenezca al documento $d$.
+
+LDA ocupa este criterio para ajustar los pesos de cada palabra en cada tópico y la asignación de tópicos a cada documento.
+
 ## ¿Cómo aprende LDA? {.topic-compact .topic-code-slide}
 
-Pasa palabra por palabra, documento por documento, recalculando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
+Pasa palabra por palabra, documento por documento, ajustando probabilidades. Se pregunta: ¿Qué tan común es este tópico en este tutorial? y ¿Qué tan común es esta palabra en este tópico?.
+
 
 Repite este escaneo miles de veces hasta que las palabras se agrupan de forma lógica. En nuestro ejemplo: Las palabras de cocina se atraen entre sí, las de papiroflexia hacen lo mismo, y las categorías se vuelven nítidas.
 
-Además, se puede configurar tanto el **número de pasadas** que se le darán a los textos para ajustar los pesos, una **semilla** que haga la asignación de pesos inicial a las palabras, y la **forma de análisis** de los textos, siendo `batch` un análisis completo de todo el lote de información, mientras que `online` lo hace por partes.
+## Además, LDA cuenta con otros ajustes:
+
+**Número de pasadas** que se le darán a los textos para ajustar los pesos.
+
+**Semilla** para registrar un estado inicial.
+
+Y la **forma de análisis** de los textos, `batch` es un análisis completo de todo el dataset, mientras que `online` lo hace por partes.
 
 ### En nuestro ejemplo ... 
 
 ``` python
-        n_components=k,
+        n_components=k,           # Número de tópicos a extraer  
         learning_method="batch",  # Evalúa todo el dataset de golpe 
-        max_iter=1000,            # Asegura iteraciones suficientes para estabilizar probabilidades
+        max_iter=1000,            # Máximo número de iteraciones para ajustar los pesos
         random_state=42,          # Semilla 
 ```
 
@@ -416,9 +441,8 @@ Al aplicar esto a nuestro ejemplo, podemos extraer datos útiles, como revelar c
 
 ## ¿A qué tópico pertenecen nuestros textos? {.topic-compact .topic-table-slide}
 
-|  |  |  |
-|----|----|----|
 | id_texto | texto | tópico |
+|----|----|----|
 | 1 | La receta de reposteria indica batir harina para el pastel. Mete el pastel al horno para terminar la receta. | Tópico 3 (Recetas de cocina) |
 | 2 | Esta receta de chocolate lleva harina en el pastel. Calienta el pastel en el horno para tu receta. | Tópico 3 (Recetas de cocina) |
 | 3 | El origami consiste en realizar un pliegue en el papel. Cada pliegue de papel genera una figura de origami. | Tópico 4 (Papiroflexia) |
