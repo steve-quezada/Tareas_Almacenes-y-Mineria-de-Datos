@@ -61,6 +61,18 @@ $code-color: #115e59;
   padding: 0.42em 0.55em;
 }
 
+.reveal pre {
+  border: 1px solid #b7e4d8;
+  border-radius: 8px;
+  font-size: 0.74em;
+  width: 100%;
+}
+
+.reveal pre code {
+  line-height: 1.25;
+  max-height: 520px;
+}
+
 .compact-doc-table table {
   table-layout: fixed;
   width: 100%;
@@ -237,7 +249,7 @@ $code-color: #115e59;
 }
 
 .reveal section.topic-code-slide pre {
-  font-size: 0.64em;
+  font-size: 0.74em;
 }
 
 .reveal section.topic-image-slide img.r-stretch {
@@ -247,6 +259,10 @@ $code-color: #115e59;
 @media (max-width: 900px) {
   .reveal {
     font-size: 28px;
+  }
+
+  .reveal pre {
+    font-size: 0.66em;
   }
 
   .equation-flow,

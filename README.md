@@ -16,6 +16,9 @@
 
 ---
 
+
+<div align="center">
+
 ## Tareas
 
 | # | Título | Carpeta |
@@ -23,3 +26,11 @@
 | 01 | Data Warehouse | [Tarea01/](Tarea01/) |
 | 02 | Análisis de Personas Desaparecidas en México — EDA con CRISP-DM | [Tarea02/](Tarea02/) |
 | 03 | Reglas de asociación y clasificación | [Tarea03/](Tarea03/) |
+
+## Examenes
+| # | Título | Carpeta |
+|---|--------|---------|
+| 04 | Presentaciones de Algoritmos de Clustering, Outliers y NLP | [Examen04/](exposicionMineriaTextos/) |  
+
+
+</div>
