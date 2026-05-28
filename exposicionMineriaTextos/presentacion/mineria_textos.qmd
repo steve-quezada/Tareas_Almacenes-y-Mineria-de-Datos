@@ -1,8 +1,12 @@
 ---
 title: "Mineria de Textos Avanzada"
 subtitle: "Almacenes y Mineria de Datos"
-author: "Almacenes y Minería de Datos"
-date: "2026-05-20"
+author:
+  - Omar Fernando Gramer Muñoz
+  - Kevin Steve Quezada Ordoñez
+  - Jesús Antonio Romero Godoy
+  - Edgar Salgado González
+date: "2026-05-29"
 format:
   revealjs:
     theme: [simple, tfidf-theme.scss]
@@ -461,3 +465,218 @@ Pocas palabras que coincidan pueden confundir al modelo, empeora si son pocas en
 Se puede observar en la siguiente gráfica lo certero que estaba el modelo a la hora de asignar un tópico
 
 ![](images/paste-1.png){.r-stretch}
+
+# Análisis de Sentimientos
+
+## ¿Qué es el análisis de sentimientos?
+
+La minería de textos permite inferir el **sentimiento de quien escribe** a partir de los documentos que produce.
+
+La **elección de palabras y la forma de usarlas** dependen de la situación emocional del autor. El análisis trata de extraer esa información.
+
+**El problema:** Dado un texto, determinar a qué sentimiento u opinión corresponde.
+
+------------------------------------------------------------------------
+
+## Dos variantes
+
+**Análisis de polaridad:** Clasifica en categorías (positivo/negativo, spam/no spam).
+
+**Análisis de emociones:** Clasifica en múltiples sentimientos (felicidad, tristeza, miedo.).
+
+En ambos casos, se trata de categorizar el documento automáticamente.
+
+------------------------------------------------------------------------
+
+# Ejemplo 1: Correo no deseado
+
+## El problema del correo
+
+Uno de los problemas que enfrenta cualquier usuario del correo electrónico es la cantidad de **mensajes no solicitados** que se reciben diariamente: desde anuncios hasta intentos de fraude.
+
+::: problem-box
+Los proveedores del servicio requieren un programa que clasifique el correo recibido para determinar si es **correo basura o no**.
+:::
+
+La solución: construir un **clasificador automático** entrenado con correos ya etiquetados.
+
+------------------------------------------------------------------------
+
+## Los datos
+
+No se almacenan los mensajes completos. Se guarda la **frecuencia relativa** de 57 palabras discriminantes.
+Un valor de `0.43` en `money` significa que esa palabra representa el **43% del texto** de ese correo.
+
+```r
+data(spam)
+spam[1:8,]$money      # Frecuencia de "money" — correos spam
+# [1] 0.00 0.43 0.06 0.00 ...
+spam[1:8,]$type       # Etiqueta del mensaje
+# [1] spam spam spam spam ....
+spam[4501:4508,]$type # Correos legítimos
+# [1] nonspam nonspam nonspam ....
+```
+
+------------------------------------------------------------------------
+
+## Preparar los datos
+
+Los datos se convierten a data frame (`factor` convierte categorías a variables nominales). Se dividen en **80% entrenamiento / 20% prueba**. `set.seed(150)` garantiza que el muestreo sea reproducible.
+
+```r
+spamDF <- as.data.frame(lapply(spam, factor))
+set.seed(150)  # Semilla: mismo resultado cada vez
+
+aleatorios    <- sample(1:2, size = nrow(spamDF),
+                        replace = TRUE, prob = c(0.8, 0.2))
+entrenamiento <- spamDF[aleatorios == 1, ]  # 80%
+prueba        <- spamDF[aleatorios == 2, ]  # 20%
+```
+
+------------------------------------------------------------------------
+
+## Construir el clasificador
+
+`naiveBayes()` aprende qué frecuencias de palabras son típicas del spam y cuáles del correo legítimo. La fórmula `type ~ .` significa: *"predice `type` usando todas las demás columnas"*.
+
+`confusionMatrix()` compara las predicciones contra las etiquetas reales.
+
+```r
+clasificadorNB <- naiveBayes(type ~ ., entrenamiento)
+
+prediccion <- predict(clasificadorNB, prueba)
+referencia <- prueba[, "type"]
+
+confusionMatrix(prediccion, referencia)
+```
+
+------------------------------------------------------------------------
+
+## Resultados: correo spam
+
+| | **Predicho: nospam** | **Predicho: spam** |
+|---|:---:|:---:|
+| **Real: nospam** | 545 ✓ | 49 ✗ |
+| **Real: spam** | 117 ✗ | 249 ✓ |
+
+- **Accuracy: 82.71%**
+- Tasa base (solo adivinar la clase mayoritaria): 61.88%
+- P-value < 2.2e-16 → el modelo es significativamente mejor que adivinar
+
+::: example-box
+Se puede utilizar para clasificar correo con un **buen nivel de respuesta**.
+:::
+
+------------------------------------------------------------------------
+
+# Ejemplo 2: Discursos presidenciales
+
+## El corpus y el objetivo
+
+Se tienen los discursos a la Nación de los **últimos cinco presidentes de EE.UU.** (1989–2020).
+
+**Objetivo:** ¿Los discursos han sido positivos o negativos?
+
+------------------------------------------------------------------------
+
+## ¿Qué es un tibble y cómo se usa?
+
+Un **tibble** es una tabla donde cada fila es una palabra del discurso.
+
+El diccionario **Bing** clasifica palabras como positivas o negativas.
+
+Proceso:
+
+1. Tokenizar (una palabra por fila)
+
+2. Cruzar con Bing → solo palabras conocidas
+
+3. Contar positivas y negativas
+
+4. Calcular `positive - negative` → **puntaje**
+
+::: example-box
+BushJr_2001.txt: 91 negativas, 231 positivas → **puntaje: +140**
+:::
+
+------------------------------------------------------------------------
+
+## La función ObtieneSentimiento
+
+Implementa los 4 pasos: leer → tokenizar → cruzar con Bing → calcular puntaje.
+
+```r
+ObtieneSentimiento <- function(archivo) {
+  nomArch <- glue("TXT/", archivo)
+
+  # Leer el archivo y dividir en palabras individuales
+  tokens <- tibble(texto = read_file(nomArch)) %>%
+    unnest_tokens(word, texto)      # 1 fila = 1 palabra
+
+  sentimiento <- tokens %>%
+    inner_join(get_sentiments("bing"), by = "word") %>% # Solo palabras en el diccionario
+    count(sentiment) %>%                    # Cuenta positivas y negativas
+    spread(sentiment, n, fill = 0) %>%      # Crea columnas positive / negative
+    mutate(
+      sentimiento = positive - negative,
+      archivo = archivo,
+      year = as.numeric(str_extract(archivo, "\\d{4}")),
+      presidente = str_remove(archivo, "_\\d{4}\\.txt")
+    )
+  return(sentimiento)
+}
+```
+
+------------------------------------------------------------------------
+
+## Aplicar a todos los discursos
+
+```r
+sentimientos <- tibble()
+for (i in archivos) {
+  sentimientos <- rbind(sentimientos, ObtieneSentimiento(i))
+}
+```
+
+::: example-box
+Clinton era **muy positivo**. Trump ha sido **bastante negativo**.
+:::
+
+------------------------------------------------------------------------
+
+## Resultados por presidente
+
+| Presidente | Tono |
+|---|---|
+| Clinton | Muy positivo |
+| Obama | Positivo |
+| Bush Jr. | Variable (2002 muy negativo) |
+| Bush Sr. | Negativo |
+| Trump | Bastante negativo |
+
+------------------------------------------------------------------------
+
+## Dato atípico: Bush Jr. 2002
+
+El discurso de 2002 tiene la calificación **más negativa**: posterior al **ataque a las Torres Gemelas** en 2001.
+
+```r
+library(wordcloud)
+library(tm)
+# frecPalabras ya contiene la frecuencia de cada palabra del discurso 2002
+wordcloud(words = names(frecPalabras), freq = frecPalabras)
+```
+
+Términos dominantes: **terrorismo, guerra, Afganistán**.
+
+::: problem-box
+Las palabras tienen carga negativa en el diccionario, pero el mensaje es de condena. El modelo **no entiende intención ni contexto**.
+:::
+
+------------------------------------------------------------------------
+
+## Conclusión
+
+El análisis de sentimientos permite extraer información emocional de textos usando técnicas simples: contar palabras, usar diccionarios, aplicar clasificadores. 
+
+Sin contexto profundo, el modelo es eficaz pero limitado: funciona bien para casos claros, pero puede fallar con sarcasmo, ironía o mensajes complejos como Bush en 2002.
