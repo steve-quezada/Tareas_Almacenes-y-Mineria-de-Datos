@@ -12,9 +12,129 @@ lang: es
 </div>
 ```
 
-## Introduccion a la Mineria de Texto Avanzada
+## Introducción a la Minería de Texto y NLP
 
-\[Omar\]
+### El problema del texto no estructurado
+
+Cada día se generan volúmenes masivos de texto: correos electrónicos, publicaciones en redes sociales, artículos de noticias, reseñas de productos, registros clínicos y reportes corporativos, entre muchos otros. Se estima que alrededor de 328 millones de correos electrónicos se envían cada hora y que el 90% de todos los datos existentes en el mundo fueron generados en los últimos dos años. La mayor parte de esa información no está organizada en tablas ni bases de datos relacionales: existe como texto libre, sin etiquetas, sin orden predefinido y sin estructura fija.
+
+Este volumen hace que el análisis manual sea inviable. Una persona puede leer aproximadamente 300 palabras por minuto; analizar diez mil reseñas de un producto, identificar los temas que más preocupan a la ciudadanía en millones de publicaciones, o detectar desinformación en tiempo real son tareas que escapan por completo a la capacidad humana sin apoyo computacional. La minería de textos y el procesamiento de lenguaje natural surgen precisamente como respuesta a este problema.
+
+### ¿Qué es la Minería de Textos?
+
+La **Minería de Textos** es el proceso de extraer información útil y patrones significativos a partir de grandes colecciones de texto no estructurado, de forma automática. No se trata únicamente de buscar palabras: el objetivo es descubrir conocimiento que no es evidente a simple vista, transformando texto crudo en representaciones que los algoritmos puedan procesar y analizar.
+
+De manera esquemática, el proceso toma como entrada texto sin estructura —reseñas, noticias, correos— y produce como salida patrones, categorías, tendencias y valoraciones de sentimiento.
+
+### ¿Qué es el Procesamiento de Lenguaje Natural?
+
+El **Procesamiento de Lenguaje Natural** (NLP, por sus siglas en inglés) es la rama de la inteligencia artificial que le enseña a las computadoras a leer, entender y trabajar con el lenguaje humano. Mientras que la Minería de Textos se enfoca en extraer conocimiento, el NLP provee las herramientas y técnicas de base que hacen posible esa extracción.
+
+El NLP abarca operaciones fundamentales como tokenizar el texto en unidades manejables, analizar la estructura gramatical de las oraciones, reconocer entidades nombradas (personas, lugares, organizaciones) y comprender relaciones entre palabras. La Minería de Textos utiliza estas capacidades como punto de partida para tareas de mayor nivel: clasificar documentos, detectar temas, medir opiniones o extraer palabras clave.
+
+::: {.callout-note appearance="minimal"}
+**Analogía:** El NLP es el motor que permite a la computadora "leer"; la Minería de Textos es el destino al que se quiere llegar con esa lectura.
+:::
+
+### Aplicaciones en la vida real
+
+La combinación de NLP y Minería de Textos está presente en numerosas aplicaciones que forman parte del entorno cotidiano:
+
+- **Motores de búsqueda.** Google y sistemas similares no buscan coincidencias literales de palabras: interpretan la intención detrás de una consulta para devolver resultados relevantes.
+- **Filtros de spam.** Los clasificadores de correo electrónico aprenden a distinguir mensajes legítimos de correo no deseado analizando el contenido y los patrones léxicos de los mensajes.
+- **Sistemas de recomendación.** Plataformas como Netflix o Spotify analizan reseñas y comentarios de usuarios para inferir preferencias y sugerir contenido.
+- **Asistentes virtuales.** Sistemas como Siri, Alexa o ChatGPT procesan lenguaje natural en tiempo real para responder preguntas y ejecutar instrucciones.
+- **Análisis clínico.** Instituciones de salud procesan notas médicas no estructuradas para identificar patrones de enfermedad, efectos adversos de medicamentos o riesgos de readmisión hospitalaria.
+- **Detección de desinformación.** Plataformas de redes sociales aplican técnicas de clasificación para identificar noticias falsas antes de que se propaguen masivamente.
+
+### El reto fundamental: las máquinas no leen como nosotros
+
+Cuando un ser humano lee la frase *"El gato duerme en el sofá"*, la comprende de manera inmediata: construye mentalmente una imagen, infiere el contexto y capta la intención del enunciado. Una computadora, en cambio, no tiene acceso a ese nivel de comprensión de forma nativa. Para ella, esa misma frase no es más que una secuencia plana de caracteres almacenados como valores numéricos en memoria:
+
+```
+['E','l',' ','g','a','t','o',' ','d','u','e','r','m','e',' ','e','n',' ','e','l',' ','s','o','f','á']
+```
+
+Que en representación numérica (ASCII / Unicode) corresponde a:
+
+```
+[69, 108, 32, 103, 97, 116, 111, 32, 100, 117, 101, 114, 109, 101, 32, 101, 110, 32, 101, 108, 32, 115, 111, 102, 225]
+```
+
+El problema central de la minería de textos es precisamente este: ¿cómo pasar de una secuencia cruda de caracteres a una representación con significado que los algoritmos puedan aprovechar?
+
+### Semántica distribucional: capturar significado a partir de estadística
+
+La respuesta que ha demostrado ser más fructífera parte de una observación aparentemente simple: las palabras no aparecen solas. Siempre aparecen rodeadas de otras palabras, y esa compañía no es aleatoria.
+
+Si la palabra *"gato"* aparece con frecuencia cerca de *"ronronea"*, *"pelaje"* y *"veterinario"*, y la palabra *"perro"* aparece con frecuencia cerca de *"ladra"*, *"pelaje"* y *"veterinario"*, entonces ambas palabras comparten un contexto estadístico muy similar. Un modelo que observe suficiente texto aprenderá que *"gato"* y *"perro"* pertenecen al mismo mundo semántico, sin que nadie le haya proporcionado una definición ni un diccionario.
+
+Este principio recibe el nombre de **Hipótesis Distribucional**, formulada por J.R. Firth en 1957:
+
+> *"You shall know a word by the company it keeps."*
+
+Una idea paralela la expresó el filósofo Ludwig Wittgenstein:
+
+> *"Don't look for the meaning, look for the use."*
+
+Ambas formulaciones apuntan a lo mismo: el significado de una palabra no está en su definición abstracta, sino en los contextos en que aparece. Las palabras que aparecen en contextos lingüísticos similares tienden a tener significados similares.
+
+La intuición puede ilustrarse con un ejemplo cotidiano. Si alguien escucha repetidamente la palabra *"veterinario"* en conversaciones que también incluyen *"animal"*, *"enfermo"*, *"medicina"* y *"curar"*, puede deducir el significado de esa palabra sin necesidad de que nadie se lo explique explícitamente. Las computadoras aplican exactamente el mismo razonamiento, pero de forma sistemática y a escala de millones de textos.
+
+### Co-ocurrencias: el mecanismo operativo
+
+El mecanismo concreto con el que se operacionaliza la Hipótesis Distribucional es el conteo de **co-ocurrencias**: dado un corpus de textos, se registra con qué frecuencia cada palabra aparece acompañada de cada otra palabra dentro de una ventana de contexto definida.
+
+Consideremos tres oraciones de ejemplo:
+
+- *"El gato ronronea sobre el sillón."*
+- *"El perro duerme sobre el sillón."*
+- *"El gato persigue al perro por el jardín."*
+
+La tabla de co-ocurrencias resultante registra cuántas veces cada par de palabras aparece en el mismo contexto:
+
+| | `gato` | `perro` | `ronronea` | `duerme` | `sillón` | `jardín` |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **gato** | — | 1 | 1 | 0 | 1 | 1 |
+| **perro** | 1 | — | 0 | 1 | 1 | 1 |
+| **ronronea** | 1 | 0 | — | 0 | 1 | 0 |
+| **duerme** | 0 | 1 | 0 | — | 1 | 0 |
+
+Las filas correspondientes a *"gato"* y *"perro"* presentan un perfil muy similar: comparten los mismos co-ocurrentes con patrones de frecuencia parecidos. A partir de esta similitud estadística, un modelo puede concluir que ambas palabras pertenecen a la misma categoría semántica, sin haber recibido ninguna etiqueta ni definición externa.
+
+### Representación vectorial de documentos
+
+La lógica de las co-ocurrencias permite representar palabras individuales como vectores numéricos. El paso siguiente consiste en extender esa idea a documentos completos.
+
+Para representar un documento como vector, se toma el vocabulario completo del corpus —el conjunto de todas las palabras que aparecen en la colección— y se anota cuántas veces aparece cada término en ese documento. El resultado es un vector de longitud fija (igual al tamaño del vocabulario) donde cada posición corresponde a un término y su valor indica la frecuencia de aparición.
+
+Por ejemplo, para el documento *"el gato ronronea"*, con un vocabulario de seis términos, el vector resultante podría ser:
+
+| `gato` | `perro` | `ronronea` | `duerme` | `sillón` | `jardín` |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| 1 | 0 | 1 | 0 | 0 | 0 |
+
+En notación compacta: `[1, 0, 1, 0, 0, 0]`.
+
+La ventaja de esta representación es que todos los documentos quedan expresados en el mismo espacio vectorial, lo que permite compararlos matemáticamente, agruparlos por similitud o clasificarlos mediante algoritmos estándar de aprendizaje automático.
+
+Para ilustrarlo con un ejemplo más elaborado, consideremos tres noticias breves sobre ciencia, política y deportes, representadas con un vocabulario de seis términos relevantes:
+
+| | `evolución` | `elección` | `gol` | `científico` | `candidato` | `árbitro` |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **D1** — Nota de ciencia | 8 | 0 | 0 | 5 | 0 | 0 |
+| **D2** — Nota de política | 0 | 7 | 0 | 0 | 6 | 0 |
+| **D3** — Nota de deportes | 0 | 0 | 9 | 0 | 0 | 4 |
+
+Cada fila es el vector de ese documento: `D1 = [8, 0, 0, 5, 0, 0]`, `D2 = [0, 7, 0, 0, 6, 0]`, `D3 = [0, 0, 9, 0, 0, 4]`. Los tres vectores no comparten ningún valor distinto de cero, lo que refleja que los documentos tratan temas completamente diferentes.
+
+### El problema de las palabras frecuentes no informativas
+
+La representación por frecuencias brutas presenta, sin embargo, una limitación importante. Palabras como *"el"*, *"de"*, *"en"* o *"para"* aparecen con frecuencia altísima en prácticamente cualquier documento del corpus. Si se incluyen en los vectores sin ningún ajuste, dominan todas las representaciones y oscurecen las palabras que realmente caracterizan el contenido de cada documento.
+
+::: {.callout-note appearance="minimal"}
+Un vector dominado por *"el"* y *"de"* no permite distinguir si un documento habla de ciencia, de política o de deportes. Se necesita una medida que premie las palabras frecuentes dentro de un documento específico pero raras en el resto del corpus. Esa es precisamente la motivación detrás de la técnica TF-IDF, que se desarrolla en la sección siguiente.
+:::
 
 ## TF-IDF
 
