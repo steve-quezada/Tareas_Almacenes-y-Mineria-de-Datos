@@ -1,0 +1,83 @@
+{
+    "telemetry.sqmId": "",
+    "telemetry.machineId": "270980ae2539541f025f0c0ce88212791cf0a3af945f3f2f66a14a4185ac8132",
+    "telemetry.devDeviceId": "67f0a3e0-c021-4579-9f43-670da37d24cd",
+    "backupWorkspaces": {
+        "workspaces": [],
+        "folders": [
+            {
+                "folderUri": "file:///home/ofgm/Documentos/Tareas_Almacenes-y-Mineria-de-Datos/Tarea02"
+            }
+        ],
+        "emptyWindows": [
+            {
+                "backupFolder": "1774567717318"
+            }
+        ]
+    },
+    "windowControlHeight": 35,
+    "profileAssociations": {
+        "workspaces": {
+            "file:///home/ofgm/Documentos/Tareas_Almacenes-y-Mineria-de-Datos/Tarea02": "__default__profile__"
+        },
+        "emptyWindows": {
+            "1774567717318": "__default__profile__"
+        }
+    },
+    "theme": "vs",
+    "themeBackground": "#ffffff",
+    "windowSplash": {
+        "zoomLevel": 0,
+        "baseTheme": "vs",
+        "colorInfo": {
+            "foreground": "#202020",
+            "background": "#ffffff",
+            "editorBackground": "#ffffff",
+            "titleBarBackground": "#fafafd",
+            "titleBarBorder": "#f0f1f2",
+            "activityBarBackground": "#fafafd",
+            "activityBarBorder": "#f0f1f2",
+            "sideBarBackground": "#fafafd",
+            "sideBarBorder": "#f0f1f2",
+            "statusBarBackground": "#fafafd",
+            "statusBarBorder": "#f0f1f2",
+            "statusBarNoFolderBackground": "#f0f0f3"
+        },
+        "layoutInfo": {
+            "sideBarSide": "left",
+            "editorPartMinWidth": 220,
+            "titleBarHeight": 35,
+            "activityBarWidth": 48,
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 0,
+            "statusBarHeight": 22,
+            "windowBorder": false
+        }
+    },
+    "windowsState": {
+        "lastActiveWindow": {
+            "folder": "file:///home/ofgm/Documentos/Tareas_Almacenes-y-Mineria-de-Datos/Tarea02",
+            "backupPath": "/home/ofgm/Documentos/Tareas_Almacenes-y-Mineria-de-Datos/Tarea02/~/.vscode-root/Backups/57eb14dd9b1d302d9b0d3148eab4856b",
+            "uiState": {
+                "mode": 1,
+                "x": 0,
+                "y": 32,
+                "width": 1433,
+                "height": 1568
+            }
+        },
+        "openedWindows": []
+    },
+    "windowSplashWorkspaceOverride": {
+        "layoutInfo": {
+            "sideBarWidth": 300,
+            "auxiliaryBarWidth": 300,
+            "workspaces": {
+                "684d5663af12d2fbb9a4d3403a58eb22": {
+                    "sideBarVisible": true,
+                    "auxiliaryBarVisible": false
+                }
+            }
+        }
+    }
+}
