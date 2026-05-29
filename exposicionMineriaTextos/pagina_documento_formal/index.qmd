@@ -537,4 +537,175 @@ Para ver más de este fenómeno de inseguridad, puede ejecutarse el script de py
 
 ## Análisis de sentimientos
 
-\[Steve\]
+La minería de textos se puede utilizar para realizar un trabajo de análisis más profundo: inferir, a partir de un conjunto de documentos, el sentimiento de la persona que escribió ese documento. En muchas ocasiones cuando se habla de análisis de sentimientos lo que se hace es análisis de opiniones. La elección de las palabras, y la forma de usarlas, depende de la situación emocional de la persona que escribe; el análisis de sentimientos trata de extraer esta información de los documentos con que se cuente.
+
+El problema general de análisis de sentimiento puede expresarse de la siguiente forma: dado un texto con opiniones, determinar a qué sentimiento (u opinión) corresponde el documento.
+
+### Tipos de análisis
+
+Este proceso puede llevar a clasificar los documentos en una de dos categorías: bueno o malo, conforme o inconforme, satisfecho o insatisfecho, feliz o triste; en este caso se trata de un **análisis de polaridad**. También se puede tratar de establecer a cuál conjunto de sentimientos corresponde — felicidad, tristeza, miedo, enojo, alegría, preocupación —; en este caso se trata de un **análisis de emociones**. En cualquier caso se trata de determinar a qué categoría corresponde el documento, lo que permite usar cualquier algoritmo de categorización de textos.
+
+### Caso de aplicación 1: Clasificación de correo no deseado
+
+#### Contexto
+
+Un proveedor de correo electrónico necesita clasificar mensajes entrantes como `spam` o `nospam`. El volumen diario hace imposible la revisión manual; se requiere un clasificador automático.
+
+#### Datos
+
+Se usa el dataset `spam` del paquete `kernlab` de R, que contiene 4601 correos ya etiquetados. Cada correo no se almacena como texto completo; en su lugar se guarda la frecuencia relativa de palabras discriminantes (`money`, `free`, `remove`, entre otras).
+
+```{r}
+#| eval: false
+library(kernlab)
+library(caret)
+library(e1071)
+data(spam)
+
+spam[1:8,]$money
+# [1] 0.00 0.43 0.06 0.00 0.00 0.00 0.00 0.00
+
+spam[1:8,]$type
+# [1] spam spam spam spam spam spam spam spam
+# Levels: nonspam spam
+```
+
+#### Preprocesamiento y partición
+
+Los datos se convierten a data frame y se dividen en 80% entrenamiento / 20% prueba mediante muestreo aleatorio con semilla fija.
+
+```{r}
+#| eval: false
+spamDF        <- as.data.frame(lapply(spam, factor))
+set.seed(150)
+aleatorios    <- sample(1:2, size = nrow(spamDF), replace = TRUE, prob = c(0.8, 0.2))
+entrenamiento <- spamDF[aleatorios == 1,]
+prueba        <- spamDF[aleatorios == 2,]
+```
+
+#### Construcción y evaluación del modelo
+
+```{r}
+#| eval: false
+clasificadorNB <- naiveBayes(type ~ ., entrenamiento)
+prediccion     <- predict(clasificadorNB, prueba)
+referencia     <- prueba[, "type"]
+confusionMatrix(prediccion, referencia)
+```
+
+#### Resultados
+
+La matriz de confusión obtenida fue:
+
+::: compact-table
+|                   | Predicho: nospam | Predicho: spam |
+|-------------------|-----------------|----------------|
+| **Real: nospam**  | 545             | 49             |
+| **Real: spam**    | 117             | 249            |
+:::
+
+::: result-table
+| Métrica                           | Valor      |
+|-----------------------------------|------------|
+| Accuracy                          | 82.71%     |
+| Tasa base (No Information Rate)   | 61.88%     |
+| P-value (Acc > NIR)               | < 2.2e-16  |
+:::
+
+Este clasificador muestra una precisión del 82.71%, por lo que se puede decir que se puede utilizar para clasificar correo con un buen nivel de respuesta.
+
+### Caso de aplicación 2: Análisis de discursos presidenciales
+
+#### Contexto
+
+Se analizan los discursos a la Nación de los últimos cinco presidentes de los Estados Unidos (1989–2020) para determinar si cada discurso tiene tono positivo o negativo, y si el partido político está asociado al tono del lenguaje.
+
+#### Método: diccionario Bing
+
+Para conocer el sentimiento de cada discurso se crea una función que lee el texto de un archivo, genera un tibble con las palabras del texto y revisa cada palabra en el diccionario **Bing** — disponible en el paquete `tidytext` — que etiqueta palabras en inglés como positivas o negativas. Cuenta la cantidad de palabras que expresan cada sentimiento y calcula su diferencia; esta es la calificación del documento.
+
+#### Implementación
+
+```{r}
+#| eval: false
+library(tidyverse)
+library(tidytext)
+library(glue)
+library(stringr)
+
+ObtieneSentimiento <- function(archivo) {
+  nomArch        <- trimws(glue("TXT/", archivo, sep = ""))
+  textoDeArchivo <- gsub("\\$", "", glue(read_file(nomArch)))
+
+  tokens <- tibble(texto = textoDeArchivo) %>%
+    unnest_tokens(word, texto)
+
+  sentimiento <- tokens %>%
+    inner_join(get_sentiments("bing")) %>%
+    count(sentiment) %>%
+    spread(sentiment, n, fill = 0) %>%
+    mutate(
+      sentimiento = positive - negative,
+      archivo     = archivo,
+      year        = as.numeric(str_match(archivo, "\\d{4}")),
+      presidente  = str_match(archivo, "(.*?)")[2]
+    )
+  return(sentimiento)
+}
+```
+
+Se aplica la función a todos los archivos del corpus para obtener un data frame consolidado con el puntaje de sentimiento de cada discurso.
+
+#### Resultados por presidente
+
+::: result-table
+| Presidente | Partido     | Tono general                              |
+|------------|-------------|-------------------------------------------|
+| Clinton    | Demócrata   | Muy positivo                              |
+| Obama      | Demócrata   | Positivo                                  |
+| Bush Jr.   | Republicano | Variable (discurso 2002 muy negativo)     |
+| Bush Sr.   | Republicano | Negativo                                  |
+| Trump      | Republicano | Bastante negativo                         |
+:::
+
+#### Validación estadística: ¿el partido predice el tono?
+
+```{r}
+#| eval: false
+democratas   <- sentimientos %>%
+  filter(presidente %in% c("Clinton", "Obama")) %>%
+  mutate(partido = "D")
+
+republicanos <- sentimientos %>%
+  filter(!presidente %in% c("Clinton", "Obama")) %>%
+  mutate(partido = "R")
+
+t.test(democratas$sentimiento, republicanos$sentimiento)
+# t = 3.1204, df = 28.768, p-value = 0.004085
+# Media demócratas:   158.4
+# Media republicanos: 109.2
+```
+
+El t-test valida la hipótesis de que pertenecer a un partido político determina el tono de los discursos. Se nota que la mayoría de los discursos de los presidentes que pertenecen al Partido Demócrata son positivos, en tanto que los discursos de los presidentes que pertenecen al Partido Republicano son negativos.
+
+#### Dato atípico: Bush Jr. 2002
+
+El discurso de 2002 —posterior al ataque del 11 de septiembre— es el dato atípico con el puntaje más negativo de todo el corpus. Se nota claramente que el discurso trató del terrorismo y la guerra que se emprendería contra Afganistán.
+
+### Resumen
+
+En los ejemplos mostrados se ha trabajado únicamente con las palabras como elemento básico de procesamiento. Parece limitado, pero esta forma de trabajar con los datos textuales es sencilla y permite obtener resultados significativos.
+
+### Preguntas de reflexión
+
+::: {.callout-note title="Pregunta 1" appearance="minimal"}
+En el clasificador de spam, la base de datos no almacena los mensajes completos sino la frecuencia relativa de palabras discriminantes. ¿Por qué es suficiente esta información para clasificar el correo? ¿Qué información se pierde al no guardar el texto completo?
+:::
+
+::: {.callout-note title="Pregunta 2" appearance="minimal"}
+El diccionario Bing etiqueta palabras como positivas o negativas de forma independiente al contexto. ¿En qué casos concretos podría este enfoque producir resultados incorrectos en el análisis de discursos políticos?
+:::
+
+::: {.callout-note title="Pregunta 3" appearance="minimal"}
+El discurso de Bush Jr. en 2002 obtuvo la calificación más negativa del corpus, a pesar de que el contexto fue un ataque sufrido por el país. ¿Cómo interpretarías ese resultado? ¿Qué nos dice sobre la diferencia entre el sentimiento de las palabras y el sentimiento del mensaje?
+:::
