@@ -22,6 +22,288 @@ execute:
   warning: false
 ---
 
+
+
+## El mundo no para de escribir
+
+Cada día se generan millones de textos: correos, publicaciones, noticias, reseñas, mensajes, reportes...
+
+::::: columns
+::: {.column width="50%"}
+::: problem-box
+📧 **328.77 millones** de correos electrónicos se envían cada hora
+:::
+
+::: problem-box
+🐦 **500 millones** de tweets se publican cada día
+:::
+:::
+
+::: {.column width="50%"}
+::: example-box
+💾 **90%** de todos los datos del mundo fueron generados en los últimos dos años
+:::
+
+::: example-box
+📄 La mayor parte está en **texto no estructurado**: sin etiquetas, sin orden, sin formato fijo
+:::
+:::
+:::::
+
+
+
+## El problema: demasiado texto para leer
+
+Una persona puede leer ~300 palabras por minuto.
+
+::: problem-box
+¿Cómo analiza una empresa **10,000 reseñas** de sus productos?\
+¿Cómo sabe un gobierno qué temas preocupan más a la ciudadanía?\
+:::
+
+Leer todo manualmente es **imposible**.\
+
+Necesitamos que las computadoras nos ayuden a entender el texto.
+
+---
+
+## ¿Qué es la Minería de Textos?
+
+:::: columns
+::: {.column width="55%"}
+
+::: problem-box
+La **Minería de Textos** es el proceso de extraer información útil y patrones significativos a partir de grandes colecciones de texto de forma **automática**.
+:::
+
+:::
+
+::: {.column width="45%"}
+::: formula-card
+**Entrada**
+
+Texto sin estructura\
+*(reseñas, noticias, correos...)*
+
+↓
+
+**Salida**
+
+Patrones · Categorías\
+Tendencias · Sentimientos
+:::
+:::
+::::
+
+**Descubrir conocimiento** que no es evidente a simple vista a través del lenguaje humano.
+
+---
+
+## ¿Qué es el NLP?
+
+El **Procesamiento de Lenguaje Natural** (NLP) es la rama de la inteligencia artificial que le enseña a las computadoras a leer, entender y trabajar con el lenguaje humano.
+
+::: {.formula-card}
+
+**NLP** *(la base)*
+
+Tokenizar · Analizar gramática  
+Reconocer entidades  
+Entender estructura
+
+↓
+
+**Minería de Textos** *(la aplicación)*
+
+Clasificar · Agrupar  
+Detectar temas · Medir opiniones
+
+:::
+
+## El gran reto: las máquinas no leen como nosotros
+
+Cuando nosotros leemos:
+
+::: example-box
+*"El gato duerme en el sofá"*
+:::
+
+Instantáneamente imaginamos la escena, entendemos el significado, captamos la intención.
+
+Pero una computadora **no ve nada de eso**.\
+Para ella, esa misma frase es solo una secuencia de caracteres, uno detrás de otro.
+
+---
+
+
+## Lo que la máquina realmente "ve"
+
+::: example-box
+*"El gato duerme en el sofá"*
+:::
+
+Caracteres individuales:
+
+```
+['E','l',' ','g','a','t','o',' ','d','u','e','r','m','e',' ','e','n',' ','e','l',' ','s','o','f','á']
+```
+
+Que en la memoria de la computadora se almacenan como números (ASCII):
+
+```
+[69, 108, 32, 103, 97, 116, 111, 32, 100, 117, 101, 114, 109, 101, 32, 101, 110, 32, 101, 108, 32, 115, 111, 102, 225]
+```
+
+::: problem-box
+**¿Cómo pasamos de esta secuencia cruda a algo con significado?**\
+Necesitamos una estrategia para capturar semántica a partir de estadística.
+:::
+
+---
+
+## ¿Cómo capturamos significado?
+
+La clave está en una observación muy simple:
+
+::: formula-card
+Las palabras no aparecen solas.\
+Siempre aparecen **rodeadas de otras palabras**.
+:::
+
+Y eso no es aleatorio: si una palabra aparece siempre cerca de las mismas palabras, podemos inferir a qué mundo pertenece.
+
+::::: columns
+::: {.column width="50%"}
+::: example-box
+*"gato"* aparece cerca de:\
+`ronronea` · `pelaje` · `mascota` · `veterinario` · `maúlla`
+:::
+:::
+
+::: {.column width="50%"}
+::: example-box
+*"perro"* aparece cerca de:\
+`ladra` · `pelaje` · `mascota` · `veterinario` · `paseo`
+:::
+:::
+:::::
+
+Ambas comparten `pelaje`, `mascota` y `veterinario` → el modelo aprende que son palabras del mismo mundo, **sin que nadie se lo dijera**.
+
+---
+
+## La Hipótesis Distribucional
+
+::: formula-card
+*"You shall know a word by the company it keeps"*
+
+— J.R. Firth, 1957
+:::
+
+<br>
+
+::: formula-card
+*"Don't look for the meaning, look for the use"*
+
+— Ludwig Wittgenstein
+:::
+
+<br>
+
+Las palabras que aparecen en **contextos similares** tienden a tener **significados similares**.
+
+---
+
+## Contando co-ocurrencias 
+
+Tomamos varias oraciones y contamos cuántas veces aparece cada palabra cerca de otra.
+
+::: {.example-box}
+- "El **gato** duerme en el sillón"  
+- "El **gato** juega en el sillón"  
+- "El **gato** come en el jardín"  
+- "El **perro** duerme en el sillón"  
+- "El **perro** juega en el jardín"  
+- "El **perro** come en el jardín"
+:::
+
+## Matriz de co-ocurrencias 
+
+| $\color{white}{\text{ }}$ | $\color{white}{\text{el}}$ | $\color{white}{\text{gato}}$ | $\color{white}{\text{perro}}$ | $\color{white}{\text{duerme}}$ | $\color{white}{\text{juega}}$ | $\color{white}{\text{come}}$ | $\color{white}{\text{sillón}}$ | $\color{white}{\text{jardín}}$ |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **el**      | — | 3 | 3 | 2 | 2 | 2 | 3 | 3 |
+| **gato**    | 3 | — | 0 | 1 | 1 | 1 | 2 | 1 |
+| **perro**   | 3 | 0 | — | 1 | 1 | 1 | 1 | 2 |
+| **duerme**  | 2 | 1 | 1 | — | 0 | 0 | 1 | 0 |
+| **juega**   | 2 | 1 | 1 | 0 | — | 0 | 0 | 1 |
+| **come**    | 2 | 1 | 1 | 0 | 0 | — | 0 | 1 |
+| **sillón**  | 3 | 2 | 1 | 1 | 0 | 0 | — | 0 |
+| **jardín**  | 3 | 1 | 2 | 0 | 1 | 1 | 0 | — |
+
+::: {.problem-box style="font-size: 0.80em;"}
+Las filas de *"gato"* y *"perro"* tienen patrones casi idénticos:\
+- ambos aparecen con los mismos verbos (duerme, juega, come)\
+- ambos aparecen con los mismos lugares (sillón, jardín).
+
+La máquina aprende que son palabras similares **sin definición, sin diccionario, solo con estadística**.
+:::
+
+## De palabras a documentos
+
+
+
+Ya sabemos representar **palabras** por su contexto.\
+Ahora necesitamos representar **documentos completos**.
+
+::: formula-card
+**Idea central**
+
+Tomar todo el vocabulario y anotar **cuántas veces aparece cada palabra** en cada documento.
+
+El resultado: un vector del **mismo tamaño** para todos → comparables entre si matemáticamente.
+:::
+
+---
+
+## De palabras a documentos 
+
+::: {.example-box style="font-size: 0.8em;"}
+Tres noticias: **ciencia** · **política** · **deportes** — vocabulario de 6 palabras relevantes.
+:::
+
+| $\color{white}{\text{ }}$ | $\color{white}{\text{evolución}}$ | $\color{white}{\text{elección}}$ | $\color{white}{\text{gol}}$ | $\color{white}{\text{científico}}$ | $\color{white}{\text{candidato}}$ | $\color{white}{\text{árbitro}}$ |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **D1** *Ciencia* | 8 | 0 | 0 | 5 | 0 | 0 |
+| **D2** *Política* | 0 | 7 | 0 | 0 | 6 | 0 |
+| **D3** *Deportes* | 0 | 0 | 9 | 0 | 0 | 4 |
+
+Cada fila es el **vector** de ese documento:
+
+::: {style="font-size: 0.85em;"}
+`D1 → [8, 0, 0, 5, 0, 0]` &nbsp;·&nbsp; `D2 → [0, 7, 0, 0, 6, 0]` &nbsp;·&nbsp; `D3 → [0, 0, 9, 0, 0, 4]`
+:::
+
+Sin valores en común → la máquina los ve como documentos **completamente distintos**.
+
+---
+
+## ¿Todas las palabras valen igual?
+
+Hasta ahora solo contamos frecuencias. Pero hay un problema silencioso:
+
+::: {.problem-box style="font-size: 0.85em;"}
+Palabras como *"el"*, *"de"* o *"en"* aparecen con frecuencia altísima en **todos** los documentos, aplastando las que realmente describen el tema.
+:::
+
+Un vector dominado por *"el"* y *"de"* no nos dice nada útil sobre si el documento habla de ciencia, política o deportes.
+
+::: formula-card
+**¿Qué necesitamos?**
+
+Una medida que premie las palabras **frecuentes en ese documento** pero **raras en los demás**.
+:::
+
+
 # TF-IDF
 Term Frequency - Inverse Document Frequency
 

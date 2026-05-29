@@ -1085,6 +1085,360 @@ Edgar Salgado González
 
   <p class="date">2026-05-29</p>
 </section>
+<section id="el-mundo-no-para-de-escribir" class="slide level2">
+<h2>El mundo no para de escribir</h2>
+<p>Cada día se generan millones de textos: correos, publicaciones, noticias, reseñas, mensajes, reportes…</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="problem-box">
+<p>📧 <strong>328.77 millones</strong> de correos electrónicos se envían cada hora</p>
+</div>
+<div class="problem-box">
+<p>🐦 <strong>500 millones</strong> de tweets se publican cada día</p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="example-box">
+<p>💾 <strong>90%</strong> de todos los datos del mundo fueron generados en los últimos dos años</p>
+</div>
+<div class="example-box">
+<p>📄 La mayor parte está en <strong>texto no estructurado</strong>: sin etiquetas, sin orden, sin formato fijo</p>
+</div>
+</div></div>
+</section>
+<section id="el-problema-demasiado-texto-para-leer" class="slide level2">
+<h2>El problema: demasiado texto para leer</h2>
+<p>Una persona puede leer ~300 palabras por minuto.</p>
+<div class="problem-box">
+<p>¿Cómo analiza una empresa <strong>10,000 reseñas</strong> de sus productos?<br>
+¿Cómo sabe un gobierno qué temas preocupan más a la ciudadanía?<br>
+</p>
+</div>
+<p>Leer todo manualmente es <strong>imposible</strong>.<br>
+</p>
+<p>Necesitamos que las computadoras nos ayuden a entender el texto.</p>
+</section>
+<section id="qué-es-la-minería-de-textos" class="slide level2">
+<h2>¿Qué es la Minería de Textos?</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div class="problem-box">
+<p>La <strong>Minería de Textos</strong> es el proceso de extraer información útil y patrones significativos a partir de grandes colecciones de texto de forma <strong>automática</strong>.</p>
+</div>
+</div><div class="column" style="width:45%;">
+<div class="formula-card">
+<p><strong>Entrada</strong></p>
+<p>Texto sin estructura<br>
+<em>(reseñas, noticias, correos…)</em></p>
+<p>↓</p>
+<p><strong>Salida</strong></p>
+<p>Patrones · Categorías<br>
+Tendencias · Sentimientos</p>
+</div>
+</div></div>
+<p><strong>Descubrir conocimiento</strong> que no es evidente a simple vista a través del lenguaje humano.</p>
+</section>
+<section id="qué-es-el-nlp" class="slide level2">
+<h2>¿Qué es el NLP?</h2>
+<p>El <strong>Procesamiento de Lenguaje Natural</strong> (NLP) es la rama de la inteligencia artificial que le enseña a las computadoras a leer, entender y trabajar con el lenguaje humano.</p>
+<div class="formula-card">
+<p><strong>NLP</strong> <em>(la base)</em></p>
+<p>Tokenizar · Analizar gramática<br>
+Reconocer entidades<br>
+Entender estructura</p>
+<p>↓</p>
+<p><strong>Minería de Textos</strong> <em>(la aplicación)</em></p>
+<p>Clasificar · Agrupar<br>
+Detectar temas · Medir opiniones</p>
+</div>
+</section>
+<section id="el-gran-reto-las-máquinas-no-leen-como-nosotros" class="slide level2">
+<h2>El gran reto: las máquinas no leen como nosotros</h2>
+<p>Cuando nosotros leemos:</p>
+<div class="example-box">
+<p><em>“El gato duerme en el sofá”</em></p>
+</div>
+<p>Instantáneamente imaginamos la escena, entendemos el significado, captamos la intención.</p>
+<p>Pero una computadora <strong>no ve nada de eso</strong>.<br>
+Para ella, esa misma frase es solo una secuencia de caracteres, uno detrás de otro.</p>
+</section>
+<section id="lo-que-la-máquina-realmente-ve" class="slide level2">
+<h2>Lo que la máquina realmente “ve”</h2>
+<div class="example-box">
+<p><em>“El gato duerme en el sofá”</em></p>
+</div>
+<p>Caracteres individuales:</p>
+<pre><code>[&#39;E&#39;,&#39;l&#39;,&#39; &#39;,&#39;g&#39;,&#39;a&#39;,&#39;t&#39;,&#39;o&#39;,&#39; &#39;,&#39;d&#39;,&#39;u&#39;,&#39;e&#39;,&#39;r&#39;,&#39;m&#39;,&#39;e&#39;,&#39; &#39;,&#39;e&#39;,&#39;n&#39;,&#39; &#39;,&#39;e&#39;,&#39;l&#39;,&#39; &#39;,&#39;s&#39;,&#39;o&#39;,&#39;f&#39;,&#39;á&#39;]</code></pre>
+<p>Que en la memoria de la computadora se almacenan como números (ASCII):</p>
+<pre><code>[69, 108, 32, 103, 97, 116, 111, 32, 100, 117, 101, 114, 109, 101, 32, 101, 110, 32, 101, 108, 32, 115, 111, 102, 225]</code></pre>
+<div class="problem-box">
+<p><strong>¿Cómo pasamos de esta secuencia cruda a algo con significado?</strong><br>
+Necesitamos una estrategia para capturar semántica a partir de estadística.</p>
+</div>
+</section>
+<section id="cómo-capturamos-significado" class="slide level2">
+<h2>Cómo capturamos significado</h2>
+<p>La clave está en una observación muy simple:</p>
+<div class="formula-card">
+<p>Las palabras no aparecen solas.<br>
+Siempre aparecen <strong>rodeadas de otras palabras</strong>.</p>
+</div>
+<p>Y eso no es aleatorio: si una palabra aparece siempre cerca de las mismas palabras, podemos inferir a qué mundo pertenece.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="example-box">
+<p><em>“gato”</em> aparece cerca de:<br>
+<code>ronronea</code> · <code>pelaje</code> · <code>mascota</code> · <code>veterinario</code> · <code>maúlla</code></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="example-box">
+<p><em>“perro”</em> aparece cerca de:<br>
+<code>ladra</code> · <code>pelaje</code> · <code>mascota</code> · <code>veterinario</code> · <code>paseo</code></p>
+</div>
+</div></div>
+<p>Ambas comparten <code>pelaje</code>, <code>mascota</code> y <code>veterinario</code> → el modelo aprende que son palabras del mismo mundo, <strong>sin que nadie se lo dijera</strong>.</p>
+</section>
+<section id="la-hipótesis-distribucional" class="slide level2">
+<h2>La Hipótesis Distribucional</h2>
+<div class="formula-card">
+<p><em>“You shall know a word by the company it keeps”</em></p>
+<p>— J.R. Firth, 1957</p>
+</div>
+<p><br></p>
+<div class="formula-card">
+<p><em>“Don’t look for the meaning, look for the use”</em></p>
+<p>— Ludwig Wittgenstein</p>
+</div>
+<p><br></p>
+<p>Las palabras que aparecen en <strong>contextos similares</strong> tienden a tener <strong>significados similares</strong>.</p>
+</section>
+<section id="contando-co-ocurrencias" class="slide level2">
+<h2>Contando co-ocurrencias</h2>
+<p>Tomamos varias oraciones y contamos cuántas veces aparece cada palabra cerca de otra.</p>
+<div class="example-box">
+<ul>
+<li>“El <strong>gato</strong> duerme en el sillón”<br>
+</li>
+<li>“El <strong>gato</strong> juega en el sillón”<br>
+</li>
+<li>“El <strong>gato</strong> come en el jardín”<br>
+</li>
+<li>“El <strong>perro</strong> duerme en el sillón”<br>
+</li>
+<li>“El <strong>perro</strong> juega en el jardín”<br>
+</li>
+<li>“El <strong>perro</strong> come en el jardín”</li>
+</ul>
+</div>
+</section>
+<section id="matriz-de-co-ocurrencias" class="slide level2">
+<h2>Matriz de co-ocurrencias</h2>
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\color{white}{\text{ }}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{el}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{gato}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{perro}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{duerme}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{juega}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{come}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{sillón}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{jardín}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>el</strong></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr class="even">
+<td><strong>gato</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td><strong>perro</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td><strong>duerme</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td><strong>juega</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td><strong>come</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td><strong>sillón</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td><strong>jardín</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table>
+<div class="problem-box" style="font-size: 0.80em;">
+<p>Las filas de <em>“gato”</em> y <em>“perro”</em> tienen patrones casi idénticos:<br>
+- ambos aparecen con los mismos verbos (duerme, juega, come)<br>
+- ambos aparecen con los mismos lugares (sillón, jardín).</p>
+<p>La máquina aprende que son palabras similares <strong>sin definición, sin diccionario, solo con estadística</strong>.</p>
+</div>
+</section>
+<section id="de-palabras-a-documentos" class="slide level2">
+<h2>De palabras a documentos</h2>
+<p>Ya sabemos representar <strong>palabras</strong> por su contexto.<br>
+Ahora necesitamos representar <strong>documentos completos</strong>.</p>
+<div class="formula-card">
+<p><strong>Idea central</strong></p>
+<p>Tomar todo el vocabulario y anotar <strong>cuántas veces aparece cada palabra</strong> en cada documento.</p>
+<p>El resultado: un vector del <strong>mismo tamaño</strong> para todos → comparables entre si matemáticamente.</p>
+</div>
+</section>
+<section id="de-palabras-a-documentos-1" class="slide level2">
+<h2>De palabras a documentos</h2>
+<div class="example-box" style="font-size: 0.8em;">
+<p>Tres noticias: <strong>ciencia</strong> · <strong>política</strong> · <strong>deportes</strong> — vocabulario de 6 palabras relevantes.</p>
+</div>
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">\(\color{white}{\text{ }}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{evolución}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{elección}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{gol}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{científico}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{candidato}}\)</span></th>
+<th style="text-align: center;"><span class="math inline">\(\color{white}{\text{árbitro}}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>D1</strong> <em>Ciencia</em></td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td><strong>D2</strong> <em>Política</em></td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td><strong>D3</strong> <em>Deportes</em></td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p>Cada fila es el <strong>vector</strong> de ese documento:</p>
+<div style="font-size: 0.85em;">
+<p><code>D1 → [8, 0, 0, 5, 0, 0]</code>  ·  <code>D2 → [0, 7, 0, 0, 6, 0]</code>  ·  <code>D3 → [0, 0, 9, 0, 0, 4]</code></p>
+</div>
+<p>Sin valores en común → la máquina los ve como documentos <strong>completamente distintos</strong>.</p>
+</section>
+<section id="todas-las-palabras-valen-igual" class="slide level2">
+<h2>¿Todas las palabras valen igual?</h2>
+<p>Hasta ahora solo contamos frecuencias. Pero hay un problema silencioso:</p>
+<div class="problem-box" style="font-size: 0.85em;">
+<p>Palabras como <em>“el”</em>, <em>“de”</em> o <em>“en”</em> aparecen con frecuencia altísima en <strong>todos</strong> los documentos, aplastando las que realmente describen el tema.</p>
+</div>
+<p>Un vector dominado por <em>“el”</em> y <em>“de”</em> no nos dice nada útil sobre si el documento habla de ciencia, política o deportes.</p>
+<div class="formula-card">
+<p><strong>¿Qué necesitamos?</strong></p>
+<p>Una medida que premie las palabras <strong>frecuentes en ese documento</strong> pero <strong>raras en los demás</strong>.</p>
+</div>
+</section>
 <section>
 <section id="tf-idf" class="title-slide slide level1 center">
 <h1>TF-IDF</h1>
@@ -1618,10 +1972,10 @@ representativa</p>
 <p><strong>Semilla</strong> para registrar un estado inicial.</p>
 <p>Y la <strong>forma de análisis</strong> de los textos, <code>batch</code> es un análisis completo de todo el dataset, mientras que <code>online</code> lo hace por partes.</p>
 <h3 id="en-nuestro-ejemplo">En nuestro ejemplo …</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href></a>        n_components<span class="op">=</span>k,           <span class="co"># Número de tópicos a extraer  </span></span>
-<span id="cb1-2"><a href></a>        learning_method<span class="op">=</span><span class="st">&quot;batch&quot;</span>,  <span class="co"># Evalúa todo el dataset de golpe </span></span>
-<span id="cb1-3"><a href></a>        max_iter<span class="op">=</span><span class="dv">1000</span>,            <span class="co"># Máximo número de iteraciones para ajustar los pesos</span></span>
-<span id="cb1-4"><a href></a>        random_state<span class="op">=</span><span class="dv">42</span>,          <span class="co"># Semilla </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href></a>        n_components<span class="op">=</span>k,           <span class="co"># Número de tópicos a extraer  </span></span>
+<span id="cb3-2"><a href></a>        learning_method<span class="op">=</span><span class="st">&quot;batch&quot;</span>,  <span class="co"># Evalúa todo el dataset de golpe </span></span>
+<span id="cb3-3"><a href></a>        max_iter<span class="op">=</span><span class="dv">1000</span>,            <span class="co"># Máximo número de iteraciones para ajustar los pesos</span></span>
+<span id="cb3-4"><a href></a>        random_state<span class="op">=</span><span class="dv">42</span>,          <span class="co"># Semilla </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="aplicar-lda-al-ejemplo" class="slide level2">
 <h2>Aplicar LDA al ejemplo</h2>
@@ -1759,35 +2113,35 @@ representativa</p>
 <section id="los-datos" class="slide level2">
 <h2>Los datos</h2>
 <p>No se almacenan los mensajes completos. Se guarda la <strong>frecuencia relativa</strong> de 57 palabras discriminantes. Un valor de <code>0.43</code> en <code>money</code> significa que esa palabra representa el <strong>43% del texto</strong> de ese correo.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href></a><span class="fu">data</span>(spam)</span>
-<span id="cb2-2"><a href></a>spam[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,]<span class="sc">$</span>money      <span class="co"># Frecuencia de &quot;money&quot; — correos spam</span></span>
-<span id="cb2-3"><a href></a><span class="co"># [1] 0.00 0.43 0.06 0.00 ...</span></span>
-<span id="cb2-4"><a href></a>spam[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,]<span class="sc">$</span>type       <span class="co"># Etiqueta del mensaje</span></span>
-<span id="cb2-5"><a href></a><span class="co"># [1] spam spam spam spam ....</span></span>
-<span id="cb2-6"><a href></a>spam[<span class="dv">4501</span><span class="sc">:</span><span class="dv">4508</span>,]<span class="sc">$</span>type <span class="co"># Correos legítimos</span></span>
-<span id="cb2-7"><a href></a><span class="co"># [1] nonspam nonspam nonspam ....</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a><span class="fu">data</span>(spam)</span>
+<span id="cb4-2"><a href></a>spam[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,]<span class="sc">$</span>money      <span class="co"># Frecuencia de &quot;money&quot; — correos spam</span></span>
+<span id="cb4-3"><a href></a><span class="co"># [1] 0.00 0.43 0.06 0.00 ...</span></span>
+<span id="cb4-4"><a href></a>spam[<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>,]<span class="sc">$</span>type       <span class="co"># Etiqueta del mensaje</span></span>
+<span id="cb4-5"><a href></a><span class="co"># [1] spam spam spam spam ....</span></span>
+<span id="cb4-6"><a href></a>spam[<span class="dv">4501</span><span class="sc">:</span><span class="dv">4508</span>,]<span class="sc">$</span>type <span class="co"># Correos legítimos</span></span>
+<span id="cb4-7"><a href></a><span class="co"># [1] nonspam nonspam nonspam ....</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="preparar-los-datos" class="slide level2">
 <h2>Preparar los datos</h2>
 <p>Los datos se convierten a data frame (<code>factor</code> convierte categorías a variables nominales). Se dividen en <strong>80% entrenamiento / 20% prueba</strong>. <code>set.seed(150)</code> garantiza que el muestreo sea reproducible.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href></a>spamDF <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">lapply</span>(spam, factor))</span>
-<span id="cb3-2"><a href></a><span class="fu">set.seed</span>(<span class="dv">150</span>)  <span class="co"># Semilla: mismo resultado cada vez</span></span>
-<span id="cb3-3"><a href></a></span>
-<span id="cb3-4"><a href></a>aleatorios    <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">size =</span> <span class="fu">nrow</span>(spamDF),</span>
-<span id="cb3-5"><a href></a>                        <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>))</span>
-<span id="cb3-6"><a href></a>entrenamiento <span class="ot">&lt;-</span> spamDF[aleatorios <span class="sc">==</span> <span class="dv">1</span>, ]  <span class="co"># 80%</span></span>
-<span id="cb3-7"><a href></a>prueba        <span class="ot">&lt;-</span> spamDF[aleatorios <span class="sc">==</span> <span class="dv">2</span>, ]  <span class="co"># 20%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href></a>spamDF <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">lapply</span>(spam, factor))</span>
+<span id="cb5-2"><a href></a><span class="fu">set.seed</span>(<span class="dv">150</span>)  <span class="co"># Semilla: mismo resultado cada vez</span></span>
+<span id="cb5-3"><a href></a></span>
+<span id="cb5-4"><a href></a>aleatorios    <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">size =</span> <span class="fu">nrow</span>(spamDF),</span>
+<span id="cb5-5"><a href></a>                        <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>))</span>
+<span id="cb5-6"><a href></a>entrenamiento <span class="ot">&lt;-</span> spamDF[aleatorios <span class="sc">==</span> <span class="dv">1</span>, ]  <span class="co"># 80%</span></span>
+<span id="cb5-7"><a href></a>prueba        <span class="ot">&lt;-</span> spamDF[aleatorios <span class="sc">==</span> <span class="dv">2</span>, ]  <span class="co"># 20%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="construir-el-clasificador" class="slide level2">
 <h2>Construir el clasificador</h2>
 <p><code>naiveBayes()</code> aprende qué frecuencias de palabras son típicas del spam y cuáles del correo legítimo. La fórmula <code>type ~ .</code> significa: <em>“predice <code>type</code> usando todas las demás columnas”</em>.</p>
 <p><code>confusionMatrix()</code> compara las predicciones contra las etiquetas reales.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href></a>clasificadorNB <span class="ot">&lt;-</span> <span class="fu">naiveBayes</span>(type <span class="sc">~</span> ., entrenamiento)</span>
-<span id="cb4-2"><a href></a></span>
-<span id="cb4-3"><a href></a>prediccion <span class="ot">&lt;-</span> <span class="fu">predict</span>(clasificadorNB, prueba)</span>
-<span id="cb4-4"><a href></a>referencia <span class="ot">&lt;-</span> prueba[, <span class="st">&quot;type&quot;</span>]</span>
-<span id="cb4-5"><a href></a></span>
-<span id="cb4-6"><a href></a><span class="fu">confusionMatrix</span>(prediccion, referencia)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href></a>clasificadorNB <span class="ot">&lt;-</span> <span class="fu">naiveBayes</span>(type <span class="sc">~</span> ., entrenamiento)</span>
+<span id="cb6-2"><a href></a></span>
+<span id="cb6-3"><a href></a>prediccion <span class="ot">&lt;-</span> <span class="fu">predict</span>(clasificadorNB, prueba)</span>
+<span id="cb6-4"><a href></a>referencia <span class="ot">&lt;-</span> prueba[, <span class="st">&quot;type&quot;</span>]</span>
+<span id="cb6-5"><a href></a></span>
+<span id="cb6-6"><a href></a><span class="fu">confusionMatrix</span>(prediccion, referencia)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="resultados-correo-spam" class="slide level2">
 <h2>Resultados: correo spam</h2>
@@ -1852,32 +2206,32 @@ representativa</p>
 <section id="la-función-obtienesentimiento" class="slide level2">
 <h2>La función ObtieneSentimiento</h2>
 <p>Implementa los 4 pasos: leer → tokenizar → cruzar con Bing → calcular puntaje.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href></a>ObtieneSentimiento <span class="ot">&lt;-</span> <span class="cf">function</span>(archivo) {</span>
-<span id="cb5-2"><a href></a>  nomArch <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">&quot;TXT/&quot;</span>, archivo)</span>
-<span id="cb5-3"><a href></a></span>
-<span id="cb5-4"><a href></a>  <span class="co"># Leer el archivo y dividir en palabras individuales</span></span>
-<span id="cb5-5"><a href></a>  tokens <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">texto =</span> <span class="fu">read_file</span>(nomArch)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href></a>    <span class="fu">unnest_tokens</span>(word, texto)      <span class="co"># 1 fila = 1 palabra</span></span>
-<span id="cb5-7"><a href></a></span>
-<span id="cb5-8"><a href></a>  sentimiento <span class="ot">&lt;-</span> tokens <span class="sc">%&gt;%</span></span>
-<span id="cb5-9"><a href></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;bing&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># Solo palabras en el diccionario</span></span>
-<span id="cb5-10"><a href></a>    <span class="fu">count</span>(sentiment) <span class="sc">%&gt;%</span>                    <span class="co"># Cuenta positivas y negativas</span></span>
-<span id="cb5-11"><a href></a>    <span class="fu">spread</span>(sentiment, n, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span>      <span class="co"># Crea columnas positive / negative</span></span>
-<span id="cb5-12"><a href></a>    <span class="fu">mutate</span>(</span>
-<span id="cb5-13"><a href></a>      <span class="at">sentimiento =</span> positive <span class="sc">-</span> negative,</span>
-<span id="cb5-14"><a href></a>      <span class="at">archivo =</span> archivo,</span>
-<span id="cb5-15"><a href></a>      <span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(archivo, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{4}&quot;</span>)),</span>
-<span id="cb5-16"><a href></a>      <span class="at">presidente =</span> <span class="fu">str_remove</span>(archivo, <span class="st">&quot;_</span><span class="sc">\\</span><span class="st">d{4}</span><span class="sc">\\</span><span class="st">.txt&quot;</span>)</span>
-<span id="cb5-17"><a href></a>    )</span>
-<span id="cb5-18"><a href></a>  <span class="fu">return</span>(sentimiento)</span>
-<span id="cb5-19"><a href></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href></a>ObtieneSentimiento <span class="ot">&lt;-</span> <span class="cf">function</span>(archivo) {</span>
+<span id="cb7-2"><a href></a>  nomArch <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">&quot;TXT/&quot;</span>, archivo)</span>
+<span id="cb7-3"><a href></a></span>
+<span id="cb7-4"><a href></a>  <span class="co"># Leer el archivo y dividir en palabras individuales</span></span>
+<span id="cb7-5"><a href></a>  tokens <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">texto =</span> <span class="fu">read_file</span>(nomArch)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href></a>    <span class="fu">unnest_tokens</span>(word, texto)      <span class="co"># 1 fila = 1 palabra</span></span>
+<span id="cb7-7"><a href></a></span>
+<span id="cb7-8"><a href></a>  sentimiento <span class="ot">&lt;-</span> tokens <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href></a>    <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;bing&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># Solo palabras en el diccionario</span></span>
+<span id="cb7-10"><a href></a>    <span class="fu">count</span>(sentiment) <span class="sc">%&gt;%</span>                    <span class="co"># Cuenta positivas y negativas</span></span>
+<span id="cb7-11"><a href></a>    <span class="fu">spread</span>(sentiment, n, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span>      <span class="co"># Crea columnas positive / negative</span></span>
+<span id="cb7-12"><a href></a>    <span class="fu">mutate</span>(</span>
+<span id="cb7-13"><a href></a>      <span class="at">sentimiento =</span> positive <span class="sc">-</span> negative,</span>
+<span id="cb7-14"><a href></a>      <span class="at">archivo =</span> archivo,</span>
+<span id="cb7-15"><a href></a>      <span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(archivo, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d{4}&quot;</span>)),</span>
+<span id="cb7-16"><a href></a>      <span class="at">presidente =</span> <span class="fu">str_remove</span>(archivo, <span class="st">&quot;_</span><span class="sc">\\</span><span class="st">d{4}</span><span class="sc">\\</span><span class="st">.txt&quot;</span>)</span>
+<span id="cb7-17"><a href></a>    )</span>
+<span id="cb7-18"><a href></a>  <span class="fu">return</span>(sentimiento)</span>
+<span id="cb7-19"><a href></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="aplicar-a-todos-los-discursos" class="slide level2">
 <h2>Aplicar a todos los discursos</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href></a>sentimientos <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
-<span id="cb6-2"><a href></a><span class="cf">for</span> (i <span class="cf">in</span> archivos) {</span>
-<span id="cb6-3"><a href></a>  sentimientos <span class="ot">&lt;-</span> <span class="fu">rbind</span>(sentimientos, <span class="fu">ObtieneSentimiento</span>(i))</span>
-<span id="cb6-4"><a href></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href></a>sentimientos <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
+<span id="cb8-2"><a href></a><span class="cf">for</span> (i <span class="cf">in</span> archivos) {</span>
+<span id="cb8-3"><a href></a>  sentimientos <span class="ot">&lt;-</span> <span class="fu">rbind</span>(sentimientos, <span class="fu">ObtieneSentimiento</span>(i))</span>
+<span id="cb8-4"><a href></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="example-box">
 <p>Clinton era <strong>muy positivo</strong>. Trump ha sido <strong>bastante negativo</strong>.</p>
 </div>
@@ -1918,10 +2272,10 @@ representativa</p>
 <section id="dato-atípico-bush-jr.-2002" class="slide level2">
 <h2>Dato atípico: Bush Jr. 2002</h2>
 <p>El discurso de 2002 tiene la calificación <strong>más negativa</strong>: posterior al <strong>ataque a las Torres Gemelas</strong> en 2001.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href></a><span class="fu">library</span>(wordcloud)</span>
-<span id="cb7-2"><a href></a><span class="fu">library</span>(tm)</span>
-<span id="cb7-3"><a href></a><span class="co"># frecPalabras ya contiene la frecuencia de cada palabra del discurso 2002</span></span>
-<span id="cb7-4"><a href></a><span class="fu">wordcloud</span>(<span class="at">words =</span> <span class="fu">names</span>(frecPalabras), <span class="at">freq =</span> frecPalabras)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href></a><span class="fu">library</span>(wordcloud)</span>
+<span id="cb9-2"><a href></a><span class="fu">library</span>(tm)</span>
+<span id="cb9-3"><a href></a><span class="co"># frecPalabras ya contiene la frecuencia de cada palabra del discurso 2002</span></span>
+<span id="cb9-4"><a href></a><span class="fu">wordcloud</span>(<span class="at">words =</span> <span class="fu">names</span>(frecPalabras), <span class="at">freq =</span> frecPalabras)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Términos dominantes: <strong>terrorismo, guerra, Afganistán</strong>.</p>
 <div class="problem-box">
 <p>Las palabras tienen carga negativa en el diccionario, pero el mensaje es de condena. El modelo <strong>no entiende intención ni contexto</strong>.</p>
