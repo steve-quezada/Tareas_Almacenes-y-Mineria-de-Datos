@@ -691,21 +691,3 @@ El t-test valida la hipótesis de que pertenecer a un partido político determin
 #### Dato atípico: Bush Jr. 2002
 
 El discurso de 2002 —posterior al ataque del 11 de septiembre— es el dato atípico con el puntaje más negativo de todo el corpus. Se nota claramente que el discurso trató del terrorismo y la guerra que se emprendería contra Afganistán.
-
-### Resumen
-
-En los ejemplos mostrados se ha trabajado únicamente con las palabras como elemento básico de procesamiento. Parece limitado, pero esta forma de trabajar con los datos textuales es sencilla y permite obtener resultados significativos.
-
-### Preguntas de reflexión
-
-::: {.callout-note title="Pregunta 1" appearance="minimal"}
-En el clasificador de spam, la base de datos no almacena los mensajes completos sino la frecuencia relativa de palabras discriminantes. ¿Por qué es suficiente esta información para clasificar el correo? ¿Qué información se pierde al no guardar el texto completo?
-:::
-
-::: {.callout-note title="Pregunta 2" appearance="minimal"}
-El diccionario Bing etiqueta palabras como positivas o negativas de forma independiente al contexto. ¿En qué casos concretos podría este enfoque producir resultados incorrectos en el análisis de discursos políticos?
-:::
-
-::: {.callout-note title="Pregunta 3" appearance="minimal"}
-El discurso de Bush Jr. en 2002 obtuvo la calificación más negativa del corpus, a pesar de que el contexto fue un ataque sufrido por el país. ¿Cómo interpretarías ese resultado? ¿Qué nos dice sobre la diferencia entre el sentimiento de las palabras y el sentimiento del mensaje?
-:::
