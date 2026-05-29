@@ -1,0 +1,664 @@
+---
+title: "Exploración y Limpieza del Dataset"
+---
+
+Este capítulo contiene el pipeline completo de exploración, análisis de calidad y limpieza del dataset `data_secretariado.csv`. Como resultado se generan dos versiones limpias del dataset en `data/clean/`.
+
+## Carga del dataset
+
+```{python}
+#| label: carga-datos
+import pandas as pd
+import numpy as np
+
+df_original = pd.read_csv('data/raw/data_secretariado.csv')
+df = df_original.copy()
+print(f"Dataset original: {df.shape[0]:,} filas × {df.shape[1]} columnas")
+```
+
+```{python}
+#| label: info-general
+print(f"Columnas: {list(df.columns)}")
+df.dtypes
+```
+
+## Análisis exploratorio por columna
+
+### ORIGEN_REPORTE
+
+```{python}
+valores_na = df['ORIGEN_REPORTE'].isna().sum()
+print(f"Valores nulos: {valores_na}")
+
+origen_reportes = df['ORIGEN_REPORTE'].value_counts()
+print(f"\nFuentes de reporte distintas: {len(origen_reportes)}")
+```
+
+No hay valores nulos. Se identifican **74 fuentes** de origen de los reportes, que se categorizan en:
+
+```{python}
+#| label: categorizacion-fuentes
+comisiones = origen_reportes[origen_reportes.index.str.contains('COMISION')]
+fiscalias = origen_reportes[origen_reportes.index.str.contains('FISCALIA GENERAL DE')]
+procuradurias = origen_reportes[origen_reportes.index.str.contains('PROCURADURIA')]
+subprocuradurias = origen_reportes[origen_reportes.index.str.contains('SUBPROCURADURIA')]
+procuradurias = procuradurias[~procuradurias.index.str.contains('SUBPROCURADURIA')]
+
+fuentes_clasificadas = (
+    comisiones.index
+    .union(fiscalias.index)
+    .union(procuradurias.index)
+    .union(subprocuradurias.index)
+)
+otras = origen_reportes[~origen_reportes.index.isin(fuentes_clasificadas)]
+
+print(f"Comisiones locales de búsqueda: {len(comisiones)}")
+print(f"Fiscalías generales: {len(fiscalias)}")
+print(f"Procuradurías: {len(procuradurias)}")
+print(f"Subprocuradurías: {len(subprocuradurias)}")
+print(f"Otras fuentes: {len(otras)}")
+```
+
+### FECHA_NACIMIENTO
+
+```{python}
+fechas_nacimiento = df['FECHA_NACIMIENTO']
+
+valores_nulos = fechas_nacimiento.isna().sum()
+valores_confidenciales = fechas_nacimiento.str.contains('CONFIDENCIAL', na=False).sum()
+valores_formato_valido = fechas_nacimiento.str.match(r'^\d{4}-\d{2}-\d{2}$', na=False).sum()
+
+total_registros = len(df)
+print(f"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})")
+print(f"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})")
+print(f"Valores con formato yyyy-mm-dd: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})")
+```
+
+La columna contiene valores nulos y registros `CONFIDENCIAL`. Las fechas válidas siguen el formato `yyyy-mm-dd`.
+
+### SEXO
+
+```{python}
+sexo = df['SEXO']
+valores_nulos = sexo.isna().sum()
+categorias_sexo = sexo.value_counts()
+
+print(f"Valores nulos: {valores_nulos}")
+print(f"Categorías distintas: {len(categorias_sexo)}")
+categorias_sexo
+```
+
+No hay valores nulos. Los registros se agrupan en pocas categorías.
+
+### FECHA_DESAPARICION
+
+```{python}
+fechas_desaparicion = df['FECHA_DESAPARICION'].astype('string')
+
+valores_nulos = fechas_desaparicion.isna().sum()
+valores_confidenciales = fechas_desaparicion.str.contains('CONFIDENCIAL', case=False, na=False).sum()
+valores_formato_valido = fechas_desaparicion.str.match(r'^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}$', na=False).sum()
+
+print(f"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})")
+print(f"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})")
+print(f"Valores con formato yyyy-mm-dd HH:MM:SS: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})")
+```
+
+### FECHA_REGISTRO
+
+```{python}
+fechas_registro = df['FECHA_REGISTRO'].astype('string')
+
+valores_nulos = fechas_registro.isna().sum()
+valores_confidenciales = fechas_registro.str.contains('CONFIDENCIAL', case=False, na=False).sum()
+valores_formato_valido = fechas_registro.str.match(r'^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}$', na=False).sum()
+
+print(f"Valores nulos: {valores_nulos} ({valores_nulos/total_registros:.2%})")
+print(f"Valores confidenciales: {valores_confidenciales} ({valores_confidenciales/total_registros:.2%})")
+print(f"Valores con formato yyyy-mm-dd HH:MM:SS: {valores_formato_valido} ({valores_formato_valido/total_registros:.2%})")
+```
+
+### ESTATUS_VICTIMA
+
+```{python}
+estatus_victima = df['ESTATUS_VICTIMA'].astype('string')
+valores_nulos = estatus_victima.isna().sum()
+categorias_estatus = estatus_victima.value_counts()
+
+print(f"Valores nulos: {valores_nulos}")
+print(f"Categorías distintas: {len(categorias_estatus)}")
+categorias_estatus
+```
+
+### CVE_ENT y ENTIDAD
+
+```{python}
+clave_entidad = df['CVE_ENT']
+print(f"Valores nulos en CVE_ENT: {clave_entidad.isna().sum()}")
+print(f"Claves distintas: {clave_entidad.nunique()}")
+
+entidad = df['ENTIDAD'].astype('string')
+print(f"\nValores nulos en ENTIDAD: {entidad.isna().sum()}")
+print(f"Entidades distintas: {entidad.nunique()}")
+
+# Verificar consistencia entre CVE_ENT=99 y SE DESCONOCE
+print(f"\nRegistros con CVE_ENT=99: {(df['CVE_ENT'] == 99).sum()}")
+print(f"Registros con ENTIDAD='SE DESCONOCE': {(entidad == 'SE DESCONOCE').sum()}")
+```
+
+Se identifican 33 claves: las 32 entidades federativas más la clave `99` (SE DESCONOCE).
+
+### CVE_MUN y MUNICIPIO
+
+```{python}
+clave_municipio = df['CVE_MUN']
+print(f"Valores nulos en CVE_MUN: {clave_municipio.isna().sum()}")
+print(f"Claves de municipio distintas: {clave_municipio.nunique()}")
+print(f"Registros con clave 999: {(df['CVE_MUN'] == 999).sum()}")
+
+municipio = df['MUNICIPIO'].astype('string')
+municipios = municipio.value_counts()
+print(f"\nValores nulos en MUNICIPIO: {municipio.isna().sum()}")
+print(f"Municipios distintos: {len(municipios)}")
+print(f"\nRegistros CONFIDENCIAL: {municipios.get('CONFIDENCIAL', 0)}")
+print(f"Registros SE DESCONOCE: {municipios.get('SE DESCONOCE', 0)}")
+```
+
+La clave `999` no corresponde a un municipio específico; se asocia a registros confidenciales o desconocidos.
+
+## Análisis de los registros `CONFIDENCIAL`
+
+Durante la exploración inicial del dataset se observó una cantidad importante de registros marcados como `CONFIDENCIAL` en varias columnas clave. Antes de decidir cómo tratarlos, conviene identificar si esta reserva de información ocurre de forma aislada o si corresponde al mismo bloque de personas a lo largo de distintas variables.
+
+```{python}
+#| label: conteo-confidenciales
+columnas_confidenciales = [
+    'FECHA_NACIMIENTO',
+    'SEXO',
+    'FECHA_DESAPARICION',
+    'FECHA_REGISTRO',
+    'ESTATUS_VICTIMA',
+    'MUNICIPIO'
+]
+
+for col in columnas_confidenciales:
+    total_conf = (df[col] == 'CONFIDENCIAL').sum()
+    print(f"Registros con {col} confidencial: {total_conf}")
+```
+
+Los conteos anteriores muestran que la frecuencia de `CONFIDENCIAL` es exactamente la misma en todas las columnas analizadas. Esto sugiere la existencia de un subconjunto común de registros censurados.
+
+```{python}
+#| label: verificar-bloque
+subconjuntos_confidenciales = {
+    col: set(df.loc[df[col] == 'CONFIDENCIAL', 'ID_VICTIMA'])
+    for col in columnas_confidenciales
+}
+
+base_ids = subconjuntos_confidenciales['FECHA_NACIMIENTO']
+
+print("Los IDs confidenciales coinciden exactamente con los de FECHA_NACIMIENTO?")
+for col, ids in subconjuntos_confidenciales.items():
+    print(f"{col}: {base_ids == ids}")
+```
+
+La comparación confirma que se trata del mismo grupo de víctimas en todas las columnas revisadas. En otras palabras, cuando un registro aparece como `CONFIDENCIAL` en una de estas variables, también aparece censurado en las demás. Esto indica que no estamos frente a valores faltantes dispersos, sino ante un **bloque consistente de información reservada**.
+
+## Construcción de banderas de confidencialidad
+
+Dado que la única variable que todavía aporta información útil dentro de este bloque censurado es `ENTIDAD`, se separarán estos registros en dos grupos: aquellos cuyo estado sí se conoce y aquellos en los que incluso la entidad aparece como `SE DESCONOCE`.
+
+```{python}
+#| label: banderas-confidencialidad
+mask_confidencial_total = (df['FECHA_NACIMIENTO'] == 'CONFIDENCIAL').fillna(False)
+
+df['confidencial_con_estado'] = (
+        mask_confidencial_total &
+        (df['ENTIDAD'] != 'SE DESCONOCE')
+).astype(int)
+
+df['confidencial_sin_estado'] = (
+        mask_confidencial_total &
+        (df['ENTIDAD'] == 'SE DESCONOCE')
+).astype(int)
+
+print("Distribución de la confidencialidad:")
+print(f"Confidencial con estado conocido: {df['confidencial_con_estado'].sum()}")
+print(f"Confidencial sin estado conocido: {df['confidencial_sin_estado'].sum()}")
+```
+
+Esta clasificación permite distinguir entre registros reservados que aún conservan valor geográfico y registros cuya utilidad analítica es mucho menor.
+
+## Identificación de registros con información mínima
+
+A continuación se aísla el subconjunto más problemático: los registros que son completamente confidenciales y que además no tienen entidad conocida.
+
+```{python}
+#| label: confidencial-sin-entidad
+confidencial_sin_entidad = df[df['confidencial_sin_estado'] == 1].copy()
+
+print(f"Total de registros confidenciales sin entidad conocida: {len(confidencial_sin_entidad)}")
+```
+
+```{python}
+#| label: origen-confidencial-sin-entidad
+confidencial_sin_entidad['ORIGEN_REPORTE'].value_counts().head(10)
+```
+
+Aunque estos registros no contienen información demográfica ni de ubicación específica, todavía podrían conservar valor administrativo si al menos se conoce la institución que levantó el reporte. Por ello, se revisa cuántos de ellos también tienen `ORIGEN_REPORTE = 'SE DESCONOCE'`.
+
+```{python}
+#| label: informacion-minima
+df_casos_informacion_minima = confidencial_sin_entidad[
+    confidencial_sin_entidad['ORIGEN_REPORTE'] == 'SE DESCONOCE'
+    ].copy()
+
+cantidad_informacion_minima = len(df_casos_informacion_minima)
+porcentaje_informacion_minima = (cantidad_informacion_minima / len(df)) * 100
+
+print(f"Registros con información mínima: {cantidad_informacion_minima}")
+print(f"Esto representa el {porcentaje_informacion_minima:.2f}% del dataset total.")
+```
+
+El resultado muestra que los casos con información realmente mínima son muy pocos en comparación con el tamaño total del dataset. Por ello, conviene tratarlos como un subconjunto muy específico y no confundirlos con todo el bloque confidencial.
+
+## Eliminación de registros con información mínima
+
+Dado que estos registros presentan `CONFIDENCIAL` en todas las variables sensibles analizadas y además tienen `ENTIDAD = 'SE DESCONOCE'` y `ORIGEN_REPORTE = 'SE DESCONOCE'`, su utilidad analítica es prácticamente nula. En consecuencia, se eliminarán del dataset de trabajo, ya que no aportan información demográfica, temporal, geográfica ni institucional aprovechable para el análisis.
+
+```{python}
+#| label: eliminar-minimos
+mask_informacion_minima = (
+        mask_confidencial_total &
+        (df['ENTIDAD'] == 'SE DESCONOCE') &
+        (df['ORIGEN_REPORTE'] == 'SE DESCONOCE')
+)
+
+print(f"Registros a eliminar: {mask_informacion_minima.sum()}")
+```
+
+```{python}
+#| label: aplicar-eliminacion
+df = df.loc[~mask_informacion_minima].copy()
+
+print(f"Filas restantes después de eliminar registros con información mínima: {len(df)}")
+```
+
+A partir de este punto, el DataFrame `df` será el dataset principal de trabajo. Es decir, conservará tanto los registros completos como aquellos confidenciales que todavía contienen alguna información útil, y únicamente excluirá los casos con información mínima.
+
+### Eliminación de registros con información mínima
+
+Se identifican registros que son `CONFIDENCIAL` en todas las variables sensibles Y además tienen `ENTIDAD = SE DESCONOCE` y `ORIGEN_REPORTE = SE DESCONOCE`:
+
+```{python}
+mask_informacion_minima = (
+    mask_confidencial_total &
+    (df['ENTIDAD'] == 'SE DESCONOCE') &
+    (df['ORIGEN_REPORTE'] == 'SE DESCONOCE')
+)
+
+print(f"Registros con información mínima: {mask_informacion_minima.sum()}")
+print(f"Porcentaje del total: {mask_informacion_minima.sum() / len(df):.4%}")
+```
+
+```{python}
+df = df.loc[~mask_informacion_minima].copy()
+print(f"Filas restantes: {len(df):,}")
+```
+
+## Limpieza de datos
+
+### 1. Valores faltantes
+
+# Limpieza de datos
+
+A partir de este punto se trabaja con el DataFrame `df` ya depurado de los registros con información mínima. El objetivo de esta sección es construir dos versiones finales del dataset: una **general**, que conserva los registros confidenciales útiles, y otra **temporal**, enfocada exclusivamente en análisis cronológicos.
+
+## Preparación base del dataset
+
+### 1. Valores faltantes
+
+En esta etapa se resume el tratamiento de los valores faltantes reales del dataset. Es importante distinguirlos de los valores `CONFIDENCIAL`, ya que estos últimos no representan ausencia de información, sino **información reservada**.
+
+```{python}
+#| label: resumen-faltantes
+resumen_faltantes = pd.DataFrame({
+    'columna': ['FECHA_NACIMIENTO', 'FECHA_DESAPARICION', 'FECHA_REGISTRO'],
+    'nulos': [
+        df['FECHA_NACIMIENTO'].isna().sum(),
+        df['FECHA_DESAPARICION'].isna().sum(),
+        df['FECHA_REGISTRO'].isna().sum()
+    ]
+})
+resumen_faltantes['porcentaje'] = (resumen_faltantes['nulos'] / len(df) * 100).round(2)
+resumen_faltantes['decision'] = 'Se conserva como nulo; no se imputa'
+resumen_faltantes
+```
+
+Los valores faltantes se conservaron como nulos y no fueron imputados, ya que en este trabajo interesa preservar la información original del registro. La imputación podría introducir supuestos difíciles de justificar, especialmente en variables temporales.
+
+### 2. Duplicados
+
+Para detectar duplicados se utilizaron dos criterios: duplicados exactos por fila completa y duplicados en el identificador `ID_VICTIMA`, que funciona como clave de registro.
+
+```{python}
+#| label: duplicados
+duplicados_fila_completa = df.duplicated().sum()
+duplicados_id = df['ID_VICTIMA'].duplicated().sum()
+
+print(f"Duplicados por fila completa: {duplicados_fila_completa}")
+print(f"Duplicados en ID_VICTIMA: {duplicados_id}")
+```
+
+No se identificaron registros duplicados bajo ninguno de los dos criterios, por lo que no fue necesario eliminar observaciones por duplicidad.
+
+### 3. Tipos de datos correctos
+
+En esta etapa se corrigen y validan los tipos de datos del dataset principal. Primero se convierten las claves numéricas, después las variables textuales y, finalmente, se normalizan las categorías.
+
+#### 3.1 Conversión de variables numéricas
+
+Las columnas `CVE_ENT` y `CVE_MUN` representan claves geográficas, por lo que deben tratarse como variables numéricas enteras. Para conservar posibles valores faltantes, se utiliza el tipo nullable `Int64` de pandas.
+
+```{python}
+#| label: vars-numericas
+df['CVE_ENT'] = pd.to_numeric(df['CVE_ENT'], errors='coerce').astype('Int64')
+df['CVE_MUN'] = pd.to_numeric(df['CVE_MUN'], errors='coerce').astype('Int64')
+
+df[['CVE_ENT', 'CVE_MUN']].info()
+```
+
+Con esta conversión, ambas columnas quedan preparadas para análisis numéricos, cruces geográficos y validaciones de consistencia entre claves y etiquetas textuales.
+
+#### 3.2 Conversión de variables textuales
+
+Las columnas restantes contienen identificadores, categorías, nombres institucionales o etiquetas geográficas. Por ello, se convierten explícitamente a tipo `string`, lo que permite un tratamiento uniforme y evita interpretaciones incorrectas por parte de pandas.
+
+```{python}
+#| label: vars-textuales
+columnas_texto = [
+    'ID_VICTIMA', 'ORIGEN_REPORTE', 'FECHA_NACIMIENTO', 'SEXO',
+    'FECHA_DESAPARICION', 'FECHA_REGISTRO', 'ESTATUS_VICTIMA',
+    'ENTIDAD', 'MUNICIPIO'
+]
+
+for col in columnas_texto:
+    df[col] = df[col].astype('string')
+
+df[columnas_texto].info()
+```
+
+Esta conversión no modifica el contenido semántico de las variables, pero sí asegura consistencia en el manejo de valores categóricos, alfanuméricos y temporales en formato textual.
+
+### 4. Normalización de categorías
+
+Se aplicó una normalización preventiva sobre las principales columnas categóricas de texto, con el fin de verificar si existían diferencias artificiales por espacios redundantes o por uso inconsistente de mayúsculas y minúsculas. En este caso, no se observaron cambios relevantes, lo que indica que el dataset ya presentaba categorías homogéneas.
+
+```{python}
+#| label: normalizacion
+columnas_categoricas = ['ORIGEN_REPORTE', 'SEXO', 'ESTATUS_VICTIMA', 'ENTIDAD', 'MUNICIPIO']
+
+for col in columnas_categoricas:
+    df[col] = (
+        df[col]
+        .astype('string')
+        .str.strip()
+        .str.replace(r'\s+', ' ', regex=True)
+        .str.upper()
+    )
+```
+
+Después de esta revisión, la cardinalidad de las categorías se mantuvo sin cambios, por lo que la normalización funcionó principalmente como una validación preventiva de consistencia.
+
+## Construcción del dataset limpio general
+
+Esta versión conserva los registros confidenciales cuando aún aportan información útil para análisis descriptivos, institucionales o geográficos. Las nuevas columnas con sufijo `_DT` representan la versión temporal limpia de las variables de fecha. Cuando un valor original es `CONFIDENCIAL`, nulo o inválido, su conversión da como resultado `NaT`, que es el valor nulo temporal de pandas.
+
+```{python}
+#| label: dataset-general
+df_limpio_general = df.copy()
+
+df_limpio_general['FECHA_NACIMIENTO_DT'] = pd.to_datetime(
+    df_limpio_general['FECHA_NACIMIENTO'],
+    format='%Y-%m-%d',
+    errors='coerce'
+)
+
+df_limpio_general['FECHA_DESAPARICION_DT'] = pd.to_datetime(
+    df_limpio_general['FECHA_DESAPARICION'],
+    format='%Y-%m-%d %H:%M:%S',
+    errors='coerce'
+)
+
+df_limpio_general['FECHA_REGISTRO_DT'] = pd.to_datetime(
+    df_limpio_general['FECHA_REGISTRO'],
+    format='%Y-%m-%d %H:%M:%S',
+    errors='coerce'
+)
+
+print(f"Filas del dataset limpio general: {len(df_limpio_general)}")
+```
+
+```{python}
+#| label: info-fechas-general
+df_limpio_general[
+    ['FECHA_NACIMIENTO_DT', 'FECHA_DESAPARICION_DT', 'FECHA_REGISTRO_DT']
+].info()
+```
+
+## Construcción del dataset limpio temporal
+
+Para el análisis temporal se construye una segunda versión del dataset excluyendo todo el bloque confidencial. De esta forma, las fechas pueden utilizarse sin ambigüedades en análisis cronológicos.
+
+```{python}
+#| label: dataset-temporal
+mask_confidencial_total = (df_limpio_general['FECHA_NACIMIENTO'] == 'CONFIDENCIAL').fillna(False)
+
+df_limpio_temporal = df_limpio_general.loc[~mask_confidencial_total].copy()
+
+print(f"Filas del dataset limpio temporal: {len(df_limpio_temporal)}")
+```
+
+En este dataset temporal se generan banderas que distinguen entre valores originalmente nulos, problemas de conversión y posibles inconsistencias cronológicas.
+
+```{python}
+#| label: banderas-nulos-temporal
+df_limpio_temporal['nulo_fecha_nacimiento'] = df_limpio_temporal['FECHA_NACIMIENTO'].isna().astype(int)
+df_limpio_temporal['nulo_fecha_desaparicion'] = df_limpio_temporal['FECHA_DESAPARICION'].isna().astype(int)
+df_limpio_temporal['nulo_fecha_registro'] = df_limpio_temporal['FECHA_REGISTRO'].isna().astype(int)
+
+df_limpio_temporal[
+    ['nulo_fecha_nacimiento', 'nulo_fecha_desaparicion', 'nulo_fecha_registro']
+].sum()
+```
+
+## Validaciones
+
+Una vez corregidos los tipos de datos y normalizadas las categorías, se realizaron validaciones para identificar inconsistencias estructurales y temporales en las versiones finales del dataset.
+
+### Validación estructural
+
+Primero se verifica la coherencia entre la clave numérica de entidad y la etiqueta textual correspondiente. En particular, se revisa que la clave `99` coincida con el valor `SE DESCONOCE` en la columna `ENTIDAD`.
+
+```{python}
+#| label: validacion-estructural
+inconsistencia_entidad = (
+        ((df_limpio_general['CVE_ENT'] == 99) & (df_limpio_general['ENTIDAD'] != 'SE DESCONOCE')) |
+        ((df_limpio_general['CVE_ENT'] != 99) & (df_limpio_general['ENTIDAD'] == 'SE DESCONOCE'))
+).sum()
+
+print(f"Inconsistencias entre CVE_ENT y ENTIDAD: {inconsistencia_entidad}")
+```
+
+La validación anterior permite confirmar que las claves geográficas y sus etiquetas textuales se encuentran alineadas.
+
+### Validación de conversión de fechas
+
+En el dataset temporal se revisa si existen valores no nulos que no hayan podido convertirse correctamente a tipo fecha.
+
+```{python}
+#| label: validacion-fechas
+df_limpio_temporal['flag_nacimiento_invalido'] = (
+        df_limpio_temporal['FECHA_NACIMIENTO'].notna() &
+        df_limpio_temporal['FECHA_NACIMIENTO_DT'].isna()
+).astype(int)
+
+df_limpio_temporal['flag_desaparicion_invalido'] = (
+        df_limpio_temporal['FECHA_DESAPARICION'].notna() &
+        df_limpio_temporal['FECHA_DESAPARICION_DT'].isna()
+).astype(int)
+
+df_limpio_temporal['flag_registro_invalido'] = (
+        df_limpio_temporal['FECHA_REGISTRO'].notna() &
+        df_limpio_temporal['FECHA_REGISTRO_DT'].isna()
+).astype(int)
+
+df_limpio_temporal[
+    ['flag_nacimiento_invalido', 'flag_desaparicion_invalido', 'flag_registro_invalido']
+].sum()
+```
+
+```{python}
+#| label: nacimientos-invalidos
+df_limpio_temporal[
+    df_limpio_temporal['flag_nacimiento_invalido'] == 1
+][['ID_VICTIMA', 'FECHA_NACIMIENTO']]
+```
+
+### Validación de consistencia temporal
+
+Finalmente, se generan banderas para detectar secuencias cronológicas poco probables entre nacimiento, desaparición y registro.
+
+```{python}
+#| label: validacion-consistencia-temporal
+df_limpio_temporal['flag_nacimiento_despues_desaparicion'] = (
+        df_limpio_temporal['FECHA_NACIMIENTO_DT'].notna() &
+        df_limpio_temporal['FECHA_DESAPARICION_DT'].notna() &
+        (df_limpio_temporal['FECHA_NACIMIENTO_DT'] > df_limpio_temporal['FECHA_DESAPARICION_DT'])
+).astype(int)
+
+df_limpio_temporal['flag_nacimiento_despues_registro'] = (
+        df_limpio_temporal['FECHA_NACIMIENTO_DT'].notna() &
+        df_limpio_temporal['FECHA_REGISTRO_DT'].notna() &
+        (df_limpio_temporal['FECHA_NACIMIENTO_DT'] > df_limpio_temporal['FECHA_REGISTRO_DT'])
+).astype(int)
+
+df_limpio_temporal['flag_registro_antes_desaparicion'] = (
+        df_limpio_temporal['FECHA_REGISTRO_DT'].notna() &
+        df_limpio_temporal['FECHA_DESAPARICION_DT'].notna() &
+        (df_limpio_temporal['FECHA_REGISTRO_DT'] < df_limpio_temporal['FECHA_DESAPARICION_DT'])
+).astype(int)
+
+df_limpio_temporal[
+    [
+        'flag_nacimiento_despues_desaparicion',
+        'flag_nacimiento_despues_registro',
+        'flag_registro_antes_desaparicion'
+    ]
+].sum()
+```
+
+Se identificaron **1,121 casos** con fecha de registro anterior a la de desaparición (1.52% de los registros con fechas calculables), concentrados en la Fiscalía General de Veracruz y la Procuraduría de Michoacán. Estas validaciones no implican automáticamente la eliminación de registros, pero sí permiten identificar observaciones que requieren revisión adicional por posible error de captura o por inconsistencias cronológicas.
+
+## Exportación de los CSV limpios
+
+Aunque en memoria se conservan columnas temporales de tipo `datetime`, para exportar a CSV las fechas se serializan nuevamente como texto estandarizado. Esto facilita su lectura posterior desde otras herramientas y conserva un formato uniforme.
+
+```{python}
+#| label: preparar-exportacion
+df_export_general = df_limpio_general.copy()
+df_export_temporal = df_limpio_temporal.copy()
+
+# En el dataset general se conservan las fechas originales
+# y se agregan versiones limpias serializadas.
+df_export_general['FECHA_NACIMIENTO_LIMPIA'] = df_export_general['FECHA_NACIMIENTO_DT'].dt.strftime('%Y-%m-%d')
+df_export_general['FECHA_DESAPARICION_LIMPIA'] = df_export_general['FECHA_DESAPARICION_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')
+df_export_general['FECHA_REGISTRO_LIMPIA'] = df_export_general['FECHA_REGISTRO_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+# En el dataset temporal sí se pueden reemplazar, porque ya no tiene confidenciales
+df_export_temporal['FECHA_NACIMIENTO'] = df_export_temporal['FECHA_NACIMIENTO_DT'].dt.strftime('%Y-%m-%d')
+df_export_temporal['FECHA_DESAPARICION'] = df_export_temporal['FECHA_DESAPARICION_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')
+df_export_temporal['FECHA_REGISTRO'] = df_export_temporal['FECHA_REGISTRO_DT'].dt.strftime('%Y-%m-%d %H:%M:%S')
+```
+
+A continuación se seleccionan únicamente las columnas que se conservarán en los archivos finales.
+
+```{python}
+#| label: seleccion-columnas
+columnas_finales_general = [
+    'ID_VICTIMA', 'ORIGEN_REPORTE',
+    'FECHA_NACIMIENTO', 'FECHA_NACIMIENTO_LIMPIA',
+    'SEXO',
+    'FECHA_DESAPARICION', 'FECHA_DESAPARICION_LIMPIA',
+    'FECHA_REGISTRO', 'FECHA_REGISTRO_LIMPIA',
+    'ESTATUS_VICTIMA',
+    'CVE_ENT', 'ENTIDAD', 'CVE_MUN', 'MUNICIPIO',
+    'confidencial_con_estado', 'confidencial_sin_estado'
+]
+
+columnas_finales_temporal = [
+    'ID_VICTIMA', 'ORIGEN_REPORTE', 'FECHA_NACIMIENTO', 'SEXO',
+    'FECHA_DESAPARICION', 'FECHA_REGISTRO', 'ESTATUS_VICTIMA',
+    'CVE_ENT', 'ENTIDAD', 'CVE_MUN', 'MUNICIPIO',
+    'nulo_fecha_nacimiento', 'nulo_fecha_desaparicion', 'nulo_fecha_registro',
+    'flag_nacimiento_invalido',
+    'flag_nacimiento_despues_desaparicion', 'flag_nacimiento_despues_registro',
+    'flag_registro_antes_desaparicion'
+]
+
+df_export_general = df_export_general[columnas_finales_general].copy()
+df_export_temporal = df_export_temporal[columnas_finales_temporal].copy()
+```
+
+```{python}
+#| label: resumen-exportacion
+print("Resumen final:")
+print(f"Filas export general: {len(df_export_general)}")
+print(f"Filas export temporal: {len(df_export_temporal)}")
+print(f"Columnas export general: {df_export_general.shape[1]}")
+print(f"Columnas export temporal: {df_export_temporal.shape[1]}")
+
+print("\nValores clave:")
+print(f"confidencial_con_estado: {df_export_general['confidencial_con_estado'].sum()}")
+print(f"confidencial_sin_estado: {df_export_general['confidencial_sin_estado'].sum()}")
+print(f"flag_nacimiento_invalido: {df_export_temporal['flag_nacimiento_invalido'].sum()}")
+print(f"flag_registro_antes_desaparicion: {df_export_temporal['flag_registro_antes_desaparicion'].sum()}")
+```
+
+```{python}
+#| label: guardar-csv
+df_export_general.to_csv('data/clean/data_secretariado_limpio_general.csv', index=False)
+df_export_temporal.to_csv('data/clean/data_secretariado_limpio_temporal.csv', index=False)
+
+print("Archivos exportados correctamente.")
+```
+
+Con esto se concluye la etapa de limpieza. A partir de aquí, el análisis puede realizarse sobre dos bases distintas.
+
+## Descripción de los datasets generados
+
+### `df_export_general`
+
+Este dataset corresponde a la versión general limpia del conjunto de datos. Conserva los registros confidenciales que todavía contienen información útil para análisis descriptivos, institucionales o geográficos. Además, incluye las banderas `confidencial_con_estado` y `confidencial_sin_estado`, que permiten distinguir entre registros reservados con entidad conocida y aquellos en los que incluso la entidad federativa se desconoce.
+
+En esta versión se mantienen las columnas originales del dataset, junto con versiones limpias de las fechas, por lo que resulta adecuada para análisis generales donde no necesariamente se requiere trabajar con secuencias temporales completas.
+
+### `df_export_temporal`
+
+Este dataset corresponde a la versión limpia orientada al análisis temporal. A diferencia del dataset general, aquí se excluyen los registros confidenciales, ya que sus fechas no pueden utilizarse de manera confiable en análisis cronológicos.
+
+Además de las variables principales, esta versión incorpora banderas de apoyo como `nulo_fecha_nacimiento`, `nulo_fecha_desaparicion`, `nulo_fecha_registro` y distintas banderas de consistencia temporal. Estas variables permiten identificar valores faltantes y posibles secuencias cronológicas poco plausibles sin eliminar automáticamente los registros.
+
+### Uso de cada dataset en el análisis
+
+A partir de este punto, el análisis del trabajo se apoyará en ambos datasets según el objetivo de cada apartado:
+
+- **`df_export_general`** se utilizará para análisis descriptivos generales, distribución por entidad, municipio, origen del reporte, estatus de la víctima y presencia de registros confidenciales.
+- **`df_export_temporal`** se utilizará para análisis relacionados con fechas, cronología de registros, consistencia temporal y cualquier exploración que dependa directamente de variables temporales limpias.
+
+```{python}
+#| label: resumen-final
+print("Resumen final de los datasets generados:")
+print(f"df_export_general -> filas: {df_export_general.shape[0]}, columnas: {df_export_general.shape[1]}")
+print(f"df_export_temporal -> filas: {df_export_temporal.shape[0]}, columnas: {df_export_temporal.shape[1]}")
+```
