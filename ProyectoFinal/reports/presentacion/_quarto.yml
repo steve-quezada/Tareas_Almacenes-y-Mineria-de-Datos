@@ -1,0 +1,23 @@
+project:
+  type: default
+  title: "Proyecto Final"
+  output-dir: _site
+  render:
+    - index.qmd
+
+lang: es
+
+format:
+  revealjs:
+    theme: [simple, styles/tfidf-theme.scss]
+    slide-number: true
+    transition: slide
+    width: 1280
+    height: 720
+    margin: 0.06
+    footer: "Proyecto Final · ATUS 2024"
+    embed-resources: true
+
+execute:
+  echo: false
+  warning: false
