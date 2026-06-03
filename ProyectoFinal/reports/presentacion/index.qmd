@@ -31,7 +31,7 @@ La problemática se analiza desde su **severidad**: accidentes con sólo daños 
 **Fuente**
 
 Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas  
-Microdatos INEGI · serie **1997-2024**
+Datos del INEGI · serie **1997-2024**
 :::
 ::::
 

@@ -16,6 +16,9 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
+# Documentos generados/locales
+docs/repote_formal/
+
 # Entornos virtuales
 .venv/
 venv/
