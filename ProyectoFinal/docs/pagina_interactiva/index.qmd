@@ -23,14 +23,25 @@ lang: es
 
 ## Introducción
 
-El proyecto estudia los accidentes de tránsito terrestre registrados en zonas urbanas y suburbanas
-de México durante 2024. El análisis se centra en comprender la severidad de los accidentes,
-distinguiendo entre eventos con sólo daños materiales, accidentes no fatales y accidentes fatales.
+Los accidentes de tránsito terrestre registrados en zonas urbanas y suburbanas de México
+representan un problema de movilidad, seguridad pública y bienestar social. El proyecto se centra
+en comprender la severidad de los accidentes ocurridos durante 2024, distinguiendo entre eventos
+con sólo daños materiales, accidentes no fatales y accidentes fatales.
 
 El objetivo general es identificar qué condiciones del evento, del lugar, del momento, de los
 vehículos y del conductor se relacionan con accidentes de mayor gravedad. Para ello, el documento
 parte de una revisión exploratoria y una limpieza reproducible del dataset antes de avanzar hacia
 análisis estadísticos, modelos supervisados y agrupamiento.
+
+La justificación del proyecto se basa en la magnitud del fenómeno y en el uso de una fuente oficial,
+pública y verificable. ATUS permite analizar registros administrativos con información sobre
+ubicación, temporalidad, tipo de percance, vehículos involucrados, causa presunta, características
+del conductor y consecuencias humanas del accidente.
+
+El valor del proyecto consiste en transformar estos registros en conocimiento útil para reconocer
+patrones, perfiles de riesgo y variables asociadas con la severidad. Con ello se obtiene una lectura
+basada en datos que puede apoyar la comprensión del problema y orientar decisiones futuras en
+seguridad vial.
 
 ## Descripción del dataset
 
@@ -77,12 +88,12 @@ explícitamente durante la calidad de datos y la limpieza.
 |---|---|---|
 | `COBERTURA` | `varchar` | Área geográfica a la que se refieren los indicadores. |
 | `ID_ENTIDAD` | `varchar` | Clave INEGI de la entidad federativa. |
-| `ID_MUNICIPIO` | `varchar` | Clave INEGI del municipio; debe interpretarse junto con la entidad. |
+| `ID_MUNICIPIO` | `varchar` | Clave INEGI del municipio, debe interpretarse junto con la entidad. |
 | `ANIO` | `int` | Año en el que ocurrió el accidente. |
 | `MES` | `varchar` | Mes de referencia del accidente. |
-| `ID_HORA` | `int` | Hora del accidente; el código 99 indica hora no especificada. |
-| `ID_MINUTO` | `int` | Minuto del accidente; el código 99 indica minuto no especificado. |
-| `ID_DIA` | `varchar` | Día del mes; el código 32 indica día no especificado. |
+| `ID_HORA` | `int` | Hora del accidente, el código 99 indica hora no especificada. |
+| `ID_MINUTO` | `int` | Minuto del accidente, el código 99 indica minuto no especificado. |
+| `ID_DIA` | `varchar` | Día del mes, el código 32 indica día no especificado. |
 | `DIASEMANA` | `varchar` | Día de la semana en que ocurrió el evento. |
 | `URBANA` | `varchar` | Tipo de ubicación dentro de zona urbana. |
 | `SUBURBANA` | `varchar` | Tipo de vía o camino dentro de zona suburbana. |
@@ -97,7 +108,7 @@ explícitamente durante la calidad de datos y la limpieza.
 | `SEXO` | `varchar` | Sexo registrado del conductor presunto responsable. |
 | `ALIENTO` | `varchar` | Registro de aliento alcohólico del conductor. |
 | `CINTURON` | `varchar` | Uso registrado de cinturón de seguridad por parte del conductor. |
-| `ID_EDAD` | `varchar` | Edad del conductor; 0 indica fuga y 99 edad desconocida. |
+| `ID_EDAD` | `varchar` | Edad del conductor, 0 indica fuga y 99 edad desconocida. |
 
 ### Vehículos involucrados
 
@@ -166,7 +177,7 @@ la estructura de las columnas, después se construyó una vista auxiliar de acci
 finalmente, se aplicaron transformaciones de limpieza para crear `atus_anual_2024_limpio.csv`.
 
 ::: {.note-box}
-En esta etapa sólo se identifican problemas y códigos especiales; no se modifica el archivo original.
+En esta etapa sólo se identifican problemas y códigos especiales, no se modifica el archivo original.
 Las decisiones formales se aplican más adelante, en la sección de limpieza.
 :::
 
@@ -213,7 +224,7 @@ categoría `Sólo daños` con filas que no son accidentes reales.
 
 ::: {.note-box}
 Esta exclusión es sólo analítica y temporal: sirve para describir correctamente los accidentes en el
-análisis exploratorio. El archivo original no se modifica en este punto; la eliminación definitiva de
+análisis exploratorio. El archivo original no se modifica en este punto, la eliminación definitiva de
 estos registros se documenta en la sección de limpieza.
 :::
 
@@ -246,7 +257,7 @@ aproximada.
 #### Zona del accidente
 
 Las columnas `URBANA` y `SUBURBANA` son complementarias. Cuando el accidente ocurre en zona urbana,
-`SUBURBANA` contiene `Sin accidente en esta zona`; cuando ocurre en zona suburbana, sucede lo
+`SUBURBANA` contiene `Sin accidente en esta zona`, cuando ocurre en zona suburbana, sucede lo
 contrario. Ese texto no debe tratarse como dato faltante.
 
 ```{=html}
@@ -313,7 +324,7 @@ dos códigos especiales: `0` significa conductor fugado y `99` edad desconocida.
 ```
 
 En la vista auxiliar hay 278,004 registros con conductor hombre, 61,908 con conductor mujer y 35,037
-casos de fuga. Al excluir los códigos especiales quedan 278,348 edades válidas entre 12 y 98 años;
+casos de fuga. Al excluir los códigos especiales quedan 278,348 edades válidas entre 12 y 98 años,
 la media es 37.85 años y la mediana 35 años.
 Los códigos especiales de edad no deben mezclarse con edades reales, porque distorsionarían medidas
 como promedio, mediana y distribuciones por grupo etario.
@@ -365,7 +376,7 @@ efecto tiene sobre el dataset.
 <div class="decision-grid cleaning-grid">
   <div class="decision-card">
     <h3>1. Duplicados exactos</h3>
-    <p><strong>Justificación:</strong> se encontraron 871 registros idénticos en las 45 columnas, equivalentes aproximadamente al 0.22% del archivo original; es poco probable que correspondan a accidentes independientes.</p>
+    <p><strong>Justificación:</strong> se encontraron 871 registros idénticos en las 45 columnas, equivalentes aproximadamente al 0.22% del archivo original, es poco probable que correspondan a accidentes independientes.</p>
     <p><strong>Resultado:</strong> el dataset pasa de 390,627 a 389,756 filas.</p>
   </div>
   <div class="decision-card">
@@ -381,7 +392,7 @@ efecto tiene sobre el dataset.
   <div class="decision-card">
     <h3>4. Códigos de edad</h3>
     <p><strong>Justificación:</strong> en <code>ID_EDAD</code>, los valores <code>0</code> y <code>99</code> no son edades reales.</p>
-    <p><strong>Resultado:</strong> se crean <code>CONDUCTOR_FUGADO</code> y <code>EDAD_DESCONOCIDA</code>; <code>ID_EDAD</code> conserva 96,222 nulos intencionales.</p>
+    <p><strong>Resultado:</strong> se crean <code>CONDUCTOR_FUGADO</code> y <code>EDAD_DESCONOCIDA</code>, <code>ID_EDAD</code> conserva 96,222 nulos intencionales.</p>
   </div>
   <div class="decision-card">
     <h3>5. Variable ESTATUS</h3>
