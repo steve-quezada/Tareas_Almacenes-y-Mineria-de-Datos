@@ -543,14 +543,6 @@ Aplicando lo anterior a las edades, parece que hay una tendencia.
 
 ![](images/paste-6.png)
 
-## De lo general a lo particular.
-
-Rango de edad de los conductores: De 12 a 98 años.
-
-¿Los accidentes son causados por infantes o personas de la tercera edad?
-
-![](images/paste-7.png)
-
 ## ¿Existen tendencias? Variabilidad.
 
 Gracias a distintas herramientas, como la varianza y la desviación estándar, podemos apreciar lo siguiente.
