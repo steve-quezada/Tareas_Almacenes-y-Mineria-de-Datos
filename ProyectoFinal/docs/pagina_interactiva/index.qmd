@@ -23,25 +23,15 @@ lang: es
 
 ## Introducción
 
-El proyecto estudia los accidentes de tránsito terrestre registrados en zonas urbanas y suburbanas
-de México durante 2024. El análisis se centra en comprender la severidad de los accidentes,
-distinguiendo entre eventos con sólo daños materiales, accidentes no fatales y accidentes fatales.
+El proyecto estudia los accidentes de tránsito terrestre registrados en zonas urbanas y suburbanas de México durante 2024. El análisis se centra en comprender la severidad de los accidentes, distinguiendo entre eventos con sólo daños materiales, accidentes no fatales y accidentes fatales.
 
-El objetivo general es identificar qué condiciones del evento, del lugar, del momento, de los
-vehículos y del conductor se relacionan con accidentes de mayor gravedad. Para ello, el documento
-parte de una revisión exploratoria y una limpieza reproducible del dataset antes de avanzar hacia
-análisis estadísticos, modelos supervisados y agrupamiento.
+El objetivo general es identificar qué condiciones del evento, del lugar, del momento, de los vehículos y del conductor se relacionan con accidentes de mayor gravedad. Para ello, el documento parte de una revisión exploratoria y una limpieza reproducible del dataset antes de avanzar hacia análisis estadísticos, modelos supervisados y agrupamiento.
 
 ## Descripción del dataset
 
-El proyecto utiliza el archivo `atus_anual_2024.csv`, correspondiente al año 2024 del programa
-**Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)**. La información proviene
-de registros administrativos de seguridad pública, vialidad, ministerios públicos y juzgados cívicos.
+El proyecto utiliza el archivo `atus_anual_2024.csv`, correspondiente al año 2024 del programa **Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)**. La información proviene de registros administrativos de seguridad pública, vialidad, ministerios públicos y juzgados cívicos.
 
-El dataset se descargó desde la página oficial de INEGI del programa
-[Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)](https://www.inegi.org.mx/programas/accidentes/?ps=Microdatos),
-en la sección de microdatos. Para este proyecto se seleccionó el archivo anual correspondiente a
-2024.
+El dataset se descargó desde la página oficial de INEGI del programa [Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)](https://www.inegi.org.mx/programas/accidentes/?ps=Microdatos), en la sección de microdatos. Para este proyecto se seleccionó el archivo anual correspondiente a 2024.
 
 ```{=html}
 <div class="mt-card-grid">
@@ -52,29 +42,20 @@ en la sección de microdatos. Para este proyecto se seleccionó el archivo anual
 </div>
 ```
 
-Cada registro caracteriza un accidente mediante ubicación, fecha, hora, tipo de percance,
-vehículos involucrados, causa presunta, características del conductor y número de personas heridas
-o fallecidas. La variable `CLASACC` resume la severidad del evento en tres categorías: `Sólo daños`,
-`No fatal` y `Fatal`.
+Cada registro caracteriza un accidente mediante ubicación, fecha, hora, tipo de percance, vehículos involucrados, causa presunta, características del conductor y número de personas heridas o fallecidas. La variable `CLASACC` resume la severidad del evento en tres categorías: `Sólo daños`, `No fatal` y `Fatal`.
 
 ## Diccionario de variables
 
-El archivo `diccionario_de_datos_atus_anual_2024.csv`, publicado junto con el dataset de ATUS,
-documenta las 45 variables originales. A continuación se presenta una versión resumida, agrupada
-por tipo de información, para orientar la lectura del análisis exploratorio y las decisiones de
-limpieza.
+El archivo `diccionario_de_datos_atus_anual_2024.csv`, publicado junto con el dataset de ATUS, documenta las 45 variables originales. A continuación se presenta una versión resumida, agrupada por tipo de información, para orientar la lectura del análisis exploratorio y las decisiones de limpieza.
 
-::: {.note-box}
-El diccionario oficial incluye códigos especiales para información no disponible o casos
-administrativos. Por ejemplo, `ID_EDAD` usa códigos para fuga y edad desconocida, mientras que
-algunas variables categóricas pueden contener registros administrativos. Estos casos se revisan
-explícitamente durante la calidad de datos y la limpieza.
+::: note-box
+El diccionario oficial incluye códigos especiales para información no disponible o casos administrativos. Por ejemplo, `ID_EDAD` usa códigos para fuga y edad desconocida, mientras que algunas variables categóricas pueden contener registros administrativos. Estos casos se revisan explícitamente durante la calidad de datos y la limpieza.
 :::
 
 ### Identificación, localización y tiempo
 
 | Variable | Tipo | Descripción resumida |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `COBERTURA` | `varchar` | Área geográfica a la que se refieren los indicadores. |
 | `ID_ENTIDAD` | `varchar` | Clave INEGI de la entidad federativa. |
 | `ID_MUNICIPIO` | `varchar` | Clave INEGI del municipio; debe interpretarse junto con la entidad. |
@@ -90,7 +71,7 @@ explícitamente durante la calidad de datos y la limpieza.
 ### Características del accidente y del conductor
 
 | Variable | Tipo | Descripción resumida |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `TIPACCID` | `varchar` | Tipo de percance: colisión, volcadura, salida del camino, incendio, entre otros. |
 | `CAUSAACCI` | `varchar` | Causa presunta registrada para el accidente. |
 | `CAPAROD` | `varchar` | Tipo de superficie de rodamiento: pavimentada o no pavimentada. |
@@ -101,12 +82,10 @@ explícitamente durante la calidad de datos y la limpieza.
 
 ### Vehículos involucrados
 
-Las siguientes columnas numéricas indican cuántos vehículos de cada categoría participaron en el
-accidente. No son categorías excluyentes, porque un mismo evento puede involucrar varios tipos de
-vehículo.
+Las siguientes columnas numéricas indican cuántos vehículos de cada categoría participaron en el accidente. No son categorías excluyentes, porque un mismo evento puede involucrar varios tipos de vehículo.
 
 | Variable | Tipo | Descripción resumida |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `AUTOMOVIL` | `int` | Automóviles de hasta siete asientos. |
 | `CAMPASAJ` | `int` | Camionetas de pasajeros de 8 a 15 asientos. |
 | `MICROBUS` | `int` | Microbuses de 16 a 20 asientos. |
@@ -123,11 +102,10 @@ vehículo.
 
 ### Víctimas, severidad y publicación
 
-Las variables de víctimas contabilizan personas fallecidas o heridas según su forma de participación
-en el accidente.
+Las variables de víctimas contabilizan personas fallecidas o heridas según su forma de participación en el accidente.
 
 | Variable | Tipo | Descripción resumida |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | `CONDMUERTO` | `int` | Conductores fallecidos en el lugar del accidente. |
 | `CONDHERIDO` | `int` | Conductores heridos. |
 | `PASAMUERTO` | `int` | Pasajeros fallecidos en el lugar del accidente. |
@@ -143,35 +121,25 @@ en el accidente.
 | `CLASACC` | `varchar` | Severidad del accidente: fatal, no fatal o sólo daños. |
 | `ESTATUS` | `varchar` | Estado administrativo de las cifras publicadas por INEGI. |
 
-::: {.note-box}
-Este diccionario ayuda a separar atributos descriptivos, conteos numéricos y variables
-administrativas. También orienta decisiones posteriores: `CLASACC` puede utilizarse como variable
-objetivo, mientras que `ESTATUS`, las columnas constantes y los códigos especiales requieren un
-tratamiento acorde con su significado.
+::: note-box
+Este diccionario ayuda a separar atributos descriptivos, conteos numéricos y variables administrativas. También orienta decisiones posteriores: `CLASACC` puede utilizarse como variable objetivo, mientras que `ESTATUS`, las columnas constantes y los códigos especiales requieren un tratamiento acorde con su significado.
 :::
 
 ## Análisis exploratorio
 
-El análisis exploratorio se organiza en tres momentos. Primero se revisa la calidad del archivo
-original sin modificarlo. Después se analizan las columnas más importantes usando una vista auxiliar
-que permite describir únicamente accidentes reales. Finalmente se documenta la limpieza formal que
-produce el dataset final.
+El análisis exploratorio se organiza en tres momentos. Primero se revisa la calidad del archivo original sin modificarlo. Después se analizan las columnas más importantes usando una vista auxiliar que permite describir únicamente accidentes reales. Finalmente se documenta la limpieza formal que produce el dataset final.
 
 ### Calidad de los datos
 
 #### Alcance
 
-El notebook exploratorio se trabajó conservando intacto el archivo original. Primero se inspeccionó
-la estructura de las columnas, después se construyó una vista auxiliar de accidentes reales y,
-finalmente, se aplicaron transformaciones de limpieza para crear `atus_anual_2024_limpio.csv`.
+El notebook exploratorio se trabajó conservando intacto el archivo original. Primero se inspeccionó la estructura de las columnas, después se construyó una vista auxiliar de accidentes reales y, finalmente, se aplicaron transformaciones de limpieza para crear `atus_anual_2024_limpio.csv`.
 
-::: {.note-box}
-En esta etapa sólo se identifican problemas y códigos especiales; no se modifica el archivo original.
-Las decisiones formales se aplican más adelante, en la sección de limpieza.
+::: note-box
+En esta etapa sólo se identifican problemas y códigos especiales; no se modifica el archivo original. Las decisiones formales se aplican más adelante, en la sección de limpieza.
 :::
 
-La primera revisión identificó aspectos que podían alterar las estadísticas o afectar modelos
-posteriores.
+La primera revisión identificó aspectos que podían alterar las estadísticas o afectar modelos posteriores.
 
 ```{=html}
 <div class="decision-grid">
@@ -196,25 +164,14 @@ posteriores.
 
 #### Deteccion de Registros Administrativos
 
-El valor `Certificado cero` no describe un tipo de accidente. De acuerdo con el diccionario del
-dataset, se utiliza para registrar una situación administrativa: un municipio no reportó accidentes
-durante un mes determinado. Es decir, la fila existe para conservar la estructura mensual y municipal
-del sistema de información, pero no representa un percance ocurrido en la vía pública.
+El valor `Certificado cero` no describe un tipo de accidente. De acuerdo con el diccionario del dataset, se utiliza para registrar una situación administrativa: un municipio no reportó accidentes durante un mes determinado. Es decir, la fila existe para conservar la estructura mensual y municipal del sistema de información, pero no representa un percance ocurrido en la vía pública.
 
-Estas filas se reconocen porque aparecen como registros completos, no como valores vacíos. Además
-de incluir `Certificado cero` en variables categóricas, contienen valores de relleno como día 28,
-día de la semana lunes, cero vehículos involucrados, cero personas heridas o fallecidas y
-clasificación `Sólo daños`.
+Estas filas se reconocen porque aparecen como registros completos, no como valores vacíos. Además de incluir `Certificado cero` en variables categóricas, contienen valores de relleno como día 28, día de la semana lunes, cero vehículos involucrados, cero personas heridas o fallecidas y clasificación `Sólo daños`.
 
-Para el análisis por columna se excluyen temporalmente estos registros mediante una vista auxiliar.
-La razón es que mantenerlos durante el EDA alteraría artificialmente varias distribuciones: aumentaría
-la frecuencia del lunes y del día 28, agregaría casos sin vehículos ni víctimas y haría crecer la
-categoría `Sólo daños` con filas que no son accidentes reales.
+Para el análisis por columna se excluyen temporalmente estos registros mediante una vista auxiliar. La razón es que mantenerlos durante el EDA alteraría artificialmente varias distribuciones: aumentaría la frecuencia del lunes y del día 28, agregaría casos sin vehículos ni víctimas y haría crecer la categoría `Sólo daños` con filas que no son accidentes reales.
 
-::: {.note-box}
-Esta exclusión es sólo analítica y temporal: sirve para describir correctamente los accidentes en el
-análisis exploratorio. El archivo original no se modifica en este punto; la eliminación definitiva de
-estos registros se documenta en la sección de limpieza.
+::: note-box
+Esta exclusión es sólo analítica y temporal: sirve para describir correctamente los accidentes en el análisis exploratorio. El archivo original no se modifica en este punto; la eliminación definitiva de estos registros se documenta en la sección de limpieza.
 :::
 
 ```{=html}
@@ -225,79 +182,57 @@ estos registros se documenta en la sección de limpieza.
 
 #### Dimensión geográfica y temporal
 
-El dataset contiene registros de las 32 entidades federativas y 2,349 combinaciones de entidad y
-municipio. `ID_ENTIDAD` e `ID_MUNICIPIO` deben interpretarse juntos porque una misma clave municipal
-puede repetirse en entidades distintas.
+El dataset contiene registros de las 32 entidades federativas y 2,349 combinaciones de entidad y municipio. `ID_ENTIDAD` e `ID_MUNICIPIO` deben interpretarse juntos porque una misma clave municipal puede repetirse en entidades distintas.
 
-Las columnas temporales son `ANIO`, `MES`, `ID_DIA`, `DIASEMANA`, `ID_HORA` e `ID_MINUTO`. Todos los
-registros pertenecen a 2024, por lo que `ANIO` funciona como referencia, pero no aporta variación
-interna. En cambio, la hora y los minutos sí muestran patrones útiles.
+Las columnas temporales son `ANIO`, `MES`, `ID_DIA`, `DIASEMANA`, `ID_HORA` e `ID_MINUTO`. Todos los registros pertenecen a 2024, por lo que `ANIO` funciona como referencia, pero no aporta variación interna. En cambio, la hora y los minutos sí muestran patrones útiles.
 
 ```{=html}
 <div id="plot-horas" class="plotly-chart"></div>
 ```
 
-::: {.note-box}
-Los minutos terminados en cero aparecen con mucha frecuencia: `00` tiene 58,300 registros, `30`
-tiene 33,707 y `20` tiene 22,680. Esto sugiere que parte de la hora pudo capturarse de forma
-aproximada.
+::: note-box
+Los minutos terminados en cero aparecen con mucha frecuencia: `00` tiene 58,300 registros, `30` tiene 33,707 y `20` tiene 22,680. Esto sugiere que parte de la hora pudo capturarse de forma aproximada.
 :::
 
 #### Zona del accidente
 
-Las columnas `URBANA` y `SUBURBANA` son complementarias. Cuando el accidente ocurre en zona urbana,
-`SUBURBANA` contiene `Sin accidente en esta zona`; cuando ocurre en zona suburbana, sucede lo
-contrario. Ese texto no debe tratarse como dato faltante.
+Las columnas `URBANA` y `SUBURBANA` son complementarias. Cuando el accidente ocurre en zona urbana, `SUBURBANA` contiene `Sin accidente en esta zona`; cuando ocurre en zona suburbana, sucede lo contrario. Ese texto no debe tratarse como dato faltante.
 
 ```{=html}
 <div id="plot-zonas" class="plotly-chart"></div>
 ```
 
-En conjunto, 345,434 accidentes corresponden a zonas urbanas y 29,515 a zonas suburbanas.
-La lectura principal es que la mayoría de los eventos ocurre en contexto urbano, especialmente en
-intersecciones. Esto no significa que las intersecciones sean necesariamente más riesgosas, porque
-el dataset no contiene una medida de exposición como volumen de tránsito o kilómetros recorridos.
+En conjunto, 345,434 accidentes corresponden a zonas urbanas y 29,515 a zonas suburbanas. La lectura principal es que la mayoría de los eventos ocurre en contexto urbano, especialmente en intersecciones. Esto no significa que las intersecciones sean necesariamente más riesgosas, porque el dataset no contiene una medida de exposición como volumen de tránsito o kilómetros recorridos.
 
 #### Tipo de accidente
 
-`TIPACCID` identifica el tipo de percance. La distribución está fuertemente concentrada en pocas
-categorías.
+`TIPACCID` identifica el tipo de percance. La distribución está fuertemente concentrada en pocas categorías.
 
 ```{=html}
 <div id="plot-tipos" class="plotly-chart"></div>
 ```
 
-Las tres categorías principales son colisión con vehículo automotor, colisión con motocicleta y
-colisión con objeto fijo. Juntas concentran la mayor parte de los accidentes reales analizados.
-Esta concentración es útil para describir el fenómeno, pero también advierte que las categorías poco
-frecuentes podrían requerir cuidado especial en modelos o comparaciones posteriores.
+Las tres categorías principales son colisión con vehículo automotor, colisión con motocicleta y colisión con objeto fijo. Juntas concentran la mayor parte de los accidentes reales analizados. Esta concentración es útil para describir el fenómeno, pero también advierte que las categorías poco frecuentes podrían requerir cuidado especial en modelos o comparaciones posteriores.
 
 #### Causa presunta y superficie de rodamiento
 
-`CAUSAACCI` representa una causa presunta registrada en el dataset, no una demostración independiente
-de causalidad. `CAPAROD` indica si la superficie era pavimentada o no pavimentada.
+`CAUSAACCI` representa una causa presunta registrada en el dataset, no una demostración independiente de causalidad. `CAPAROD` indica si la superficie era pavimentada o no pavimentada.
 
 ```{=html}
 <div id="plot-causa-superficie" class="plotly-chart"></div>
 ```
 
-La categoría `Conductor` concentra 360,051 accidentes, equivalente al 96.03%. A su vez, 368,913
-accidentes ocurrieron en superficie pavimentada, pero esto no implica que esas vías sean más
-peligrosas, porque el dataset no incluye medidas de exposición como flujo vehicular o longitud de
-vialidades.
+La categoría `Conductor` concentra 360,051 accidentes, equivalente al 96.03%. A su vez, 368,913 accidentes ocurrieron en superficie pavimentada, pero esto no implica que esas vías sean más peligrosas, porque el dataset no incluye medidas de exposición como flujo vehicular o longitud de vialidades.
 
 #### Vehículos involucrados
 
-Las trece columnas vehiculares cuentan cuántas unidades participaron por categoría. No son
-excluyentes: un mismo accidente puede involucrar automóviles, motocicletas, camionetas u otros
-vehículos a la vez.
+Las trece columnas vehiculares cuentan cuántas unidades participaron por categoría. No son excluyentes: un mismo accidente puede involucrar automóviles, motocicletas, camionetas u otros vehículos a la vez.
 
 ```{=html}
 <div id="plot-vehiculos" class="plotly-chart"></div>
 ```
 
-En la vista auxiliar se contabilizaron 710,403 vehículos, con un promedio de 1.89 por accidente.
-La mayoría de los accidentes, aproximadamente 78.43%, involucra exactamente dos vehículos.
+En la vista auxiliar se contabilizaron 710,403 vehículos, con un promedio de 1.89 por accidente. La mayoría de los accidentes, aproximadamente 78.43%, involucra exactamente dos vehículos.
 
 ```{=html}
 <div id="plot-vehiculos-por-accidente" class="plotly-chart"></div>
@@ -305,61 +240,45 @@ La mayoría de los accidentes, aproximadamente 78.43%, involucra exactamente dos
 
 #### Información del conductor
 
-`SEXO` e `ID_EDAD` describen al conductor presunto responsable. Antes de analizar la edad se separan
-dos códigos especiales: `0` significa conductor fugado y `99` edad desconocida.
+`SEXO` e `ID_EDAD` describen al conductor presunto responsable. Antes de analizar la edad se separan dos códigos especiales: `0` significa conductor fugado y `99` edad desconocida.
 
 ```{=html}
 <div id="plot-sexo-edad" class="plotly-chart"></div>
 ```
 
-En la vista auxiliar hay 278,004 registros con conductor hombre, 61,908 con conductor mujer y 35,037
-casos de fuga. Al excluir los códigos especiales quedan 278,348 edades válidas entre 12 y 98 años;
-la media es 37.85 años y la mediana 35 años.
-Los códigos especiales de edad no deben mezclarse con edades reales, porque distorsionarían medidas
-como promedio, mediana y distribuciones por grupo etario.
+En la vista auxiliar hay 278,004 registros con conductor hombre, 61,908 con conductor mujer y 35,037 casos de fuga. Al excluir los códigos especiales quedan 278,348 edades válidas entre 12 y 98 años; la media es 37.85 años y la mediana 35 años. Los códigos especiales de edad no deben mezclarse con edades reales, porque distorsionarían medidas como promedio, mediana y distribuciones por grupo etario.
 
 #### Aliento alcohólico y cinturón
 
-Las variables `ALIENTO` y `CINTURON` contienen una proporción importante de valores `Se ignora`.
-Por eso se interpretan distinguiendo el porcentaje sobre todos los accidentes y el porcentaje entre
-casos conocidos.
+Las variables `ALIENTO` y `CINTURON` contienen una proporción importante de valores `Se ignora`. Por eso se interpretan distinguiendo el porcentaje sobre todos los accidentes y el porcentaje entre casos conocidos.
 
 ```{=html}
 <div id="plot-aliento-cinturon" class="plotly-chart"></div>
 ```
 
-En `ALIENTO`, el porcentaje de registros con aliento alcohólico entre casos conocidos es 6.24%.
-En `CINTURON`, la información desconocida es especialmente alta: 289,213 accidentes, es decir,
-77.13% del total.
+En `ALIENTO`, el porcentaje de registros con aliento alcohólico entre casos conocidos es 6.24%. En `CINTURON`, la información desconocida es especialmente alta: 289,213 accidentes, es decir, 77.13% del total.
 
 #### Víctimas y severidad
 
-Las columnas de víctimas cuentan personas heridas y fallecidas por tipo de participación. Estos
-totales no equivalen al número de accidentes, porque un solo percance puede afectar a más de una
-persona.
+Las columnas de víctimas cuentan personas heridas y fallecidas por tipo de participación. Estos totales no equivalen al número de accidentes, porque un solo percance puede afectar a más de una persona.
 
 ```{=html}
 <div id="plot-victimas" class="plotly-chart"></div>
 ```
 
-En total se registraron 4,656 personas fallecidas y 85,980 heridas. Los conductores concentran el
-mayor número de víctimas, seguidos por pasajeros y peatones.
+En total se registraron 4,656 personas fallecidas y 85,980 heridas. Los conductores concentran el mayor número de víctimas, seguidos por pasajeros y peatones.
 
 ```{=html}
 <div id="plot-severidad" class="plotly-chart"></div>
 ```
 
-La cantidad de accidentes fatales coincide con los 4,188 eventos donde se registró al menos una
-persona fallecida. La distribución también evidencia un desbalance fuerte de clases, especialmente
-para `Fatal`, que representa 1.12% de los accidentes reales.
+La cantidad de accidentes fatales coincide con los 4,188 eventos donde se registró al menos una persona fallecida. La distribución también evidencia un desbalance fuerte de clases, especialmente para `Fatal`, que representa 1.12% de los accidentes reales.
 
 ### Limpieza del dataset
 
 #### Resumen del proceso
 
-La limpieza se aplicó de forma secuencial para generar un nuevo archivo sin alterar el CSV original.
-Cada transformación se justifica en su propia mini sección para mostrar qué problema resuelve y qué
-efecto tiene sobre el dataset.
+La limpieza se aplicó de forma secuencial para generar un nuevo archivo sin alterar el CSV original. Cada transformación se justifica en su propia mini sección para mostrar qué problema resuelve y qué efecto tiene sobre el dataset.
 
 ```{=html}
 <div class="decision-grid cleaning-grid">
@@ -391,9 +310,8 @@ efecto tiene sobre el dataset.
 </div>
 ```
 
-::: {.note-box}
-La limpieza conserva el archivo original sin modificaciones y exporta un nuevo CSV limpio. Los únicos
-valores nulos restantes son intencionales y corresponden a `ID_EDAD`.
+::: note-box
+La limpieza conserva el archivo original sin modificaciones y exporta un nuevo CSV limpio. Los únicos valores nulos restantes son intencionales y corresponden a `ID_EDAD`.
 :::
 
 #### Dimensiones del nuevo dataset y observaciones
@@ -413,11 +331,518 @@ El resultado se exportó como `data/atus_anual_2024_limpio.csv`.
 </div>
 ```
 
-Este dataset limpio conserva únicamente accidentes reales y será la base para el análisis
-estadístico, la clasificación supervisada y el agrupamiento.
+Este dataset limpio conserva únicamente accidentes reales y será la base para el análisis estadístico, la clasificación supervisada y el agrupamiento.
 
 ## Analisis Descriptivo y Estadistico
 
+### Localización
+
+Con el fin de poder enfocar nuestro análisis en un fenómeno relevante en nuestros datos, es importante generar un panorama general de estos que nos puedan dar una evidencia de dichos eventos que estamos buscando. Exponemos este panorama en una presentación de los datos predominantes de categorías que nos ayudan a entender el motivo de los accidentes de transito, el tema principal de nuestro dataset. Fue necesario implementar una columna adicional para mapear el ID de las entidades federativas para poder ser desplegadas de manera correcta en nuestras gráficas.
+
+```{=html}
+<div id="plot-genero" class="plotly-chart"></div>
+```
+
+```{=html}
+<div id="plot-entidades" class="plotly-chart"></div>
+```
+
+```{=html}
+<div id="plot-vehiculos-pastel" class="plotly-chart"></div>
+```
+
+```{=html}
+<div id="plot-aliento" class="plotly-chart"></div>
+```
+
+Pero hay dos columnas de información que también nos dan información adicional que consideramos relevante para un análisis más exhaustivo: La edad y las horas en las que ocurren los accidentes. Podemos determinar un promedio de la edad de los involucrados en los accidentes, así como el poder recopilar una media en la que generalmente los accidentes, así como recopilar un punto medio de la información de ambas categorías conocido como mediana.
+
+```{=html}
+<div id="plot-edades" class="plotly-chart"></div>
+```
+
+```{=html}
+<div id="plot-horas-media" class="plotly-chart"></div>
+```
+
+### Variabilidad
+
+Las dos últimas gráficas que se presentaron dan evidencia para una conclusión interesante para las categorías de edad y horas en las que ocurren los accidentes, teniendo la posibilidad de dar paso a una conclusión al rango de edades/horas predominantes en nuestros datos; estas conclusiones deben de ser respaldadas por cálculos. Es aquí donde las medidas de variabilidad entran en juego, mediante las medidas IQR, varianza y desviación estándar respaldaremos una conclusión respecto al rango de edad en los involucrados, así como dar un horario en donde es más probable que ocurran accidentes.
+
+Las medidas de variabilidad nos dan más detalles de la población de estas categorías, analicemos primero las edades. El rango en está categoría nos revela cuál es la edad más temprana y tardía encontrada en los conductores, este caso nos revela que el conductor más joven involucrado en un accidente tenía 12 años de edad, mientras que la persona más longeva involucrada en un accidente de tránsito contaba con 98 años de edad. Mientras tanto, el rango en las horas solo nos demuestra que los accidentes pueden ocurrir a cualquier hora. El rango de edades en los conductores puede ser un resultado preocupante, pero el indice de IQR puede demostrar que estos casos son atípicos, la varianza y la desviación estándar funcionan de la misma manera al indicar de que forma tienden a variar nuestros casos, esto lo podemos ver en las siguientes gráficas de BoxPlots que indican donde se concentran nuestros resultados al mismo tiempo que mediante los Whiskers/bigotes se determinan donde usualmente los casos de edad y horas de accidentes terminan.
+
+```{python}
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go # Importamos la biblioteca plotly.graph_objects para crear gráficos personalizados
+import numpy as np # Importamos la biblioteca numpy para realizar operaciones numéricas
+import plotly.io as pio # Importamos plotly.io para configurar la visualización de gráficos para Github
+df_original = pd.read_csv("../../data/atus_anual_2024_limpio.csv")
+df = df_original.copy()
+# Boxplot para Edad
+fig_box_edad = px.box(df, y='ID_EDAD', 
+                      title='Análisis de Valores Atípicos (Outliers) en la Edad de Conductores',
+                      labels={'ID_EDAD': 'Edad Real (Años)'},
+                      color_discrete_sequence=['#4A90E2'])
+fig_box_edad.update_layout(template='plotly_white')
+fig_box_edad.show()
+
+# Boxplot para Horas
+fig_box_hora = px.box(df, y='ID_HORA', 
+                      title='Distribución de Tiempos y Valores Atípicos en las Horas de Siniestros',
+                      labels={'ID_HORA': 'Hora del Día (0-23)'},
+                      color_discrete_sequence=['#E67E22'])
+fig_box_hora.update_layout(template='plotly_white')
+fig_box_hora.show()
+
+```
+
+Ambas cajas nos dan información bastante contundente: No es poco común, es incluso frecuente que menores de edad no solo conduzcan, sino que se vean envueltos en accidentes de tránsito; pero también es cierto que casos donde el conductor tenga una edad superior a los 79 años son muy singulares, por lo cuál sería equivocado tomarlo como una tendencia y sería correcto tartar estas edades como casos aislados. De la caja de horas también obtenemos una conclusión muy importante: No existe una hora o periodo de tiempo en los que no sucedan accidentes de manera frecuente. Pero la desviación estándar también nos indica donde nuestros registros suelen fuertemente permanecer, permitiéndonos dar una generalidad acerca de los rangos de edad de los conductores que suelen tener accidentes, así como un horario en donde ocurren más accidentes.
+
+```{python}
+# Estadísticos
+edad_media = df['ID_EDAD'].mean()
+edad_mediana = df['ID_EDAD'].median()
+hora_media = df['ID_HORA'].mean()
+hora_mediana = df['ID_HORA'].median()
+# Cálculo de la desviación estándar para ambas variables
+edad_std = df['ID_EDAD'].std()
+hora_std = df['ID_HORA'].std()
+# Histograma normalizado por densidad
+fig_densidad_edad = px.histogram(df, x='ID_EDAD', histnorm='probability density',
+                                 title=f'Visualización de la Variabilidad: Dispersión de Edades',
+                                 labels={'ID_EDAD': 'Edad al momento del siniestro'},
+                                 color_discrete_sequence=['#A6C8E0'], nbins=50)
+
+# Línea vertical de la Media
+fig_densidad_edad.add_vline(x=edad_media, line_width=2, line_dash="dash", line_color="red",
+                            annotation_text=f"Media ({edad_media:.1f})", annotation_position="top right")
+
+# Sombreado del área de 1 Desviación Estándar (Media - STD a Media + STD)
+fig_densidad_edad.add_vrect(x0=edad_media - edad_std, x1=edad_media + edad_std, 
+                            fillcolor="rgba(128, 128, 128, 0.15)", line_width=0,
+                            annotation_text=f"1 Desviación (±{edad_std:.1f} años)", 
+                            annotation_position="top left")
+
+fig_densidad_edad.update_layout(template='plotly_white', yaxis_title='Densidad de Casos', showlegend=False)
+fig_densidad_edad.show()
+### Histograma normalizado por densidad para Horas
+fig_densidad_hora = px.histogram(df, x='ID_HORA', histnorm='probability density',
+                                 title=f'Visualización de la Variabilidad: Dispersión de Horarios',
+                                 labels={'ID_HORA': 'Hora del Siniestro (0-23 hrs)'},
+                                 color_discrete_sequence=['#F3C68F'], nbins=24)
+
+# Línea vertical de la Media
+fig_densidad_hora.add_vline(x=hora_media, line_width=2, line_dash="dash", line_color="red",
+                            annotation_text=f"Media ({hora_media:.1f}h)", annotation_position="top right")
+
+# Sombreado del área de 1 Desviación Estándar para las Horas
+fig_densidad_hora.add_vrect(x0=max(0, hora_media - hora_std), x1=min(23, hora_media + hora_std), 
+                            fillcolor="rgba(128, 128, 128, 0.15)", line_width=0,
+                            annotation_text=f"1 Desviación (±{hora_std:.1f} hrs)", 
+                            annotation_position="top left")
+
+fig_densidad_hora.update_layout(template='plotly_white', yaxis_title='Densidad de Casos',
+                                xaxis=dict(tickmode='linear', tick0=0, dtick=2), showlegend=False)
+fig_densidad_hora.show()
+
+```
+
+### Heterogeneidad.
+
+Tenemos conocimiento acerca de las entidades que más presentan accidentes de tránsito en todo el país, pero de momento con base a nuestros datos no tenemos una prueba la cuál nos indique que los accidentes de tránsito sean un problema generalizado. Además, no sabemos si los accidentes están distribuidos de forma similar cada día de la semana o si existirá algún día que por una razón u otra presente una mayor incidencia de accidentes. Mediante el índice de impureza de Gini y la medida de entropía podemos determinar si existe una tendencia en alguno de estos campos que podamos explotar. A la entropía se le define como el nivel de certeza que tendremos de que un resultado pertenezca a una categoría, mientras mayor certeza tengamos de que un registro pertenezca a un conjunto de datos, con menor entropía contamos. Recordemos que el indice de impureza de Gini y el indice de entropía de Shannon evalúan el mismo fenómeno de distinta forma, o sea, que a pesar de que ambos no den el mismo resultado, son directamente proporcionales.
+
+En ambos casos podemos notar tanto un índice de entropía muy alto, como una impureza igualmente alta (ambas casi rozando el máximo nivel de entropía); retomando la definición anterior, se tiene poca certeza de que un registro cualquiera pertenezca a una entidad en específico, lo mismo con el día de la semana en el que ocurre el accidente, la siguiente gráfica muestra como las probabilidades de pertenecer a una categoría en específico son bastante similares.
+
+```{python}
+# Diccionario oficial de IDs numéricos a nombres de Entidades Federativas en México
+diccionario_estados = {
+    1: 'Aguascalientes', 2: 'Baja California', 3: 'Baja California Sur', 
+    4: 'Campeche', 5: 'Coahuila', 6: 'Colima', 7: 'Chiapas', 
+    8: 'Chihuahua', 9: 'Ciudad de México', 10: 'Durango', 
+    11: 'Guanajuato', 12: 'Guerrero', 13: 'Hidalgo', 14: 'Jalisco', 
+    15: 'Estado de México', 16: 'Michoacán', 17: 'Morelos', 18: 'Nayarit', 
+    19: 'Nuevo León', 20: 'Oaxaca', 21: 'Puebla', 22: 'Querétaro', 
+    23: 'Quintana Roo', 24: 'San Luis Potosí', 25: 'Sinaloa', 
+    26: 'Sonora', 27: 'Tabasco', 28: 'Tamaulipas', 29: 'Tlaxcala', 
+    30: 'Veracruz', 31: 'Yucatán', 32: 'Zacatecas'
+}
+# Creamos una columna auxiliar con el nombre mapeado
+df['NOMBRE_ENTIDAD'] = df['ID_ENTIDAD'].map(diccionario_estados)
+
+# Los días de la semana se presentan como números del 1 al 7, donde 1 es Lunes y 7 es Domingo. Creamos una columna auxiliar con el nombre mapeado.
+diccionario_dias = {
+    1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 
+    5: 'Viernes', 6: 'Sábado', 7: 'Domingo',
+}
+if 'DIASEMANA' in df.columns:
+    df['NOM_DIASEMANA'] = df['DIASEMANA'].map(diccionario_dias).fillna(df['DIASEMANA'])
+# Obtenemos la proporción relativa (de 0 a 1) para cada estado
+df_entidades = df['NOMBRE_ENTIDAD'].dropna().value_counts(normalize=True).reset_index()
+df_entidades.columns = ['Entidad', 'Proporción']
+
+# Número de categorías para entidades (Normalmente 32)
+k_entidades = len(df_entidades)
+valor_uniforme_entidades = 1.0 / k_entidades
+
+# Generamos la gráfica interactiva de Entidades
+fig_uniformidad_entidad = px.bar(df_entidades, x='Entidad', y='Proporción',
+                                 title='Probabilidad por Estado vs. Uniformidad Perfecta (Análisis de Entropía)',
+                                 labels={'Proporción': 'Proporción (Proportion)', 'Entidad': 'ENTIDAD'},
+                                 color_discrete_sequence=['#B22222']) # Color rojo similar a tu imagen
+
+# Añadimos la línea horizontal discontinua teórica
+fig_uniformidad_entidad.add_hline(y=valor_uniforme_entidades, 
+                                  line_width=2, line_dash="dash", line_color="black",
+                                  annotation_text=f"Distribución Uniforme Teórica ({valor_uniforme_entidades:.4f})", 
+                                  annotation_position="top right")
+
+fig_uniformidad_entidad.update_layout(template='plotly_white', xaxis_tickangle=-90)
+fig_uniformidad_entidad.show()
+
+# Convertimos a string, quitamos espacios en blanco y aseguramos formato tipo Título 
+df['NOM_DIASEMANA'] = df['NOM_DIASEMANA'].astype(str).str.strip().str.capitalize()
+
+# Diccionario de homologación para capturar variantes comunes sin acento
+mapa_acentos = {
+    'Miercoles': 'Miércoles',
+    'Sabado': 'Sábado',
+    'Domingo': 'Domingo',
+    'Lunes': 'Lunes',
+    'Martes': 'Martes',
+    'Jueves': 'Jueves',
+    'Viernes': 'Viernes'
+}
+df['NOM_DIASEMANA'] = df['NOM_DIASEMANA'].replace(mapa_acentos)
+
+# Filtramos valores vacíos o cadenas de texto nulas que puedan quedar
+df_dias_limpio = df[df['NOM_DIASEMANA'].notna() & (df['NOM_DIASEMANA'] != 'Nan')]
+
+# Calculamos las proporciones 
+df_dias = df_dias_limpio['NOM_DIASEMANA'].value_counts(normalize=True).reset_index()
+df_dias.columns = ['Día', 'Proporción']
+orden_dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+df_dias['Día'] = pd.Categorical(df_dias['Día'], categories=orden_dias, ordered=True)
+df_dias = df_dias.sort_values('Día')
+
+# Número de categorías estricto (7 días de la semana)
+k_dias = 7
+valor_uniforme_dias = 1.0 / k_dias
+
+# Generamos la gráfica 
+fig_uniformidad_dias = px.bar(df_dias, x='Día', y='Proporción',
+                              title='Probabilidad por Día de la Semana vs. Uniformidad Perfecta (Análisis de Entropía)',
+                              labels={'Proporción': 'Proporción (Proportion)', 'Día': 'DÍA DE LA SEMANA'},
+                              color_discrete_sequence=['#B22222'])
+
+# Añadimos la línea horizontal discontinua teórica
+fig_uniformidad_dias.add_hline(y=valor_uniforme_dias, 
+                               line_width=2, line_dash="dash", line_color="black",
+                               annotation_text=f"Distribución Uniforme Teórica ({valor_uniforme_dias:.4f})", 
+                               annotation_position="top right")
+
+fig_uniformidad_dias.update_layout(template='plotly_white')
+fig_uniformidad_dias.show()
+```
+
+Notamos que la diferencia es mínima en los días de la semana, por lo que es seguro decir que el día de la semana no es exactamente un factor relevante para determinar cuando los accidentes son más propensos de ocurrir; aunque es notable destacar que los accidente tienen una mayor pero pequeña probabilidad de ocurrir entre los días Viernes y Sábado respecto a otros días . La gráfica de las entidades federativas fundamenta una afirmación poderosa: " A pesar de que algunas entidades federativas presentan una alta o una baja probabilidad relativa de hospedar accidentes, la probabilidad de que ocurra en un estado cualquiera es lo suficientemente grande para concluir que los accidentes de tránsito son un problema que asolan a todos los estados de una manera más o menos igual.
+
+Con el afán de obtener alguna otra conclusión interesante, hacemos un proceso similar al anterior sobre los meses para ver si algún mes tiene mayor probabilidad de tener más accidentes que los demás.
+
+```{python}
+# Función para calcular índices de heterogeneidad (Entropía de Shannon y Gini) para una serie de datos categóricos.
+def calcular_indices_heterogeneidad(serie_datos, nombre_analisis):
+    # Obtener frecuencias relativas (probabilidades p_i)
+    frecuencias = serie_datos.value_counts(normalize=True)
+    pi = frecuencias.values
+    
+    # Entropía de Shannon: -sum(p_i * log2(p_i))
+    entropia = -np.sum(pi * np.log2(pi + 1e-12)) # 1e-12 evita el log(0)
+    # Entropía Máxima Posible = log2(K) donde K es el número de categorías
+    entropia_max = np.log2(len(pi))
+    entropia_normalizada = entropia / entropia_max if entropia_max > 0 else 0
+    
+    # Índice de Gini (Impureza/Concentración): 1 - sum(p_i^2)
+    # Nota: Para distribución uniforme, Gini_max = 1 - (1/K)
+    gini_concentracion = 1 - np.sum(pi**2)
+    
+    print(f"=== ANÁLISIS DE HETEROGENEIDAD PARA: {nombre_analisis} ===")
+    print(f"  - Clases/Categorías detectadas: {len(pi)}")
+    print(f"  - Entropía de Shannon:          {entropia:.4f} (Máx teórica: {entropia_max:.4f})")
+    print(f"  - Entropía Normalizada:         {entropia_normalizada:.4f} (0 = Concentración total, 1 = Uniforme)")
+    print(f"  - Índice de Gini:               {gini_concentracion:.4f}")
+    print("-" * 60)
+    
+    return frecuencias.reset_index()
+
+# 1. Diccionario oficial para mapear los números de mes a nombres legibles
+diccionario_meses = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 
+    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 
+    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
+# Aplicamos el diccionario
+df['NOM_MES'] = df['MES'].map(diccionario_meses)
+# Aplicamos la función de cálculo de índices de heterogeneidad para los meses del año
+df_freq_meses = calcular_indices_heterogeneidad(df['NOM_MES'].dropna(), "MESES DEL AÑO")
+# Ajustamos nombres de columnas del resultado devuelto por tu función
+df_freq_meses.columns = ['Mes', 'Proporción']
+
+# Ordenamos cronológicamente de Enero a Diciembre para que el eje X tenga coherencia temporal
+orden_meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+               'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+df_freq_meses['Mes'] = pd.Categorical(df_freq_meses['Mes'], categories=orden_meses, ordered=True)
+df_freq_meses = df_freq_meses.sort_values('Mes')
+
+# Definimos el valor teórico de máxima entropía para 12 categorías (1/12)
+k_meses = 12
+valor_uniforme_meses = 1.0 / k_meses
+
+# Generamos la gráfica interactiva en Plotly
+fig_uniformidad_meses = px.bar(df_freq_meses, x='Mes', y='Proporción',
+                               title='Probabilidad por Mes del Año vs. Uniformidad Perfecta (Análisis de Entropía)',
+                               labels={'Proporción': 'Proporción (Proportion)', 'Mes': 'MES DEL AÑO'},
+                               color_discrete_sequence=['#B22222']) # Mismo color institucional de tus gráficos
+
+# Añadimos la línea horizontal discontinua teórica de uniformidad
+fig_uniformidad_meses.add_hline(y=valor_uniforme_meses, 
+                                line_width=2, line_dash="dash", line_color="black",
+                                annotation_text=f"Distribución Uniforme Teórica ({valor_uniforme_meses:.4f})", 
+                                annotation_position="top right")
+
+fig_uniformidad_meses.update_layout(template='plotly_white')
+fig_uniformidad_meses.show()
+```
+
+De acuerdo a la información del INEGI y nuestros cálculos, no existe una relación significativa entre la frecuencia de accidentes y el mes en el que acontecen.
+
+### Concentración
+
+Al tener altos índices de entropía en los meses, días y estados vamos a regresar a las variables que ya presentaron una variabilidad interesante con anterioridad, que son la edad de los conductores así como las horas en las que ocurren los siniestros, como hemos visto que existen un rango de datos que concentran la mayoría de registros de accidentes, veremos que tan fuerte es la ocurrencia de estos casos en los rangos anteriormente dados. Para esto se emplea el indice de concentración, así como las gráficas conocidas como curvas de Lorenz que nos mostrará si los "horarios pico" tienen algún efecto en la ocurrencia de accidentes; así como la búsqueda de una conclusión solida que nos permita relacionar la edad con los horarios y conectar este fenómeno con actividades cotidianas como el trabajo, estudio u otros.
+
+Podemos observar que el indice de concentración es bastante alto para las edades, lo cuál indica que unos pocos sectores de edad (los cuáles ya hemos analizado y recopilado) concentran la mayor cantidad de accidentes. A pesar de que la concentración en los horarios es un poco menor, es un número lo suficientemente grande como para concluir que existen algunas horas o periodos de tiempo que concentran más evidente. Esto lo podemos ver de forma más evidente en las curvas de Lorenz de ambas categorías.
+
+```{python}
+def calcular_lorenz_y_gini(serie_datos, nombre_variable):
+    # Contamos frecuencias por categoría y ordenamos de menor a mayor volumen de accidentes
+    conteos = serie_datos.value_counts().sort_values()
+    n_categorias = len(conteos)
+    
+    #  Proporciones acumuladas de las categorías (Eje X de Lorenz)
+    # Representa el % acumulado de "población" de categorías (ej. % de las 24 horas)
+    eje_x = np.arange(1, n_categorias + 1) / n_categorias
+    eje_x = np.insert(eje_x, 0, 0) # Empezar en el origen (0,0)
+    
+    # Proporciones acumuladas de los accidentes (Eje Y de Lorenz)
+    # Representa el % acumulado de siniestros ocurridos
+    proporciones_y = conteos.values / conteos.sum()
+    eje_y = np.cumsum(proporciones_y)
+    eje_y = np.insert(eje_y, 0, 0) # Empezar en el origen (0,0)
+    
+    # Cálculo del Coeficiente de Gini basado en el área bajo la curva
+    # Gini = 1 - 2 * Área_Bajo_Lorenz
+    area_bajo_curva = np.trapezoid(eje_y, eje_x)
+    coeficiente_gini = 1 - 2 * area_bajo_curva
+    
+    return eje_x, eje_y, coeficiente_gini
+
+# Ejecutamos los cálculos para Horas y Edades
+x_hora, y_hora, gini_hora = calcular_lorenz_y_gini(df['ID_HORA'].dropna(), "Horas del Día")
+x_edad, y_edad, gini_edad = calcular_lorenz_y_gini(df['ID_EDAD'].dropna(), "Edades de Conductores")
+# Grafica de Lorenz para las HORAS DEL DÍA
+fig_lorenz_hora = go.Figure()
+
+# Línea de Equidad Perfecta (Diagonal)
+fig_lorenz_hora.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', 
+                                     name='Equidad Perfecta (Distribución Uniforme)',
+                                     line=dict(color='black', dash='dash')))
+# Curva de Lorenz Real
+fig_lorenz_hora.add_trace(go.Scatter(x=x_hora, y=y_hora, mode='lines+markers', 
+                                     name=f'Curva de Lorenz (Gini: {gini_hora:.3f})',
+                                     line=dict(color='firebrick', width=3)))
+
+fig_lorenz_hora.update_layout(
+    title=f'Curva de Lorenz de Accidentes por Hora del Día<br><sup>Índice de Concentración de Gini: {gini_hora:.4f}</sup>',
+    xaxis_title='Porcentaje Acumulado de Horas del Día',
+    yaxis_title='Porcentaje Acumulado de Accidentes',
+    template='plotly_white',
+    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+)
+fig_lorenz_hora.show()
+# Grafica de Lorenz para las EDADES DE LOS CONDUCTORES
+fig_lorenz_edad = go.Figure()
+
+# Línea de Equidad Perfecta (Diagonal)
+fig_lorenz_edad.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', 
+                                     name='Equidad Perfecta (Distribución Uniforme)',
+                                     line=dict(color='black', dash='dash')))
+# Curva de Lorenz Real
+fig_lorenz_edad.add_trace(go.Scatter(x=x_edad, y=y_edad, mode='lines+markers', 
+                                     name=f'Curva de Lorenz (Gini: {gini_edad:.3f})',
+                                     line=dict(color='darkblue', width=3)))
+
+fig_lorenz_edad.update_layout(
+    title=f'Curva de Lorenz de Accidentes por Edad del Conductor<br><sup>Índice de Concentración de Gini: {gini_edad:.4f}</sup>',
+    xaxis_title='Porcentaje Acumulado de Edades',
+    yaxis_title='Porcentaje Acumulado de Accidentes',
+    template='plotly_white',
+    legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
+)
+fig_lorenz_edad.show()
+```
+
+Con esto podemos confirmar algunas intuiciones hechas con algunas gráficas de la localización. En cuanto a las horas, podemos observar que la mayoría de accidentes ocurren en horas tempranas o medio día, mientras que las personas involucradas en accidentes son en su mayoría personas jóvenes o de mediana edad, esto nos da las evidencias suficientes para concluir que la mayoría de incidentes ocurren horas de más actividad en ciudades, donde personas, en su mayoría varones en edad de estudiar/trabajar tienen la necesidad de transportarse a realizar alguna de estas actividades.
+
+### Correlaciones
+
+A lo largo de este análisis, hemos evitado operar bajo columnas que contienen información considerada relevante para el registro de accidentes: El número de heridos o personas fallecidas a causa de estas. El Dataset cuenta con las siguientes columnas que hacen el registro de estos casos: 'CONDMUERTO', 'CONDHERIDO', 'PASAMUERTO', 'PASAHERIDO', 'PEATMUERTO', 'PEATHERIDO', 'CICLMUERTO', 'CICLHERIDO', 'OTROMUERTO', 'OTROHERIDO', 'CLASACC', 'CONDUCTOR_FUGADO'. Las cuáles documentan si hubo Conductores, peatones, ciclistas u otras victimas en el accidente, también teniendo una columna que lleva el registro de conductores fugados después de un accidente. El motivo fue reservar estos resultado para el apartado de correlación, pues ya teniendo un análisis bastante completo de las variables "circunstanciales" de los accidentes ahora podemos relacionar las más relevantes que encontramos con el número de victimas (si es el caso). La limpieza del dataset también nos permite hacer esto sin muchas preocupaciones, ya que la variable "CLASACC" actúa como una bandera que indica las repercusiones del accidente y así prevenir el ruido al no tomar en cuenta registros en accidentes fatales o no fatales. Al ser columnas con valores numéricas, podemos directamente hacer un heatMap que contenga todas las columnas de nuestro dataset limpio que contengan valores numéricos, así podremos observar si existen relaciones entre variables en todo el contenido del dataset.
+
+```{python}
+# Aseguramos la limpieza previa de Edad y Hora
+df['ID_EDAD'] = pd.to_numeric(df['ID_EDAD'], errors='coerce').replace([0, 99], np.nan)
+df['ID_HORA'] = pd.to_numeric(df['ID_HORA'], errors='coerce')
+
+# 2. Convertimos la bandera de fuga y las víctimas a numérico estricto
+df['CONDUCTOR_FUGADO'] = pd.to_numeric(df['CONDUCTOR_FUGADO'], errors='coerce').fillna(0).astype(int)
+
+columnas_victimas = [
+    'CONDMUERTO', 'CONDHERIDO', 'PASAMUERTO', 'PASAHERIDO', 
+    'PEATMUERTO', 'PEATHERIDO', 'CICLMUERTO', 'CICLHERIDO', 
+    'OTROMUERTO', 'OTROHERIDO'
+]
+
+for col in columnas_victimas:
+    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+# Seleccionamos las columnas numéricas clave para la matriz
+columnas_analisis = ['ID_EDAD', 'ID_HORA', 'CONDUCTOR_FUGADO'] + columnas_victimas
+df_corr_temp = df[columnas_analisis].copy()
+
+
+mediana_temporal = df_corr_temp['ID_EDAD'].median()
+df_corr_temp['ID_EDAD'] = df_corr_temp['ID_EDAD'].fillna(mediana_temporal)
+
+# Calculamos la matriz sobre el dataframe 
+matriz_corr = df_corr_temp.corr(method='pearson')
+
+# Visualización del Heatmap 
+fig_heatmap = px.imshow(matriz_corr,
+                        text_auto=".2f",
+                        aspect="auto",
+                        title="Matriz de Correlación",
+                        color_continuous_scale='RdBu_r',
+                        zmin=-1, zmax=1)
+
+fig_heatmap.update_layout(template='plotly_white', width=900, height=700)
+fig_heatmap.show()
+```
+
+En el anterior heaMap podemos ver algunas relaciones que se pueden considerar como obvias, como la relación entre conductores y pasajeros muertos/heridos, donde si uno de los dos se presenta muerto/herido, es probable que el otro también. Aunque a simple vista no se presenten otras relaciones fuertes entre la información, existe un fenómeno que merece la pena inspeccionar más de cerca.
+
+#### Un fenómeno visto más a detalle
+
+En el heatmap no es muy claro que realmente la gravedad del incidente afecta en la decisión de los conductores de abandonar la escena, pero si lo observamos a más profundidad, de acuerdo a nuestro análisis, la gravedad del siniestro si influye de una forma considerable a la decisión de fugarse como podemos ver en la siguiente gráfica. Mientras que el conductor decide permanecer en la escena del accidente cuando el incidente deja solo heridos o daños, es mucho más probable (casi un 20%) que un conductor decida abandonar la escena cuando hay victimas mortales.
+
+```{python}
+# Filtramos valores nulos o raros de CLASACC para evitar ruido
+df_severidad = df[df['CLASACC'].isin(['Fatal', 'No fatal', 'Sólo daños'])].copy()
+
+# ¿Influye la severidad en la decisión de fugarse?
+# Calculamos la tasa de fuga por tipo de accidente
+tabla_fuga = pd.crosstab(df_severidad['CLASACC'], df_severidad['CONDUCTOR_FUGADO'], normalize='index') * 100
+tabla_fuga = tabla_fuga.reset_index()
+tabla_fuga.columns = ['Clasificación del Accidente', 'Se Quedó (%)', 'Se Fugó (%)']
+
+fig_fuga = px.bar(tabla_fuga, x='Clasificación del Accidente', y=['Se Quedó (%)', 'Se Fugó (%)'],
+                  title='Porcentaje de Conductores Fugados según la Gravedad del Accidente',
+                  labels={'value': 'Porcentaje (%)', 'variable': 'Comportamiento'},
+                  barmode='group',
+                  color_discrete_sequence=['#2CA02C', '#D62728'])
+
+fig_fuga.update_layout(template='plotly_white')
+fig_fuga.show()
+
+```
+
+#### Búsqueda de correlaciones adicionales
+
+Nuestra búsqueda de relaciones inicialmente resultó infructífera al no haber podido establecer de manera más clara. Por lo que realizamos una comparación entre el número de vehículos que estuvieron afectados en los accidentes y relacionarlos con las variables de mortandad previamente rescatadas para concluir si existe mayor riesgo de resultar herido o perder la vida si se presentan cierto tipo de vehículos. Además, también analizamos dos banderas adicionales: ALIENTO y CINTURON. Los cuáles son otros factores de riesgo en los accidentes, ya que ALIENTO determina si una persona se presentaba en estado de ebriedad al momento de ocurrir el accidente o si los conductores llevaban puesto el cinturón o no al momento de ocurrir el siniestro, determinaremos si estos factores aumentan o disminuyen el riesgo de resultar herido o morir.
+
+Después de realizar la limpieza y hacer las exposiciones de la información, encontramos relaciones fuertes que podemos considerar obvias: Que un vehículo este presente muestra la tendencia a que otro tipo de vehículos no estén involucrados en un accidente (Pues estas columnas muestran una tendencia exclusiva por definición). Pero hay celdas en nuestro HeatMap que presentan fenómenos relevantes. La más fuerte de todas es que si se presentan motocicletas en un accidente, existe la gran posibilidad de que haya heridos en el accidente, también se presentan más decesos cuando esto ocurre aunque la tendencia es mucho menor. A pesar de ser un factor de riesgo importante, la relación entre el estado de ebriedad y la gravedad del accidente resulta inconclusa. Además se presentan dos fenómenos curiosos: Si un conductor se encuentra en estado de ebriedad es menos probable que abandone el lugar del accidente, mientras que el no uso de un cinturón de seguridad hace más propenso que el perpetrador de uan accidente huya. A pesar de que estos fenómenos puedan verse vistos influenciados por el ruido en el dataset, tanto el proceso de limpieza para solo aplicar resultados válidos de banderas, así como la gran incidencia de casos hacen que estos sean eventos relativamente frecuentes.
+
+```{python}
+
+# Preparación de datos para análisis de regresión logística (Predicción de Fuga)
+
+# Hacemos la limpieza de las variables, ya que CINTURON y ALIENTO son dos factores de riesgo clave 
+# que queremos incluir en el modelo, pero sus banderas de "No_Aplicable" o "Se ignora" pueden generar ruido.
+# Transformación de ALIENTO (1 = Con aliento alcohólico, 0 = No o sin registro)
+df['ALIENTO_SI'] = df['ALIENTO'].astype(str).str.strip().str.capitalize()
+df['ALIENTO_SI'] = df['ALIENTO_SI'].map({'Sí': 1, 'Si': 1, 'No': 0})
+# Imputamos nulos con la moda histórica (0) para mantener la estabilidad matemática
+df['ALIENTO_SI'] = df['ALIENTO_SI'].fillna(0).astype(int)
+
+#  Transformación de CINTURON (Nos interesa el riesgo: 1 = NO usaba cinturón, 0 = Sí usaba)
+df['CINTURON_NO'] = df['CINTURON'].astype(str).str.strip().str.capitalize()
+df['CINTURON_NO'] = df['CINTURON_NO'].map({'No': 1, 'Sí': 0, 'Si': 0, 'Se ignora': np.nan})
+# Imputamos los valores "Se ignora" / NaN con la moda temporal para no perder la fila en la matriz
+moda_cinturon = df['CINTURON_NO'].mode()[0] if not df['CINTURON_NO'].mode().empty else 0
+df['CINTURON_NO'] = df['CINTURON_NO'].fillna(moda_cinturon).astype(int)
+
+
+
+# ASEGURAR FORMATO NUMÉRICO DE VEHÍCULOS Y VÍCTIMAS
+# Seleccionamos los tipos de vehículos clave para el análisis
+columnas_vehiculos = [
+    'AUTOMOVIL', 'MOTOCICLET', 'BICICLETA', 'CAMIONETA', 'CAMION', 'MICROBUS'
+]
+
+# Convertimos a entero rellenando nulos con cero (0 vehículos de ese tipo involucrados)
+for col in columnas_vehiculos:
+    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+
+# Variables de afectación física y comportamiento que ya conocemos
+columnas_afectacion = ['CONDMUERTO', 'CONDHERIDO', 'PEATMUERTO', 'PEATHERIDO', 'CONDUCTOR_FUGADO']
+for col in columnas_afectacion:
+    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
+
+# Aseguramos limpieza de edad y hora (con imputación temporal de edad para evitar NaN)
+df['ID_HORA'] = pd.to_numeric(df['ID_HORA'], errors='coerce').fillna(0).astype(int)
+df['ID_EDAD_TEMP'] = pd.to_numeric(df['ID_EDAD'], errors='coerce').replace([0, 99], np.nan)
+df['ID_EDAD_TEMP'] = df['ID_EDAD_TEMP'].fillna(df['ID_EDAD_TEMP'].median())
+# Consolidamos la lista de columnas que queremos correlacionar
+columnas_riesgo_vehiculos = (
+    ['ID_EDAD_TEMP', 'ID_HORA', 'ALIENTO_SI', 'CINTURON_NO'] + 
+    columnas_vehiculos + 
+    columnas_afectacion
+)
+
+# Renombramos temporalmente las columnas para que el Heatmap sea sumamente elegante y entendible
+nombres_legibles = {
+    'ID_EDAD_TEMP': 'Edad Conductor', 'ID_HORA': 'Hora del Día',
+    'ALIENTO_SI': 'Aliento Alcohólico', 'CINTURON_NO': 'NO usaba Cinturón',
+    'AUTOMOVIL': 'V: Automóvil', 'MOTOCICLET': 'V: Motocicleta',
+    'BICICLETA': 'V: Bicicleta', 'CAMIONETA': 'V: Camioneta',
+    'CAMION': 'V: Camión Carga', 'MICROBUS': 'V: Microbús',
+    'CONDMUERTO': 'Conductor Muerto', 'CONDHERIDO': 'Conductor Herido',
+    'PEATMUERTO': 'Peatón Muerto', 'PEATHERIDO': 'Peatón Herido',
+    'CONDUCTOR_FUGADO': 'Conductor Fugado'
+}
+
+# Extraemos la matriz de correlación de Pearson
+df_sub_corr = df[columnas_riesgo_vehiculos].rename(columns=nombres_legibles)
+matriz_riesgo = df_sub_corr.corr(method='pearson')
+
+# Generamos el mapa de calor interactivo
+fig_heatmap_riesgo = px.imshow(matriz_riesgo,
+                               text_auto=".2f",
+                               aspect="auto",
+                               title="Matriz de Correlación Avanzada: Factores de Riesgo, Tipos de Vehículo y Víctimas",
+                               color_continuous_scale='RdBu_r', # Rojo positivo (riesgo compartido), Azul negativo
+                               zmin=-1, zmax=1)
+
+fig_heatmap_riesgo.update_layout(template='plotly_white', width=1000, height=800)
+fig_heatmap_riesgo.show()
+```
 
 ```{=html}
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -707,11 +1132,293 @@ document.addEventListener("DOMContentLoaded", function () {
     yaxis: { title: "Filas", gridcolor: grid, range: [0, 430000] }
   }, config);
 
+
+  Plotly.newPlot("plot-genero", [{
+  type: "pie",
+  labels: ["Hombre", "Mujer", "Se fugó"],
+  values: [278004, 61908, 35037],
+  marker: {
+    colors: [blue900, blue500, blue200],
+    line: {
+      color: "#ffffff",
+      width: 2
+    }
+  },
+  textinfo: "percent+label",
+  hovertemplate:
+    "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
+}], {
+  ...baseLayout,
+  title: "Distribución de Accidentes por Género",
+  margin: {
+    l: 20,
+    r: 20,
+    t: 54,
+    b: 35
+  },
+  legend: {
+    orientation: "h",
+    x: 0.5,
+    xanchor: "center",
+    y: -0.08
+  }
+}, config);
+  Plotly.newPlot("plot-entidades", [{
+  type: "bar",
+  orientation: "h",
+  y: [
+    "Ciudad de México",
+    "Jalisco",
+    "Nuevo León",
+    "Guanajuato",
+    "Estado de México",
+    "Veracruz",
+    "Puebla",
+    "Chihuahua",
+    "Baja California",
+    "Coahuila"
+  ].reverse(),
+
+  x: [
+    50000,
+    42000,
+    39000,
+    35000,
+    33000,
+    30000,
+    28000,
+    25000,
+    23000,
+    21000
+  ].reverse(),
+
+  marker: {
+    color: [
+      blue900,
+      blue800,
+      blue700,
+      blue600,
+      blue500,
+      blue400,
+      blue300,
+      blue200,
+      blue300,
+      blue400
+    ].reverse(),
+    line: {
+      color: "#ffffff",
+      width: 1
+    }
+  },
+
+  hovertemplate:
+    "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
+}], {
+  ...baseLayout,
+
+  title: "Top 10 Entidades Federativas con Mayor Frecuencia de Accidentes",
+
+  margin: {
+    l: 180,
+    r: 35,
+    t: 54,
+    b: 55
+  },
+
+  xaxis: {
+    title: "Cantidad de accidentes",
+    gridcolor: grid
+  },
+
+  yaxis: {
+    title: ""
+  }
+
+}, config);
+
+  Plotly.newPlot("plot-vehiculos-pastel", [{
+  type: "pie",
+
+  labels: [
+    "Automóvil",
+    "Motocicleta",
+    "Camioneta pasajeros",
+    "Camioneta carga",
+    "Camión",
+    "Ómnibus",
+    "Bicicleta",
+    "Otros"
+  ],
+
+  values: [
+    436681,
+    86124,
+    79558,
+    51106,
+    28064,
+    10583,
+    8139,
+    16149
+  ],
+
+  marker: {
+    colors: [
+      blue900,
+      blue800,
+      blue700,
+      blue600,
+      blue500,
+      blue400,
+      blue300,
+      blue200
+    ],
+    line: {
+      color: "#ffffff",
+      width: 2
+    }
+  },
+
+  textinfo: "percent",
+
+  hovertemplate:
+    "%{label}<br><b>%{value:,}</b> incidentes<extra></extra>"
+}], {
+  ...baseLayout,
+
+  title: "Proporción de Accidentes por Tipo de Vehículo",
+
+  margin: {
+    l: 20,
+    r: 20,
+    t: 54,
+    b: 35
+  },
+
+  legend: {
+    orientation: "h",
+    x: 0.5,
+    xanchor: "center",
+    y: -0.1
+  }
+
+}, config);
+
+  
   const resizePlots = () => {
     document.querySelectorAll(".plotly-chart").forEach((chart) => {
       if (chart.data) Plotly.Plots.resize(chart);
     });
   };
+  Plotly.newPlot("plot-aliento", [{
+  type: "pie",
+
+  labels: ["No", "Sí"],
+
+  values: [
+    239170,
+    15915
+  ],
+
+  hole: 0.4,
+
+  marker: {
+    colors: [
+      "#BDC3C7", // No
+      "#E74C3C"  // Sí
+    ],
+    line: {
+      color: "#FFFFFF",
+      width: 2
+    }
+  },
+
+  textinfo: "percent+value",
+  textposition: "inside",
+
+  hovertemplate:
+    "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
+}], {
+  ...baseLayout,
+
+  title: "Proporción de Accidentes según la Presencia de Aliento Alcohólico",
+
+  margin: {
+    l: 20,
+    r: 20,
+    t: 54,
+    b: 35
+  },
+
+  legend: {
+    orientation: "h",
+    x: 0.5,
+    xanchor: "center",
+    y: -0.08
+  }
+
+}, config);
+    
+  Plotly.newPlot("plot-edades", [{
+  type: "bar",
+
+  x: [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98],
+
+  y: [165,264,623,1228,2096,3538,5775,6154,6754,6859,7231,7859,7642,7682,7374,7452,7892,7706,8673,7084,7838,7439,7242,7661,6883,6446,6856,5742,6639,5297,6079,5310,4784,5529,4485,4634,4621,4308,4910,3669,4079,3691,3579,3289,3023,2680,2628,2518,2574,1982,2205,1966,1813,1903,1457,1335,1180,1086,1190,808,906,754,750,652,489,471,423,322,358,197,209,167,175,104,90,62,38,34,25,20,9,14,21,29,34,36,58],
+
+  marker: {
+    color: blue700
+  },
+
+  hovertemplate:
+    "%{x} años<br><b>%{y:,}</b> accidentes<extra></extra>"
+}], {
+  ...baseLayout,
+
+  title: "Distribución de Accidentes por Edad",
+
+  xaxis: {
+    title: "Edad del conductor",
+    gridcolor: grid
+  },
+
+  yaxis: {
+    title: "Cantidad de accidentes",
+    gridcolor: grid,
+    zeroline: false
+  }
+
+}, config);
+  Plotly.newPlot("plot-horas-media", [{
+  type: "bar",
+
+  x: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+
+  y: [9068,7380,6582,5678,4875,4973,8008,15134,20619,19438,18039,17949,19630,20633,24169,23604,22494,22295,21832,21433,20007,15769,13602,10867],
+
+  marker: {
+    color: blue700
+  },
+
+  hovertemplate:
+    "%{x}:00 hrs<br><b>%{y:,}</b> accidentes<extra></extra>"
+}], {
+  ...baseLayout,
+
+  title: "Frecuencia de Accidentes por Hora",
+
+  xaxis: {
+    title: "Hora del día",
+    dtick: 1,
+    gridcolor: grid
+  },
+
+  yaxis: {
+    title: "Cantidad de accidentes",
+    gridcolor: grid,
+    zeroline: false
+  }
+
+}, config);
 
   window.addEventListener("resize", resizePlots);
   window.addEventListener("load", () => requestAnimationFrame(resizePlots));

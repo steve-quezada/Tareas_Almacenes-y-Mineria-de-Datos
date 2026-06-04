@@ -552,10 +552,6 @@ Analizar el panorama completo nos da perspectiva de los datos.
 
 ![](images/paste-3.png)
 
-## Localización: Vehículos y accidentes.
-
-![](images/paste-4.png)
-
 ## Peculiaridad en los datos.
 
 Aplicando lo anterior a las edades, parece que hay una tendencia.
@@ -574,10 +570,6 @@ Rango de edad de los conductores: De 12 a 98 años.
 
 ![](images/paste-7.png)
 
-## ¿Habrá alguna hora donde sea raro que ocurran accidentes? No
-
-![](images/paste-8.png)
-
 ## ¿Existen tendencias? Variabilidad.
 
 Gracias a distintas herramientas, como la varianza y la desviación estándar, podemos apreciar lo siguiente.
@@ -594,20 +586,6 @@ Gracias a distintas herramientas, como la varianza y la desviación estándar, p
 
 **\
 “La mayor densidad de los accidentes de tránsito terrestre se manifiesta de manera sostenida en el intervalo diurno comprendido entre las 07:00 y las 19:00 horas.”**\
-
-## Concentración: Confirmación de tendencias.
-
-Mediante el índice de concentración y curvas de Lorenz, respaldamos nuestras afirmaciones:
-
-La curva tiene mayor area en la parte media-baja de la gráfica (sector de edad productivo)
-
-![](images/paste-14.png)
-
-## Confirmación de tendencias.
-
-La curva presenta una mayor área en la parte media de la gráfica (mediodía).
-
-![](images/paste-15.png)
 
 ## ¿Qué más podemos decir de los datos?
 
@@ -628,18 +606,6 @@ El problema es generalizado a pesar de la concentración de casos.
 Norte/Sur, Ciudad/Campo, Importancia: Los conjuntos se contradicen con sus resultados.
 
 ![](images/paste-11.png)
-
-## ¿El tiempo es un factor importante?
-
-En las horas parece ser que si, en los días de la semana, no tanto.
-
-![](images/paste-12.png)
-
-## Un problema generalizado.
-
-Periodos vacacionales presentan mayor cantidad de accidentes. No los suficientes para establecer una tendencia.
-
-![](images/paste-13.png)
 
 # Correlación {data-background-color="#213849"}
 
