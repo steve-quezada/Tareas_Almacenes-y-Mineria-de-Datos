@@ -1,0 +1,720 @@
+---
+title: "Proyecto Final: ATUS Anual 2024"
+lang: es
+---
+
+```{=html}
+<section class="mt-hero">
+  <div class="mt-eyebrow">Almacenes y Minería de Datos</div>
+  <h1 class="mt-title">Proyecto Final</h1>
+  <div class="mt-project-name">ATUS Anual 2024</div>
+  <p class="mt-subtitle">
+    Análisis de accidentes de tránsito en México para identificar patrones asociados a la severidad
+    del evento a partir de variables geográficas, temporales, vehiculares y humanas.
+  </p>
+  <div class="mt-authors">
+    <span>Omar Fernando Gramer Muñoz</span>
+    <span>Kevin Steve Quezada Ordoñez</span>
+    <span>Jesús Antonio Romero Godoy</span>
+    <span>Edgar Salgado González</span>
+  </div>
+</section>
+```
+
+## Introducción
+
+El proyecto estudia los accidentes de tránsito terrestre registrados en zonas urbanas y suburbanas
+de México durante 2024. El análisis se centra en comprender la severidad de los accidentes,
+distinguiendo entre eventos con sólo daños materiales, accidentes no fatales y accidentes fatales.
+
+El objetivo general es identificar qué condiciones del evento, del lugar, del momento, de los
+vehículos y del conductor se relacionan con accidentes de mayor gravedad. Para ello, el documento
+parte de una revisión exploratoria y una limpieza reproducible del dataset antes de avanzar hacia
+análisis estadísticos, modelos supervisados y agrupamiento.
+
+## Descripción del dataset
+
+El proyecto utiliza el archivo `atus_anual_2024.csv`, correspondiente al año 2024 del programa
+**Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)**. La información proviene
+de registros administrativos de seguridad pública, vialidad, ministerios públicos y juzgados cívicos.
+
+El dataset se descargó desde la página oficial de INEGI del programa
+[Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)](https://www.inegi.org.mx/programas/accidentes/?ps=Microdatos),
+en la sección de microdatos. Para este proyecto se seleccionó el archivo anual correspondiente a
+2024.
+
+```{=html}
+<div class="mt-card-grid">
+  <div class="mt-card"><div class="mt-card-title">390,627</div><div class="mt-card-body">registros originales</div></div>
+  <div class="mt-card"><div class="mt-card-title">45</div><div class="mt-card-body">variables documentadas</div></div>
+  <div class="mt-card"><div class="mt-card-title">32</div><div class="mt-card-body">entidades federativas</div></div>
+  <div class="mt-card"><div class="mt-card-title">439.12 MB</div><div class="mt-card-body">tamaño aproximado reportado</div></div>
+</div>
+```
+
+Cada registro caracteriza un accidente mediante ubicación, fecha, hora, tipo de percance,
+vehículos involucrados, causa presunta, características del conductor y número de personas heridas
+o fallecidas. La variable `CLASACC` resume la severidad del evento en tres categorías: `Sólo daños`,
+`No fatal` y `Fatal`.
+
+## Diccionario de variables
+
+El archivo `diccionario_de_datos_atus_anual_2024.csv`, publicado junto con el dataset de ATUS,
+documenta las 45 variables originales. A continuación se presenta una versión resumida, agrupada
+por tipo de información, para orientar la lectura del análisis exploratorio y las decisiones de
+limpieza.
+
+::: {.note-box}
+El diccionario oficial incluye códigos especiales para información no disponible o casos
+administrativos. Por ejemplo, `ID_EDAD` usa códigos para fuga y edad desconocida, mientras que
+algunas variables categóricas pueden contener registros administrativos. Estos casos se revisan
+explícitamente durante la calidad de datos y la limpieza.
+:::
+
+### Identificación, localización y tiempo
+
+| Variable | Tipo | Descripción resumida |
+|---|---|---|
+| `COBERTURA` | `varchar` | Área geográfica a la que se refieren los indicadores. |
+| `ID_ENTIDAD` | `varchar` | Clave INEGI de la entidad federativa. |
+| `ID_MUNICIPIO` | `varchar` | Clave INEGI del municipio; debe interpretarse junto con la entidad. |
+| `ANIO` | `int` | Año en el que ocurrió el accidente. |
+| `MES` | `varchar` | Mes de referencia del accidente. |
+| `ID_HORA` | `int` | Hora del accidente; el código 99 indica hora no especificada. |
+| `ID_MINUTO` | `int` | Minuto del accidente; el código 99 indica minuto no especificado. |
+| `ID_DIA` | `varchar` | Día del mes; el código 32 indica día no especificado. |
+| `DIASEMANA` | `varchar` | Día de la semana en que ocurrió el evento. |
+| `URBANA` | `varchar` | Tipo de ubicación dentro de zona urbana. |
+| `SUBURBANA` | `varchar` | Tipo de vía o camino dentro de zona suburbana. |
+
+### Características del accidente y del conductor
+
+| Variable | Tipo | Descripción resumida |
+|---|---|---|
+| `TIPACCID` | `varchar` | Tipo de percance: colisión, volcadura, salida del camino, incendio, entre otros. |
+| `CAUSAACCI` | `varchar` | Causa presunta registrada para el accidente. |
+| `CAPAROD` | `varchar` | Tipo de superficie de rodamiento: pavimentada o no pavimentada. |
+| `SEXO` | `varchar` | Sexo registrado del conductor presunto responsable. |
+| `ALIENTO` | `varchar` | Registro de aliento alcohólico del conductor. |
+| `CINTURON` | `varchar` | Uso registrado de cinturón de seguridad por parte del conductor. |
+| `ID_EDAD` | `varchar` | Edad del conductor; 0 indica fuga y 99 edad desconocida. |
+
+### Vehículos involucrados
+
+Las siguientes columnas numéricas indican cuántos vehículos de cada categoría participaron en el
+accidente. No son categorías excluyentes, porque un mismo evento puede involucrar varios tipos de
+vehículo.
+
+| Variable | Tipo | Descripción resumida |
+|---|---|---|
+| `AUTOMOVIL` | `int` | Automóviles de hasta siete asientos. |
+| `CAMPASAJ` | `int` | Camionetas de pasajeros de 8 a 15 asientos. |
+| `MICROBUS` | `int` | Microbuses de 16 a 20 asientos. |
+| `PASCAMION` | `int` | Camiones urbanos de pasajeros de 21 a 29 asientos. |
+| `OMNIBUS` | `int` | Ómnibus de 30 o más asientos. |
+| `TRANVIA` | `int` | Trenes eléctricos o trolebuses. |
+| `CAMIONETA` | `int` | Camionetas destinadas al transporte de carga. |
+| `CAMION` | `int` | Camiones destinados al transporte de carga. |
+| `TRACTOR` | `int` | Tractores con o sin remolque. |
+| `FERROCARRI` | `int` | Ferrocarriles involucrados. |
+| `MOTOCICLET` | `int` | Motocicletas involucradas. |
+| `BICICLETA` | `int` | Bicicletas involucradas. |
+| `OTROVEHIC` | `int` | Otros vehículos no incluidos en las categorías anteriores. |
+
+### Víctimas, severidad y publicación
+
+Las variables de víctimas contabilizan personas fallecidas o heridas según su forma de participación
+en el accidente.
+
+| Variable | Tipo | Descripción resumida |
+|---|---|---|
+| `CONDMUERTO` | `int` | Conductores fallecidos en el lugar del accidente. |
+| `CONDHERIDO` | `int` | Conductores heridos. |
+| `PASAMUERTO` | `int` | Pasajeros fallecidos en el lugar del accidente. |
+| `PASAHERIDO` | `int` | Pasajeros heridos. |
+| `PEATMUERTO` | `int` | Peatones fallecidos en el lugar del accidente. |
+| `PEATHERIDO` | `int` | Peatones heridos. |
+| `CICLMUERTO` | `int` | Ciclistas fallecidos en el lugar del accidente. |
+| `CICLHERIDO` | `int` | Ciclistas heridos. |
+| `OTROMUERTO` | `int` | Otras personas fallecidas en el lugar del accidente. |
+| `OTROHERIDO` | `int` | Otras personas heridas. |
+| `NEMUERTO` | `int` | Víctimas fallecidas sin clasificación específica. |
+| `NEHERIDO` | `int` | Víctimas heridas sin clasificación específica. |
+| `CLASACC` | `varchar` | Severidad del accidente: fatal, no fatal o sólo daños. |
+| `ESTATUS` | `varchar` | Estado administrativo de las cifras publicadas por INEGI. |
+
+::: {.note-box}
+Este diccionario ayuda a separar atributos descriptivos, conteos numéricos y variables
+administrativas. También orienta decisiones posteriores: `CLASACC` puede utilizarse como variable
+objetivo, mientras que `ESTATUS`, las columnas constantes y los códigos especiales requieren un
+tratamiento acorde con su significado.
+:::
+
+## Análisis exploratorio
+
+El análisis exploratorio se organiza en tres momentos. Primero se revisa la calidad del archivo
+original sin modificarlo. Después se analizan las columnas más importantes usando una vista auxiliar
+que permite describir únicamente accidentes reales. Finalmente se documenta la limpieza formal que
+produce el dataset final.
+
+### Calidad de los datos
+
+#### Alcance
+
+El notebook exploratorio se trabajó conservando intacto el archivo original. Primero se inspeccionó
+la estructura de las columnas, después se construyó una vista auxiliar de accidentes reales y,
+finalmente, se aplicaron transformaciones de limpieza para crear `atus_anual_2024_limpio.csv`.
+
+::: {.note-box}
+En esta etapa sólo se identifican problemas y códigos especiales; no se modifica el archivo original.
+Las decisiones formales se aplican más adelante, en la sección de limpieza.
+:::
+
+La primera revisión identificó aspectos que podían alterar las estadísticas o afectar modelos
+posteriores.
+
+```{=html}
+<div class="decision-grid">
+  <div class="decision-card">
+    <h3>Valores nulos</h3>
+    <p>El CSV original no contiene celdas vacías, pero sí códigos especiales que requieren interpretación.</p>
+  </div>
+  <div class="decision-card">
+    <h3>Duplicados exactos</h3>
+    <p>Se detectaron 871 filas repetidas, equivalentes aproximadamente al 0.22% del archivo original.</p>
+  </div>
+  <div class="decision-card">
+    <h3>Columnas constantes</h3>
+    <p><code>COBERTURA</code>, <code>ANIO</code>, <code>NEMUERTO</code> y <code>NEHERIDO</code> no presentan variación.</p>
+  </div>
+  <div class="decision-card">
+    <h3>Códigos especiales</h3>
+    <p><code>Certificado cero</code> no representa un accidente. En <code>ID_EDAD</code>, 0 indica fuga y 99 edad desconocida.</p>
+  </div>
+</div>
+```
+
+#### Deteccion de Registros Administrativos
+
+El valor `Certificado cero` no describe un tipo de accidente. De acuerdo con el diccionario del
+dataset, se utiliza para registrar una situación administrativa: un municipio no reportó accidentes
+durante un mes determinado. Es decir, la fila existe para conservar la estructura mensual y municipal
+del sistema de información, pero no representa un percance ocurrido en la vía pública.
+
+Estas filas se reconocen porque aparecen como registros completos, no como valores vacíos. Además
+de incluir `Certificado cero` en variables categóricas, contienen valores de relleno como día 28,
+día de la semana lunes, cero vehículos involucrados, cero personas heridas o fallecidas y
+clasificación `Sólo daños`.
+
+Para el análisis por columna se excluyen temporalmente estos registros mediante una vista auxiliar.
+La razón es que mantenerlos durante el EDA alteraría artificialmente varias distribuciones: aumentaría
+la frecuencia del lunes y del día 28, agregaría casos sin vehículos ni víctimas y haría crecer la
+categoría `Sólo daños` con filas que no son accidentes reales.
+
+::: {.note-box}
+Esta exclusión es sólo analítica y temporal: sirve para describir correctamente los accidentes en el
+análisis exploratorio. El archivo original no se modifica en este punto; la eliminación definitiva de
+estos registros se documenta en la sección de limpieza.
+:::
+
+```{=html}
+<div id="plot-vista-auxiliar" class="plotly-chart"></div>
+```
+
+### Análisis por columna
+
+#### Dimensión geográfica y temporal
+
+El dataset contiene registros de las 32 entidades federativas y 2,349 combinaciones de entidad y
+municipio. `ID_ENTIDAD` e `ID_MUNICIPIO` deben interpretarse juntos porque una misma clave municipal
+puede repetirse en entidades distintas.
+
+Las columnas temporales son `ANIO`, `MES`, `ID_DIA`, `DIASEMANA`, `ID_HORA` e `ID_MINUTO`. Todos los
+registros pertenecen a 2024, por lo que `ANIO` funciona como referencia, pero no aporta variación
+interna. En cambio, la hora y los minutos sí muestran patrones útiles.
+
+```{=html}
+<div id="plot-horas" class="plotly-chart"></div>
+```
+
+::: {.note-box}
+Los minutos terminados en cero aparecen con mucha frecuencia: `00` tiene 58,300 registros, `30`
+tiene 33,707 y `20` tiene 22,680. Esto sugiere que parte de la hora pudo capturarse de forma
+aproximada.
+:::
+
+#### Zona del accidente
+
+Las columnas `URBANA` y `SUBURBANA` son complementarias. Cuando el accidente ocurre en zona urbana,
+`SUBURBANA` contiene `Sin accidente en esta zona`; cuando ocurre en zona suburbana, sucede lo
+contrario. Ese texto no debe tratarse como dato faltante.
+
+```{=html}
+<div id="plot-zonas" class="plotly-chart"></div>
+```
+
+En conjunto, 345,434 accidentes corresponden a zonas urbanas y 29,515 a zonas suburbanas.
+La lectura principal es que la mayoría de los eventos ocurre en contexto urbano, especialmente en
+intersecciones. Esto no significa que las intersecciones sean necesariamente más riesgosas, porque
+el dataset no contiene una medida de exposición como volumen de tránsito o kilómetros recorridos.
+
+#### Tipo de accidente
+
+`TIPACCID` identifica el tipo de percance. La distribución está fuertemente concentrada en pocas
+categorías.
+
+```{=html}
+<div id="plot-tipos" class="plotly-chart"></div>
+```
+
+Las tres categorías principales son colisión con vehículo automotor, colisión con motocicleta y
+colisión con objeto fijo. Juntas concentran la mayor parte de los accidentes reales analizados.
+Esta concentración es útil para describir el fenómeno, pero también advierte que las categorías poco
+frecuentes podrían requerir cuidado especial en modelos o comparaciones posteriores.
+
+#### Causa presunta y superficie de rodamiento
+
+`CAUSAACCI` representa una causa presunta registrada en el dataset, no una demostración independiente
+de causalidad. `CAPAROD` indica si la superficie era pavimentada o no pavimentada.
+
+```{=html}
+<div id="plot-causa-superficie" class="plotly-chart"></div>
+```
+
+La categoría `Conductor` concentra 360,051 accidentes, equivalente al 96.03%. A su vez, 368,913
+accidentes ocurrieron en superficie pavimentada, pero esto no implica que esas vías sean más
+peligrosas, porque el dataset no incluye medidas de exposición como flujo vehicular o longitud de
+vialidades.
+
+#### Vehículos involucrados
+
+Las trece columnas vehiculares cuentan cuántas unidades participaron por categoría. No son
+excluyentes: un mismo accidente puede involucrar automóviles, motocicletas, camionetas u otros
+vehículos a la vez.
+
+```{=html}
+<div id="plot-vehiculos" class="plotly-chart"></div>
+```
+
+En la vista auxiliar se contabilizaron 710,403 vehículos, con un promedio de 1.89 por accidente.
+La mayoría de los accidentes, aproximadamente 78.43%, involucra exactamente dos vehículos.
+
+```{=html}
+<div id="plot-vehiculos-por-accidente" class="plotly-chart"></div>
+```
+
+#### Información del conductor
+
+`SEXO` e `ID_EDAD` describen al conductor presunto responsable. Antes de analizar la edad se separan
+dos códigos especiales: `0` significa conductor fugado y `99` edad desconocida.
+
+```{=html}
+<div id="plot-sexo-edad" class="plotly-chart"></div>
+```
+
+En la vista auxiliar hay 278,004 registros con conductor hombre, 61,908 con conductor mujer y 35,037
+casos de fuga. Al excluir los códigos especiales quedan 278,348 edades válidas entre 12 y 98 años;
+la media es 37.85 años y la mediana 35 años.
+Los códigos especiales de edad no deben mezclarse con edades reales, porque distorsionarían medidas
+como promedio, mediana y distribuciones por grupo etario.
+
+#### Aliento alcohólico y cinturón
+
+Las variables `ALIENTO` y `CINTURON` contienen una proporción importante de valores `Se ignora`.
+Por eso se interpretan distinguiendo el porcentaje sobre todos los accidentes y el porcentaje entre
+casos conocidos.
+
+```{=html}
+<div id="plot-aliento-cinturon" class="plotly-chart"></div>
+```
+
+En `ALIENTO`, el porcentaje de registros con aliento alcohólico entre casos conocidos es 6.24%.
+En `CINTURON`, la información desconocida es especialmente alta: 289,213 accidentes, es decir,
+77.13% del total.
+
+#### Víctimas y severidad
+
+Las columnas de víctimas cuentan personas heridas y fallecidas por tipo de participación. Estos
+totales no equivalen al número de accidentes, porque un solo percance puede afectar a más de una
+persona.
+
+```{=html}
+<div id="plot-victimas" class="plotly-chart"></div>
+```
+
+En total se registraron 4,656 personas fallecidas y 85,980 heridas. Los conductores concentran el
+mayor número de víctimas, seguidos por pasajeros y peatones.
+
+```{=html}
+<div id="plot-severidad" class="plotly-chart"></div>
+```
+
+La cantidad de accidentes fatales coincide con los 4,188 eventos donde se registró al menos una
+persona fallecida. La distribución también evidencia un desbalance fuerte de clases, especialmente
+para `Fatal`, que representa 1.12% de los accidentes reales.
+
+### Limpieza del dataset
+
+#### Resumen del proceso
+
+La limpieza se aplicó de forma secuencial para generar un nuevo archivo sin alterar el CSV original.
+Cada transformación se justifica en su propia mini sección para mostrar qué problema resuelve y qué
+efecto tiene sobre el dataset.
+
+```{=html}
+<div class="decision-grid cleaning-grid">
+  <div class="decision-card">
+    <h3>1. Duplicados exactos</h3>
+    <p><strong>Justificación:</strong> se encontraron 871 registros idénticos en las 45 columnas; es poco probable que correspondan a accidentes independientes.</p>
+    <p><strong>Resultado:</strong> el dataset pasa de 390,627 a 389,756 filas.</p>
+  </div>
+  <div class="decision-card">
+    <h3>2. Columnas sin variación</h3>
+    <p><strong>Justificación:</strong> <code>COBERTURA</code>, <code>ANIO</code>, <code>NEMUERTO</code> y <code>NEHERIDO</code> no ayudan a comparar registros.</p>
+    <p><strong>Resultado:</strong> se eliminan 4 columnas constantes.</p>
+  </div>
+  <div class="decision-card">
+    <h3>3. Registros administrativos</h3>
+    <p><strong>Justificación:</strong> no representan accidentes reales y sus valores de relleno distorsionan las distribuciones.</p>
+    <p><strong>Resultado:</strong> se eliminan 15,678 filas administrativas.</p>
+  </div>
+  <div class="decision-card">
+    <h3>4. Códigos de edad</h3>
+    <p><strong>Justificación:</strong> en <code>ID_EDAD</code>, los valores <code>0</code> y <code>99</code> no son edades reales.</p>
+    <p><strong>Resultado:</strong> se crean <code>CONDUCTOR_FUGADO</code> y <code>EDAD_DESCONOCIDA</code>; <code>ID_EDAD</code> conserva 96,222 nulos intencionales.</p>
+  </div>
+  <div class="decision-card">
+    <h3>5. Variable ESTATUS</h3>
+    <p><strong>Justificación:</strong> describe la publicación de las cifras, no las condiciones del accidente.</p>
+    <p><strong>Resultado:</strong> se retira y el dataset final queda con 42 columnas.</p>
+  </div>
+</div>
+```
+
+::: {.note-box}
+La limpieza conserva el archivo original sin modificaciones y exporta un nuevo CSV limpio. Los únicos
+valores nulos restantes son intencionales y corresponden a `ID_EDAD`.
+:::
+
+#### Dimensiones del nuevo dataset y observaciones
+
+El resultado se exportó como `data/atus_anual_2024_limpio.csv`.
+
+```{=html}
+<div id="plot-dimensiones" class="plotly-chart"></div>
+```
+
+```{=html}
+<div class="mt-card-grid">
+  <div class="mt-card"><div class="mt-card-title">374,078</div><div class="mt-card-body">accidentes reales</div></div>
+  <div class="mt-card"><div class="mt-card-title">42</div><div class="mt-card-body">columnas finales</div></div>
+  <div class="mt-card"><div class="mt-card-title">0</div><div class="mt-card-body">duplicados exactos restantes</div></div>
+  <div class="mt-card"><div class="mt-card-title">96,222</div><div class="mt-card-body">nulos intencionales en edad</div></div>
+</div>
+```
+
+Este dataset limpio conserva únicamente accidentes reales y será la base para el análisis
+estadístico, la clasificación supervisada y el agrupamiento.
+
+## Analisis Descriptivo y Estadistico
+
+
+```{=html}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const ink = "#1f2937";
+  const muted = "#526171";
+  const grid = "#d8e0e8";
+  const paper = "#ffffff";
+  const blue900 = "#123047";
+  const blue800 = "#163f5f";
+  const blue700 = "#1f5f87";
+  const blue600 = "#2f7fac";
+  const blue500 = "#4c9bc6";
+  const blue400 = "#78b6d7";
+  const blue300 = "#a7d0e7";
+  const blue200 = "#cfe5f2";
+  const blue100 = "#e8f3f9";
+  const blues = [blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200];
+
+  const config = {
+    responsive: true,
+    displayModeBar: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ["lasso2d", "select2d"]
+  };
+
+  const baseLayout = {
+    autosize: true,
+    paper_bgcolor: paper,
+    plot_bgcolor: paper,
+    font: { family: "Inter, Aptos, Segoe UI, sans-serif", color: muted, size: 13 },
+    margin: { l: 75, r: 28, t: 42, b: 62 },
+    hoverlabel: { bgcolor: "#ffffff", bordercolor: grid, font: { color: ink } }
+  };
+
+  const comma = (n) => n.toLocaleString("en-US");
+
+  Plotly.newPlot("plot-vista-auxiliar", [{
+    type: "funnel",
+    y: ["Archivo original", "Registros administrativos separados", "Vista auxiliar de accidentes"],
+    x: [390627, 15678, 374949],
+    marker: { color: [blue900, blue500, blue700] },
+    textinfo: "value+percent initial",
+    hovertemplate: "%{y}<br><b>%{x:,}</b> registros<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Separación inicial de registros administrativos",
+    margin: { l: 210, r: 35, t: 54, b: 40 }
+  }, config);
+
+  Plotly.newPlot("plot-horas", [{
+    type: "scatter",
+    mode: "lines+markers",
+    x: Array.from({ length: 24 }, (_, i) => i),
+    y: [9143, 7400, 6594, 5694, 4880, 4986, 8034, 15159, 20666, 19486, 18076, 17983, 19678, 20678, 24225, 23663, 22532, 22348, 21872, 21473, 20055, 15801, 13636, 26565],
+    line: { color: blue800, width: 3, shape: "spline" },
+    marker: { color: "#ffffff", line: { color: blue800, width: 2 }, size: 7 },
+    fill: "tozeroy",
+    fillcolor: "rgba(95, 168, 211, 0.18)",
+    hovertemplate: "%{x}:00 horas<br><b>%{y:,}</b> registros<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Distribución por hora en el archivo original",
+    xaxis: { title: "Hora del día", dtick: 1, gridcolor: grid },
+    yaxis: { title: "Registros", gridcolor: grid, zeroline: false }
+  }, config);
+
+  Plotly.newPlot("plot-zonas", [{
+    type: "bar",
+    orientation: "h",
+    y: [
+      "Urbana: intersección",
+      "Urbana: no intersección",
+      "Suburbana: carretera estatal",
+      "Suburbana: otro camino",
+      "Suburbana: camino rural"
+    ].reverse(),
+    x: [259153, 86281, 20107, 5224, 4184].reverse(),
+    marker: { color: [blue800, blue700, blue500, blue400, blue300].reverse(), line: { color: "#ffffff", width: 1 } },
+    hovertemplate: "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Accidentes por ubicación registrada",
+    margin: { l: 230, r: 35, t: 54, b: 55 },
+    xaxis: { title: "Accidentes", gridcolor: grid },
+    yaxis: { title: "" }
+  }, config);
+
+  Plotly.newPlot("plot-tipos", [{
+    type: "bar",
+    orientation: "h",
+    y: [
+      "Colisión con vehículo automotor",
+      "Colisión con motocicleta",
+      "Colisión con objeto fijo",
+      "Volcadura",
+      "Colisión con peatón",
+      "Salida del camino",
+      "Colisión con ciclista",
+      "Otro"
+    ].reverse(),
+    x: [224720, 61869, 43119, 13371, 11052, 10067, 4033, 2934].reverse(),
+    marker: { color: [...blues].reverse(), line: { color: "#ffffff", width: 1 } },
+    hovertemplate: "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Tipos de accidente más frecuentes",
+    margin: { l: 255, r: 35, t: 54, b: 55 },
+    xaxis: { title: "Accidentes", gridcolor: grid },
+    yaxis: { title: "" }
+  }, config);
+
+  Plotly.newPlot("plot-causa-superficie", [{
+    type: "bar",
+    name: "Causa presunta",
+    x: ["Conductor", "Condición del camino", "Falla del vehículo", "Otra", "Peatón o pasajero"],
+    y: [360051, 5991, 3978, 2631, 2298],
+    marker: { color: blue800 },
+    hovertemplate: "%{x}<br><b>%{y:,}</b> accidentes<extra>Causa</extra>"
+  }, {
+    type: "bar",
+    name: "Superficie",
+    x: ["Pavimentada", "No pavimentada"],
+    y: [368913, 6036],
+    marker: { color: blue500 },
+    xaxis: "x2",
+    yaxis: "y2",
+    hovertemplate: "%{x}<br><b>%{y:,}</b> accidentes<extra>Superficie</extra>"
+  }], {
+    ...baseLayout,
+    title: "Causa presunta y superficie de rodamiento",
+    grid: { rows: 1, columns: 2, pattern: "independent" },
+    xaxis: { title: "", tickangle: -20, automargin: true },
+    yaxis: { title: "Accidentes", gridcolor: grid },
+    xaxis2: { title: "", tickangle: -10, automargin: true },
+    yaxis2: { title: "Accidentes", gridcolor: grid },
+    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.22 }
+  }, config);
+
+  Plotly.newPlot("plot-vehiculos", [{
+    type: "bar",
+    x: ["Automóvil", "Motocicleta", "Camioneta pasajeros", "Camioneta carga", "Camión", "Ómnibus", "Bicicleta", "Otros"],
+    y: [436681, 86124, 79558, 51106, 28064, 10583, 8139, 16149],
+    marker: { color: [blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200], line: { color: "#ffffff", width: 1 } },
+    hovertemplate: "%{x}<br><b>%{y:,}</b> vehículos<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Total de vehículos involucrados por categoría",
+    xaxis: { title: "", tickangle: -25, automargin: true },
+    yaxis: { title: "Vehículos", gridcolor: grid, zeroline: false }
+  }, config);
+
+  Plotly.newPlot("plot-vehiculos-por-accidente", [{
+    type: "bar",
+    x: ["1", "2", "3", "4", "5 o más"],
+    y: [61910, 294083, 16313, 2083, 560],
+    marker: { color: [blue200, blue800, blue600, blue400, blue300], line: { color: "#ffffff", width: 1 } },
+    text: ["16.51%", "78.43%", "4.35%", "0.56%", "0.15%"],
+    textposition: "outside",
+    cliponaxis: false,
+    hovertemplate: "%{x} vehículo(s)<br><b>%{y:,}</b> accidentes<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Cantidad de vehículos por accidente",
+    xaxis: { title: "Vehículos por accidente" },
+    yaxis: { title: "Accidentes", gridcolor: grid, range: [0, 330000] }
+  }, config);
+
+  Plotly.newPlot("plot-sexo-edad", [{
+    type: "pie",
+    labels: ["Hombre", "Mujer", "Se fugó"],
+    values: [278004, 61908, 35037],
+    hole: 0.52,
+    marker: { colors: [blue800, blue500, blue300], line: { color: "#ffffff", width: 2 } },
+    domain: { x: [0, 0.42] },
+    hovertemplate: "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
+  }, {
+    type: "bar",
+    x: ["Fuga", "Edad desconocida", "Edades válidas"],
+    y: [35037, 61564, 278348],
+    marker: { color: [blue300, blue500, blue800], line: { color: "#ffffff", width: 1 } },
+    xaxis: "x2",
+    yaxis: "y2",
+    hovertemplate: "%{x}<br><b>%{y:,}</b> registros<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Sexo registrado y tratamiento de edad",
+    grid: { rows: 1, columns: 2, pattern: "independent" },
+    xaxis2: { domain: [0.52, 1], title: "" },
+    yaxis2: { domain: [0, 1], title: "Registros", gridcolor: grid },
+    annotations: [{
+      text: "<b>SEXO</b>",
+      x: 0.2,
+      y: 0.5,
+      showarrow: false,
+      font: { color: ink, size: 16 }
+    }]
+  }, config);
+
+  Plotly.newPlot("plot-aliento-cinturon", [{
+    type: "bar",
+    name: "Sí",
+    x: ["Aliento alcohólico", "Cinturón"],
+    y: [15915, 42451],
+    marker: { color: blue400 },
+    hovertemplate: "%{x}<br>Sí: <b>%{y:,}</b><extra></extra>"
+  }, {
+    type: "bar",
+    name: "No",
+    x: ["Aliento alcohólico", "Cinturón"],
+    y: [239170, 43285],
+    marker: { color: blue800 },
+    hovertemplate: "%{x}<br>No: <b>%{y:,}</b><extra></extra>"
+  }, {
+    type: "bar",
+    name: "Se ignora",
+    x: ["Aliento alcohólico", "Cinturón"],
+    y: [119864, 289213],
+    marker: { color: blue200 },
+    hovertemplate: "%{x}<br>Se ignora: <b>%{y:,}</b><extra></extra>"
+  }], {
+    ...baseLayout,
+    barmode: "stack",
+    title: "Información disponible sobre aliento y cinturón",
+    xaxis: { title: "" },
+    yaxis: { title: "Accidentes", gridcolor: grid },
+    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.18 }
+  }, config);
+
+  Plotly.newPlot("plot-victimas", [{
+    type: "bar",
+    name: "Fallecidas",
+    x: ["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
+    y: [2614, 972, 901, 142, 27],
+    marker: { color: blue500 },
+    hovertemplate: "%{x}<br><b>%{y:,}</b> fallecidas<extra></extra>"
+  }, {
+    type: "bar",
+    name: "Heridas",
+    x: ["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
+    y: [45442, 26828, 11509, 2097, 104],
+    marker: { color: blue800 },
+    hovertemplate: "%{x}<br><b>%{y:,}</b> heridas<extra></extra>"
+  }], {
+    ...baseLayout,
+    barmode: "group",
+    title: "Personas heridas y fallecidas por tipo de participación",
+    xaxis: { title: "", tickangle: -15, automargin: true },
+    yaxis: { title: "Personas", gridcolor: grid },
+    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.2 }
+  }, config);
+
+  Plotly.newPlot("plot-severidad", [{
+    type: "pie",
+    labels: ["Sólo daños", "No fatal", "Fatal"],
+    values: [306841, 63920, 4188],
+    hole: 0.58,
+    sort: false,
+    marker: { colors: [blue200, blue500, blue900], line: { color: "#ffffff", width: 2 } },
+    textinfo: "label+percent",
+    hovertemplate: "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Clasificación de severidad de los accidentes",
+    annotations: [{
+      text: "<b>374,949</b><br>accidentes",
+      showarrow: false,
+      font: { color: ink, size: 18 }
+    }],
+    margin: { l: 20, r: 20, t: 54, b: 35 },
+    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.08 }
+  }, config);
+
+  Plotly.newPlot("plot-dimensiones", [{
+    type: "bar",
+    x: ["Antes de limpieza", "Después de limpieza"],
+    y: [390627, 374078],
+    marker: { color: [blue800, blue500], line: { color: "#ffffff", width: 1 } },
+    text: ["390,627", "374,078"],
+    textposition: "outside",
+    hovertemplate: "%{x}<br><b>%{y:,}</b> filas<extra></extra>"
+  }], {
+    ...baseLayout,
+    title: "Filas del dataset antes y después de la limpieza",
+    xaxis: { title: "" },
+    yaxis: { title: "Filas", gridcolor: grid, range: [0, 430000] }
+  }, config);
+
+  const resizePlots = () => {
+    document.querySelectorAll(".plotly-chart").forEach((chart) => {
+      if (chart.data) Plotly.Plots.resize(chart);
+    });
+  };
+
+  window.addEventListener("resize", resizePlots);
+  window.addEventListener("load", () => requestAnimationFrame(resizePlots));
+});
+</script>
+```

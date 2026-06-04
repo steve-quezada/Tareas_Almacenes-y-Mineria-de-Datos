@@ -514,7 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 ```
 
-# Análisis Descriptivo y Estadístico
+# Análisis Descriptivo y Estadístico {data-background-color="#213849"}
 
 ## Extraer información de nuestros datos
 
@@ -641,7 +641,7 @@ Periodos vacacionales presentan mayor cantidad de accidentes. No los suficientes
 
 ![](images/paste-13.png)
 
-# Correlación
+# Correlación {data-background-color="#213849"}
 
 ## Análisis de fenómenos.
 
