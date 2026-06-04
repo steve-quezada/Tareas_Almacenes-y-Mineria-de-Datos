@@ -39,7 +39,7 @@ El proyecto utiliza el archivo `atus_anual_2024.csv`, correspondiente al año 20
 de registros administrativos de seguridad pública, vialidad, ministerios públicos y juzgados cívicos.
 
 El dataset se descargó desde la página oficial de INEGI del programa
-[Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)](https://www.inegi.org.mx/programas/accidentes/?ps=Microdatos),
+[Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas (ATUS)](https://www.inegi.org.mx/programas/accidentes/#datos_abiertos),
 en la sección de microdatos. Para este proyecto se seleccionó el archivo anual correspondiente a
 2024.
 
@@ -48,7 +48,7 @@ en la sección de microdatos. Para este proyecto se seleccionó el archivo anual
   <div class="mt-card"><div class="mt-card-title">390,627</div><div class="mt-card-body">registros originales</div></div>
   <div class="mt-card"><div class="mt-card-title">45</div><div class="mt-card-body">variables documentadas</div></div>
   <div class="mt-card"><div class="mt-card-title">32</div><div class="mt-card-body">entidades federativas</div></div>
-  <div class="mt-card"><div class="mt-card-title">439.12 MB</div><div class="mt-card-body">tamaño aproximado reportado</div></div>
+  <div class="mt-card"><div class="mt-card-title">102 MB</div><div class="mt-card-body">tamaño aproximado reportado</div></div>
 </div>
 ```
 
