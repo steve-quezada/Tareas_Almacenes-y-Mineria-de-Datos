@@ -11,56 +11,55 @@ title-slide-attributes:
   data-background-color: "#213849"
 ---
 
-
 # Presentación del dataset {data-background-color="#213849"}
 
 ## ATUS 2024: accidentes en México
 
-::: {.kicker}
+::: kicker
 Dataset oficial · INEGI · transporte y movilidad
 :::
 
-:::: {.dataset-hero}
-::: {.hero-copy}
+::::: dataset-hero
+::: hero-copy
 El archivo **`atus_anual_2024.csv`** registra accidentes de tránsito terrestre ocurridos en zonas urbanas y suburbanas de México durante 2024.
 
 La problemática se analiza desde su **severidad**: accidentes con sólo daños materiales, accidentes no fatales y accidentes fatales.
 :::
 
-::: {.hero-panel}
+::: hero-panel
 **Fuente**
 
-Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas  
+Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas\
 Datos del INEGI · serie **1997-2024**
 :::
-::::
+:::::
 
-:::: {.metric-strip}
+:::::: metric-strip
 ::: metric
-**390,627**  
+**390,627**\
 registros originales
 :::
 
 ::: metric
-**45**  
+**45**\
 variables documentadas
 :::
 
 ::: metric
-**32**  
+**32**\
 entidades federativas
 :::
-::::
+::::::
 
----
+------------------------------------------------------------------------
 
 ## Problema y objetivo
 
-::: {.kicker}
+::: kicker
 Seguridad vial · severidad del accidente
 :::
 
-:::: {.two-paths}
+::::: two-paths
 ::: path-card
 **Problema**
 
@@ -72,17 +71,17 @@ Los accidentes de tránsito en zonas urbanas y suburbanas de México representan
 
 Identificar qué condiciones del evento, lugar, momento, vehículos y conductor se relacionan con accidentes de mayor severidad.
 :::
-::::
+:::::
 
 ::: {.attention-note .attention-info}
 El análisis busca distinguir perfiles de accidentes con **sólo daños**, **personas heridas** o **personas fallecidas**.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Qué contiene cada registro
 
-:::: {.feature-grid}
+::::::: feature-grid
 ::: feature-card
 **Lugar y momento**
 
@@ -106,17 +105,17 @@ Conteos por categoría: automóvil, motocicleta, camioneta, camión, bicicleta y
 
 Heridos y fallecidos: conductores, pasajeros, peatones, ciclistas y otras personas.
 :::
-::::
+:::::::
 
-::: {.attention-note}
+::: attention-note
 `CLASACC` resume la severidad del accidente: **Sólo daños**, **No fatal** o **Fatal**.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Por qué es útil para minería de datos
 
-:::: {.two-paths}
+::::: two-paths
 ::: path-card
 **Modelado supervisado**
 
@@ -128,7 +127,7 @@ Heridos y fallecidos: conductores, pasajeros, peatones, ciclistas y otras person
 
 Al retirar la etiqueta de severidad, las variables descriptivas permiten formar perfiles de accidentes similares.
 :::
-::::
+:::::
 
 ::: {.attention-note .attention-info}
 El dataset combina variables categóricas y numéricas: ubicación, temporalidad, tipo de accidente, vehículos, conductor y víctimas.
@@ -138,28 +137,28 @@ El dataset combina variables categóricas y numéricas: ubicación, temporalidad
 
 ## Preparación para explorar
 
-::: {.kicker}
+::: kicker
 Limpieza mínima antes de graficar
 :::
 
-:::: {.metric-strip}
+:::::: metric-strip
 ::: metric
-**374,949**  
+**374,949**\
 accidentes reales
 :::
 
 ::: metric
-**15,678**  
+**15,678**\
 registros administrativos separados
 :::
 
 ::: metric
-**871**  
+**871**\
 duplicados exactos detectados
 :::
-::::
+::::::
 
-:::: {.two-paths}
+::::: two-paths
 ::: path-card
 **Qué se conservó**
 
@@ -171,126 +170,130 @@ Los registros que sí representan accidentes y sus variables de lugar, tiempo, t
 
 `Certificado cero` no se interpreta como accidente, y los códigos `0` y `99` de edad no se tratan como edades reales.
 :::
-::::
+:::::
 
----
+------------------------------------------------------------------------
 
 ## Tipos de accidente
 
-<div id="plot-tipos" class="plotly-chart"></div>
+::: {#plot-tipos .plotly-chart}
+:::
 
-:::: {.metric-strip .plot-metrics}
+:::::: {.metric-strip .plot-metrics}
 ::: metric
-**59.93%**  
+**59.93%**\
 colisión con vehículo automotor
 :::
 
 ::: metric
-**16.50%**  
+**16.50%**\
 colisión con motocicleta
 :::
 
 ::: metric
-**11.50%**  
+**11.50%**\
 colisión con objeto fijo
 :::
-::::
+::::::
 
-::: {.source-line}
+::: source-line
 La colisión con vehículo automotor concentra **224,720 casos**, muy por encima de las demás categorías. La comparación permite ver qué tipos de accidente dominan el fenómeno y cuáles aparecen como eventos menos frecuentes, pero relevantes por su posible gravedad.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Edad y sexo del conductor
 
-<div id="plot-edades-sexo" class="plotly-chart"></div>
+::: {#plot-edades-sexo .plotly-chart}
+:::
 
-:::: {.metric-strip .plot-metrics}
+:::::: {.metric-strip .plot-metrics}
 ::: metric
-**81.28%**  
+**81.28%**\
 hombres
 :::
 
 ::: metric
-**18.72%**  
+**18.72%**\
 mujeres
 :::
 
 ::: metric
-**49.69%**  
+**49.69%**\
 entre 25 y 44 años
 :::
-::::
+::::::
 
-::: {.source-line}
+::: source-line
 La gráfica usa únicamente edades válidas: **226,247** registros de hombres y **52,101** de mujeres. Se excluyen `0` y `99` porque representan conductor fugado y edad desconocida. La mayor concentración aparece entre **25 y 44 años**.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Códigos especiales de edad
 
-<div id="plot-edades-especiales" class="plotly-chart"></div>
+::: {#plot-edades-especiales .plotly-chart}
+:::
 
-:::: {.metric-strip .plot-metrics}
+:::::: {.metric-strip .plot-metrics}
 ::: metric
-**9.34%**  
+**9.34%**\
 conductor fugado
 :::
 
 ::: metric
-**16.42%**  
+**16.42%**\
 edad desconocida
 :::
 
 ::: metric
-**25.76%**  
+**25.76%**\
 no son edades reales
 :::
-::::
+::::::
 
 ::: {.attention-note .attention-warning}
 En `ID_EDAD`, el código **0** significa **conductor fugado** y el código **99** significa **edad desconocida**. Por eso se reemplazan por nulos antes de calcular estadísticas o entrenar modelos.
 :::
 
----
+------------------------------------------------------------------------
 
 ## CLASACC: severidad del accidente
 
-<div id="plot-severidad" class="plotly-chart"></div>
+::: {#plot-severidad .plotly-chart}
+:::
 
 ::: {.attention-note .attention-warning}
 `CLASACC` será la variable objetivo para clasificación. El desbalance es fuerte: **Sólo daños** concentra **81.84%**, **No fatal** representa **17.05%** y **Fatal** apenas alcanza **1.12%**.
 :::
 
----
+------------------------------------------------------------------------
 
 ## Accidentes por hora
 
-<div id="plot-horas" class="plotly-chart"></div>
+::: {#plot-horas .plotly-chart}
+:::
 
-:::: {.metric-strip .plot-metrics}
+:::::: {.metric-strip .plot-metrics}
 ::: metric
-**6.46%**  
+**6.46%**\
 ocurre a las 14:00
 :::
 
 ::: metric
-**30.57%**  
+**30.57%**\
 ocurre entre 14:00 y 18:00
 :::
 
 ::: metric
-**52.41%**  
+**52.41%**\
 ocurre entre 12:00 y 20:00
 :::
-::::
+::::::
 
-::: {.source-line}
+::: source-line
 Esta fue una de las variables temporales más interesantes del EDA: los registros aumentan desde la mañana y alcanzan su punto más alto alrededor de las **14:00 horas**.
 :::
-
 
 ```{=html}
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -510,3 +513,180 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 ```
+
+# Análisis Descriptivo y Estadístico
+
+## Extraer información de nuestros datos
+
+Hacemos un análisis a nuestro dataset para:
+
+- Encontrar fenómenos y darles una explicación.
+
+- Establecer reglas de comportamiento.
+
+- Dar conclusiones respaldadas.
+
+- Extraer **conocimiento** de nuestros datos.
+
+## ¿Cómo hacemos esto?
+
+Ya tenemos una fuente de datos:
+
+¿Cómo podemos extraer este **conocimiento**?
+
+¿Dónde y cómo empezamos un análisis?
+
+Existen muchas estrategias, pero en este caso iremos de lo **general** a lo **particular.**
+
+Analizar el panorama completo nos da perspectiva de los datos.
+
+## Lo general: Localización.
+
+¿Cuáles son los datos que predominan?
+
+**Género de los conductores**
+
+![](images/paste-2.png)
+
+## Localización: Entidades con más accidentes.
+
+![](images/paste-3.png)
+
+## Localización: Vehículos y accidentes.
+
+![](images/paste-4.png)
+
+## Peculiaridad en los datos.
+
+Aplicando lo anterior a las edades, parece que hay una tendencia.
+
+![](images/paste-5.png)
+
+## Algo parecido con las horas.
+
+![](images/paste-6.png)
+
+## De lo general a lo particular.
+
+Rango de edad de los conductores: De 12 a 98 años.
+
+¿Los accidentes son causados por infantes o personas de la tercera edad?
+
+![](images/paste-7.png)
+
+## ¿Habrá alguna hora donde sea raro que ocurran accidentes? No
+
+![](images/paste-8.png)
+
+## ¿Existen tendencias? Variabilidad.
+
+Gracias a distintas herramientas, como la varianza y la desviación estándar, podemos apreciar lo siguiente.
+
+![](images/paste-9.png)
+
+## Lo mismo ocurre con las edades.
+
+![](images/paste-10.png)
+
+## ¿Qué podemos concluir?
+
+**"La mayor concentración de siniestros viales involucra a conductores en un rango de edad productiva de entre los 22 y los 52 años.”**
+
+**\
+“La mayor densidad de los accidentes de tránsito terrestre se manifiesta de manera sostenida en el intervalo diurno comprendido entre las 07:00 y las 19:00 horas.”**\
+
+## Concentración: Confirmación de tendencias.
+
+Mediante el índice de concentración y curvas de Lorenz, respaldamos nuestras afirmaciones:
+
+La curva tiene mayor area en la parte media-baja de la gráfica (sector de edad productivo)
+
+![](images/paste-14.png)
+
+## Confirmación de tendencias.
+
+La curva presenta una mayor área en la parte media de la gráfica (mediodía).
+
+![](images/paste-15.png)
+
+## ¿Qué más podemos decir de los datos?
+
+Nos hacemos más preguntas.
+
+¿Existirán más tendencias en nuestros datos?
+
+¿Habrá otro atributo que concentre accidentes?
+
+¿Es un problema que afecta a todos los estados o solo unos pocos?
+
+¿El tiempo juega un factor?
+
+## Heterogeneidad: No existen tendencias claras.
+
+El problema es generalizado a pesar de la concentración de casos.
+
+Norte/Sur, Ciudad/Campo, Importancia: Los conjuntos se contradicen con sus resultados.
+
+![](images/paste-11.png)
+
+## ¿El tiempo es un factor importante?
+
+En las horas parece ser que si, en los días de la semana, no tanto.
+
+![](images/paste-12.png)
+
+## Un problema generalizado.
+
+Periodos vacacionales presentan mayor cantidad de accidentes. No los suficientes para establecer una tendencia.
+
+![](images/paste-13.png)
+
+# Correlación
+
+## Análisis de fenómenos.
+
+Ya analizamos características del evento, pero ¿Qué hay de sus repercusiones?
+
+Contamos con las siguientes columnas:
+
+**'CONDMUERTO', 'CONDHERIDO', 'PASAMUERTO', 'PASAHERIDO', 'PEATMUERTO', 'PEATHERIDO', 'CICLMUERTO', 'CICLHERIDO', 'OTROMUERTO', 'OTROHERIDO'**. Describen el número de conductores, pasajeros, peatones, ciclistas u otras personas que salieron heridas/fallecidas después del incidente.
+
+**'CLASACC'** es una bandera que indica si hubo saldo blanco o no de los accidentes
+
+**'CONDUCTOR_FUGADO'** indica si un conductor se dió a la fuga o no.
+
+## ¿Existirá una relación entre las circunstancias del accidente con estas variables?
+
+Más que lo evidente, aparentemente no hay muchas relaciones.
+
+Un conductor herido/fallecido implica pasajeros heridos/fallecidos
+
+![](images/paste-16.png)
+
+## Un fenómeno no tan evidente
+
+No tan evidente en el heatmap directamente, pero nos indica algo interesante:
+
+"Si el accidente presenta personas fallecidas, la probabilidad de que el perpetrador se de a la fuga es casi el doble que en casos no fatales"
+
+![](images/paste-17.png)
+
+## Agravantes y mitigantes de riesgo ¿Son realmente relevantes?
+
+Contamos con las variables ALIENTO y CINTURON.
+
+ALIENTO: La persona presentaba un aliento que revelaba un estado de ebriedad o no.
+
+CINTURON: La persona conductora llevaba el cinturon de seguridad puesto o no.
+
+¿Estos factores agravaron o mitigaron el riesgo en los accidentes?
+
+También contamos con el número de vehículos involucrados en el accidente y sus tipos:
+
+**'AUTOMOVIL', 'CAMPASAJ', 'MICROBUS', 'PASCAMION', 'OMNIBUS', 'TRANVIA', 'CAMIONETA', 'CAMION', 'TRACTOR', 'FERROCARRI', 'MOTOCICLET', 'BICICLETA', 'OTROVEHIC'**
+
+¿Alguno de estos vehículos presenta más riesgos?
+
+## Agravantes y mitigantes de riesgo. Repercusiones.
+
+![](images/paste-18.png)
