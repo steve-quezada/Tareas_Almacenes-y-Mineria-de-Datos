@@ -16,8 +16,13 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
-# Documentos generados/locales
-docs/repote_formal/
+# Quarto
+docs/pagina_interactiva/_site/
+docs/pagina_interactiva/.quarto/
+reports/_site/
+reports/.quarto/
+reports/presentacion/.quarto/
+**/*.quarto_ipynb*
 
 # Entornos virtuales
 .venv/
