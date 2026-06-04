@@ -232,8 +232,19 @@ La gráfica usa únicamente edades válidas: **226,247** registros de hombres y 
 
 ## Códigos especiales de edad
 
-::: {#plot-edades-especiales .plotly-chart}
+::::: two-paths
+::: path-card
+**Código `0`: conductor fugado**
+
+No representa una edad. Indica que no se registró la edad porque el conductor se dio a la fuga.
 :::
+
+::: path-card
+**Código `99`: edad desconocida**
+
+Tampoco representa una edad. Se usa cuando la edad del conductor no fue especificada.
+:::
+:::::
 
 :::::: {.metric-strip .plot-metrics}
 ::: metric
@@ -254,17 +265,6 @@ no son edades reales
 
 ::: {.attention-note .attention-warning}
 En `ID_EDAD`, el código **0** significa **conductor fugado** y el código **99** significa **edad desconocida**. Por eso se reemplazan por nulos antes de calcular estadísticas o entrenar modelos.
-:::
-
-------------------------------------------------------------------------
-
-## CLASACC: severidad del accidente
-
-::: {#plot-severidad .plotly-chart}
-:::
-
-::: {.attention-note .attention-warning}
-`CLASACC` será la variable objetivo para clasificación. El desbalance es fuerte: **Sólo daños** concentra **81.84%**, **No fatal** representa **17.05%** y **Fatal** apenas alcanza **1.12%**.
 :::
 
 ------------------------------------------------------------------------
@@ -425,25 +425,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }],
     legend: { x: 0.82, y: 0.98, bgcolor: "rgba(255,255,255,0.72)", bordercolor: grid, borderwidth: 1 },
     margin: { l: 70, r: 25, t: 15, b: 65 }
-  }, config);
-
-  Plotly.newPlot("plot-edades-especiales", [{
-    type: "bar",
-    x: ["0 · Conductor fugado", "99 · Edad desconocida"],
-    y: [35037, 61564],
-    marker: {
-      color: [blueSoft, blueMid],
-      line: { color: "#ffffff", width: 1.4 }
-    },
-    text: ["9.34%", "16.42%"],
-    textposition: "outside",
-    cliponaxis: false,
-    hovertemplate: "%{x}<br><b>%{y:,}</b> registros<extra></extra>"
-  }], {
-    ...baseLayout,
-    xaxis: { title: "", tickfont: { size: 15 }, gridcolor: grid },
-    yaxis: { title: "", gridcolor: grid, zeroline: false, range: [0, 70000] },
-    margin: { l: 75, r: 35, t: 25, b: 75 }
   }, config);
 
   Plotly.newPlot("plot-severidad", [{
