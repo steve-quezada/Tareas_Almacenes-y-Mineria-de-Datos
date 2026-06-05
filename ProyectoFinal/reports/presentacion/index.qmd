@@ -176,8 +176,57 @@ Los registros que sí representan accidentes y sus variables de lugar, tiempo, t
 
 ## Tipos de accidente
 
-::: {#plot-tipos .plotly-chart}
-:::
+```{python}
+import plotly.graph_objects as go
+
+plot_page = "#fbfaf7"
+ink = "#334155"
+muted = "#475569"
+grid = "#d7e0ea"
+navy = "#31556f"
+blue_light = "#bdd9eb"
+blue_pale = "#e3f0f7"
+blue_mid = "#4f7f9f"
+blue_deep = "#24485f"
+rose = "#d987a6"
+rose_deep = "#a94f72"
+
+base_layout = dict(
+    autosize=True,
+    paper_bgcolor=plot_page,
+    plot_bgcolor=plot_page,
+    font=dict(family="Aptos, Inter, Segoe UI, sans-serif", color=muted, size=15),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor=grid, font=dict(color=ink)),
+)
+
+fig_tipos = go.Figure(go.Bar(
+    orientation="h",
+    y=[
+        "Colisión con vehículo automotor",
+        "Colisión con motocicleta",
+        "Colisión con objeto fijo",
+        "Volcadura",
+        "Colisión con peatón",
+        "Salida del camino",
+        "Colisión con ciclista",
+        "Otro",
+    ][::-1],
+    x=[224720, 61869, 43119, 13371, 11052, 10067, 4033, 2934][::-1],
+    marker=dict(
+        color=["#31556f", "#426b87", "#527f9d", "#6594b2", "#7aaac7", "#96bed7", "#b8d5e6", "#dcebf3"][::-1],
+        line=dict(color="#ffffff", width=1.2),
+    ),
+    hovertemplate="%{y}<br><b>%{x:,}</b> accidentes<extra></extra>",
+))
+fig_tipos.update_layout(
+    **base_layout,
+    height=400,
+    xaxis=dict(title="", gridcolor=grid, zeroline=False),
+    yaxis=dict(title="", automargin=True),
+    margin=dict(l=220, r=25, t=8, b=28),
+)
+fig_tipos.show()
+```
 
 :::::: {.metric-strip .plot-metrics}
 ::: metric
@@ -204,8 +253,57 @@ La colisión con vehículo automotor concentra **224,720 casos**, muy por encima
 
 ## Edad y sexo del conductor
 
-::: {#plot-edades-sexo .plotly-chart}
-:::
+```{python}
+rangos_edad = ["10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49",
+               "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-89",
+               "90-94", "95-99"]
+centros_edad = [12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77, 82, 87, 92, 97]
+
+fig_edades_sexo = go.Figure()
+fig_edades_sexo.add_trace(go.Bar(
+    name="Hombre",
+    x=centros_edad,
+    y=[907, 16185, 30122, 30719, 30301, 26499, 22426, 19123, 16393, 11877, 8779, 5776, 3705, 1993, 928, 291, 81, 142],
+    width=5,
+    opacity=0.76,
+    marker=dict(color=blue_mid, line=dict(color=blue_mid, width=1)),
+    customdata=rangos_edad,
+    hovertemplate="Hombre · %{customdata} años<br><b>%{y:,}</b> registros<extra></extra>",
+))
+fig_edades_sexo.add_trace(go.Bar(
+    name="Mujer",
+    x=centros_edad,
+    y=[147, 2635, 6273, 7460, 8027, 7155, 5731, 4492, 3587, 2291, 1778, 1204, 716, 366, 179, 37, 8, 15],
+    width=5,
+    opacity=0.74,
+    marker=dict(color=rose, line=dict(color=rose, width=1)),
+    customdata=rangos_edad,
+    hovertemplate="Mujer · %{customdata} años<br><b>%{y:,}</b> registros<extra></extra>",
+))
+fig_edades_sexo.update_layout(
+    **base_layout,
+    height=400,
+    barmode="overlay",
+    bargap=0,
+    xaxis=dict(title="", gridcolor=grid, dtick=10, range=[9, 100]),
+    yaxis=dict(title="", gridcolor=grid, zeroline=False),
+    shapes=[
+        dict(type="line", x0=27, x1=27, y0=0, y1=1, yref="paper",
+             line=dict(color=blue_mid, width=2.5, dash="dot")),
+        dict(type="line", x0=32, x1=32, y0=0, y1=1, yref="paper",
+             line=dict(color=rose, width=2.5, dash="dot")),
+    ],
+    annotations=[
+        dict(x=27, y=1, yref="paper", text="Hombre: 25-29", showarrow=False,
+             yanchor="bottom", font=dict(color=blue_deep, size=13)),
+        dict(x=32, y=0.9, yref="paper", text="Mujer: 30-34", showarrow=False,
+             yanchor="bottom", font=dict(color=rose_deep, size=13)),
+    ],
+    legend=dict(x=0.82, y=0.98, bgcolor="rgba(255,255,255,0.72)", bordercolor=grid, borderwidth=1),
+    margin=dict(l=55, r=20, t=8, b=32),
+)
+fig_edades_sexo.show()
+```
 
 :::::: {.metric-strip .plot-metrics}
 ::: metric
@@ -271,8 +369,27 @@ En `ID_EDAD`, el código **0** significa **conductor fugado** y el código **99*
 
 ## Accidentes por hora
 
-::: {#plot-horas .plotly-chart}
-:::
+```{python}
+fig_horas = go.Figure(go.Scatter(
+    mode="lines+markers",
+    x=list(range(24)),
+    y=[9143, 7400, 6594, 5694, 4880, 4986, 8034, 15159, 20666, 19486, 18076, 17983,
+       19678, 20678, 24225, 23663, 22532, 22348, 21872, 21473, 20055, 15801, 13636, 10887],
+    line=dict(color=navy, width=4, shape="spline"),
+    marker=dict(color="#ffffff", line=dict(color=navy, width=2), size=8),
+    fill="tozeroy",
+    fillcolor="rgba(111, 166, 201, 0.20)",
+    hovertemplate="Hora %{x}:00<br><b>%{y:,}</b> accidentes<extra></extra>",
+))
+fig_horas.update_layout(
+    **base_layout,
+    height=400,
+    xaxis=dict(title="", dtick=1, gridcolor=grid, zeroline=False),
+    yaxis=dict(title="", gridcolor=grid, zeroline=False),
+    margin=dict(l=55, r=20, t=8, b=30),
+)
+fig_horas.show()
+```
 
 :::::: {.metric-strip .plot-metrics}
 ::: metric
@@ -294,206 +411,6 @@ ocurre entre 12:00 y 20:00
 ::: source-line
 Esta fue una de las variables temporales más interesantes del EDA: los registros aumentan desde la mañana y alcanzan su punto más alto alrededor de las **14:00 horas**.
 :::
-
-```{=html}
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const plotPage = "#fbfaf7";
-  const ink = "#334155";
-  const muted = "#475569";
-  const grid = "#d7e0ea";
-  const navy = "#31556f";
-  const blue = "#6fa6c9";
-  const blueLight = "#bdd9eb";
-  const bluePale = "#e3f0f7";
-  const blueMid = "#4f7f9f";
-  const blueSoft = "#8fb9d2";
-  const blueDeep = "#24485f";
-  const rose = "#d987a6";
-  const roseDeep = "#a94f72";
-
-  const config = {
-    responsive: true,
-    displayModeBar: false,
-    displaylogo: false,
-    modeBarButtonsToRemove: ["lasso2d", "select2d"]
-  };
-
-  const baseLayout = {
-    autosize: true,
-    paper_bgcolor: plotPage,
-    plot_bgcolor: plotPage,
-    font: {
-      family: "Aptos, Inter, Segoe UI, sans-serif",
-      color: muted,
-      size: 15
-    },
-    margin: { l: 70, r: 30, t: 20, b: 55 },
-    hoverlabel: {
-      bgcolor: "#ffffff",
-      bordercolor: grid,
-      font: { color: ink }
-    }
-  };
-
-  Plotly.newPlot("plot-tipos", [{
-    type: "bar",
-    orientation: "h",
-    y: [
-      "Colisión con vehículo automotor",
-      "Colisión con motocicleta",
-      "Colisión con objeto fijo",
-      "Volcadura",
-      "Colisión con peatón",
-      "Salida del camino",
-      "Colisión con ciclista",
-      "Otro"
-    ].reverse(),
-    x: [224720, 61869, 43119, 13371, 11052, 10067, 4033, 2934].reverse(),
-    marker: {
-      color: ["#31556f", "#426b87", "#527f9d", "#6594b2", "#7aaac7", "#96bed7", "#b8d5e6", "#dcebf3"].reverse(),
-      line: { color: "#ffffff", width: 1.2 }
-    },
-    hovertemplate: "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    xaxis: { title: "", gridcolor: grid, zeroline: false },
-    yaxis: { title: "", automargin: true },
-    margin: { l: 230, r: 35, t: 15, b: 55 }
-  }, config);
-
-  Plotly.newPlot("plot-edades-sexo", [{
-    type: "bar",
-    name: "Hombre",
-    x: [12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77, 82, 87, 92, 97],
-    y: [907, 16185, 30122, 30719, 30301, 26499, 22426, 19123, 16393, 11877, 8779, 5776, 3705, 1993, 928, 291, 81, 142],
-    width: 5,
-    opacity: 0.76,
-    marker: { color: blueMid, line: { color: blueMid, width: 1 } },
-    customdata: ["10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-89", "90-94", "95-99"],
-    hovertemplate: "Hombre · %{customdata} años<br><b>%{y:,}</b> registros<extra></extra>"
-  }, {
-    type: "bar",
-    name: "Mujer",
-    x: [12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77, 82, 87, 92, 97],
-    y: [147, 2635, 6273, 7460, 8027, 7155, 5731, 4492, 3587, 2291, 1778, 1204, 716, 366, 179, 37, 8, 15],
-    width: 5,
-    opacity: 0.74,
-    marker: { color: rose, line: { color: rose, width: 1 } },
-    customdata: ["10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84", "85-89", "90-94", "95-99"],
-    hovertemplate: "Mujer · %{customdata} años<br><b>%{y:,}</b> registros<extra></extra>"
-  }], {
-    ...baseLayout,
-    barmode: "overlay",
-    bargap: 0,
-    xaxis: { title: "", gridcolor: grid, dtick: 10, range: [9, 100] },
-    yaxis: { title: "", gridcolor: grid, zeroline: false },
-    shapes: [{
-      type: "line",
-      x0: 27,
-      x1: 27,
-      y0: 0,
-      y1: 1,
-      yref: "paper",
-      line: { color: blueMid, width: 2.5, dash: "dot" }
-    }, {
-      type: "line",
-      x0: 32,
-      x1: 32,
-      y0: 0,
-      y1: 1,
-      yref: "paper",
-      line: { color: rose, width: 2.5, dash: "dot" }
-    }],
-    annotations: [{
-      x: 27,
-      y: 1,
-      yref: "paper",
-      text: "Hombre: 25-29",
-      showarrow: false,
-      yanchor: "bottom",
-      font: { color: blueDeep, size: 13 }
-    }, {
-      x: 32,
-      y: 0.9,
-      yref: "paper",
-      text: "Mujer: 30-34",
-      showarrow: false,
-      yanchor: "bottom",
-      font: { color: roseDeep, size: 13 }
-    }],
-    legend: { x: 0.82, y: 0.98, bgcolor: "rgba(255,255,255,0.72)", bordercolor: grid, borderwidth: 1 },
-    margin: { l: 70, r: 25, t: 15, b: 65 }
-  }, config);
-
-  Plotly.newPlot("plot-severidad", [{
-    type: "pie",
-    labels: ["Sólo daños", "No fatal", "Fatal"],
-    values: [306841, 63920, 4188],
-    hole: 0.58,
-    sort: false,
-    marker: {
-      colors: [bluePale, blueLight, navy],
-      line: { color: "#ffffff", width: 3 }
-    },
-    textinfo: "label+percent",
-    hovertemplate: "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    annotations: [{
-      text: "<b>374,949</b><br>accidentes",
-      showarrow: false,
-      font: { color: ink, size: 22 }
-    }],
-    margin: { l: 25, r: 25, t: 5, b: 20 },
-    showlegend: true,
-    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.08 }
-  }, config);
-
-  Plotly.newPlot("plot-horas", [{
-    type: "scatter",
-    mode: "lines+markers",
-    x: Array.from({ length: 24 }, (_, i) => i),
-    y: [9143, 7400, 6594, 5694, 4880, 4986, 8034, 15159, 20666, 19486, 18076, 17983, 19678, 20678, 24225, 23663, 22532, 22348, 21872, 21473, 20055, 15801, 13636, 10887],
-    line: { color: navy, width: 4, shape: "spline" },
-    marker: { color: "#ffffff", line: { color: navy, width: 2 }, size: 8 },
-    fill: "tozeroy",
-    fillcolor: "rgba(111, 166, 201, 0.20)",
-    hovertemplate: "Hora %{x}:00<br><b>%{y:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    xaxis: {
-      title: "",
-      dtick: 1,
-      gridcolor: grid,
-      zeroline: false
-    },
-    yaxis: {
-      title: "",
-      gridcolor: grid,
-      zeroline: false
-    }
-  }, config);
-
-  const resizePlots = () => {
-    document.querySelectorAll(".plotly-chart").forEach((chart) => {
-      if (chart.data) {
-        Plotly.Plots.resize(chart);
-      }
-    });
-  };
-
-  window.addEventListener("resize", resizePlots);
-  window.addEventListener("load", () => requestAnimationFrame(resizePlots));
-
-  if (window.Reveal) {
-    Reveal.on("ready", () => requestAnimationFrame(resizePlots));
-    Reveal.on("slidechanged", () => requestAnimationFrame(resizePlots));
-  }
-});
-</script>
-```
 
 # Análisis Descriptivo y Estadístico {data-background-color="#213849"}
 
