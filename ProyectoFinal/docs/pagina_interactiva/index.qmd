@@ -32,7 +32,7 @@ El objetivo general es identificar qué condiciones del evento, del lugar, del m
 
 La justificación del proyecto se basa en la magnitud del fenómeno y en el uso de una fuente oficial,
 pública y verificable. ATUS permite analizar registros administrativos con información sobre
-ubicación, temporalidad, tipo de percance, vehículos involucrados, causa presunta, características
+ubicación, temporalidad, tipo de accidente, vehículos involucrados, causa presunta, características
 del conductor y consecuencias humanas del accidente.
 
 El valor del proyecto consiste en transformar estos registros en conocimiento útil para reconocer
@@ -54,11 +54,11 @@ en la sección de microdatos. Para este proyecto se seleccionó el archivo anual
   <div class="mt-card"><div class="mt-card-title">390,627</div><div class="mt-card-body">registros originales</div></div>
   <div class="mt-card"><div class="mt-card-title">45</div><div class="mt-card-body">variables documentadas</div></div>
   <div class="mt-card"><div class="mt-card-title">32</div><div class="mt-card-body">entidades federativas</div></div>
-  <div class="mt-card"><div class="mt-card-title">102 MB</div><div class="mt-card-body">tamaño aproximado reportado</div></div>
+  <div class="mt-card"><div class="mt-card-title">102 MB</div><div class="mt-card-body">tamaño aproximado</div></div>
 </div>
 ```
 
-Cada registro caracteriza un accidente mediante ubicación, fecha, hora, tipo de percance, vehículos involucrados, causa presunta, características del conductor y número de personas heridas o fallecidas. La variable `CLASACC` resume la severidad del evento en tres categorías: `Sólo daños`, `No fatal` y `Fatal`.
+Cada registro caracteriza un accidente mediante ubicación, fecha, hora, tipo de accidente, vehículos involucrados, causa presunta, características del conductor y número de personas heridas o fallecidas. La variable `CLASACC` resume la severidad del evento en tres categorías: `Sólo daños`, `No fatal` y `Fatal`.
 
 ## Diccionario de variables
 
@@ -88,7 +88,7 @@ El diccionario oficial incluye códigos especiales para información no disponib
 
 | Variable | Tipo | Descripción resumida |
 |------------------------|------------------------|------------------------|
-| `TIPACCID` | `varchar` | Tipo de percance: colisión, volcadura, salida del camino, incendio, entre otros. |
+| `TIPACCID` | `varchar` | Tipo de accidente: colisión, volcadura, salida del camino, incendio, entre otros. |
 | `CAUSAACCI` | `varchar` | Causa presunta registrada para el accidente. |
 | `CAPAROD` | `varchar` | Tipo de superficie de rodamiento: pavimentada o no pavimentada. |
 | `SEXO` | `varchar` | Sexo registrado del conductor presunto responsable. |
@@ -181,7 +181,7 @@ La primera revisión identificó aspectos que podían alterar las estadísticas 
 
 #### Deteccion de Registros Administrativos
 
-El valor `Certificado cero` no describe un tipo de accidente. De acuerdo con el diccionario del dataset, se utiliza para registrar una situación administrativa: un municipio no reportó accidentes durante un mes determinado. Es decir, la fila existe para conservar la estructura mensual y municipal del sistema de información, pero no representa un percance ocurrido en la vía pública.
+El valor `Certificado cero` no describe un tipo de accidente. De acuerdo con el diccionario del dataset, se utiliza para registrar una situación administrativa: un municipio no reportó accidentes durante un mes determinado. Es decir, la fila existe para conservar la estructura mensual y municipal del sistema de información, pero no representa un accidente ocurrido en la vía pública.
 
 Estas filas se reconocen porque aparecen como registros completos, no como valores vacíos. Además de incluir `Certificado cero` en variables categóricas, contienen valores de relleno como día 28, día de la semana lunes, cero vehículos involucrados, cero personas heridas o fallecidas y clasificación `Sólo daños`.
 
@@ -193,8 +193,45 @@ análisis exploratorio. El archivo original no se modifica en este punto, la eli
 estos registros se documenta en la sección de limpieza.
 :::
 
-```{=html}
-<div id="plot-vista-auxiliar" class="plotly-chart"></div>
+```{python}
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+ink = "#1f2937"
+muted = "#526171"
+grid = "#d8e0e8"
+paper = "#ffffff"
+blue900 = "#123047"
+blue800 = "#163f5f"
+blue700 = "#1f5f87"
+blue600 = "#2f7fac"
+blue500 = "#4c9bc6"
+blue400 = "#78b6d7"
+blue300 = "#a7d0e7"
+blue200 = "#cfe5f2"
+blues = [blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200]
+
+base_layout = dict(
+    autosize=True,
+    paper_bgcolor=paper,
+    plot_bgcolor=paper,
+    font=dict(family="Inter, Aptos, Segoe UI, sans-serif", color=muted, size=13),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor=grid, font=dict(color=ink)),
+)
+
+fig_vista_auxiliar = go.Figure(go.Funnel(
+    y=["Archivo original", "Registros administrativos separados", "Vista auxiliar de accidentes"],
+    x=[390627, 15678, 374949],
+    marker=dict(color=[blue900, blue500, blue700]),
+    textinfo="value+percent initial",
+    hovertemplate="%{y}<br><b>%{x:,}</b> registros<extra></extra>",
+))
+fig_vista_auxiliar.update_layout(
+    **base_layout,
+    title="Separación inicial de registros administrativos",
+    margin=dict(l=210, r=35, t=54, b=40),
+)
+fig_vista_auxiliar.show()
 ```
 
 ### Análisis por columna
@@ -205,8 +242,25 @@ El dataset contiene registros de las 32 entidades federativas y 2,349 combinacio
 
 Las columnas temporales son `ANIO`, `MES`, `ID_DIA`, `DIASEMANA`, `ID_HORA` e `ID_MINUTO`. Todos los registros pertenecen a 2024, por lo que `ANIO` funciona como referencia, pero no aporta variación interna. En cambio, la hora y los minutos sí muestran patrones útiles.
 
-```{=html}
-<div id="plot-horas" class="plotly-chart"></div>
+```{python}
+fig_horas = go.Figure(go.Scatter(
+    mode="lines+markers",
+    x=list(range(24)),
+    y=[9143, 7400, 6594, 5694, 4880, 4986, 8034, 15159, 20666, 19486, 18076, 17983,
+       19678, 20678, 24225, 23663, 22532, 22348, 21872, 21473, 20055, 15801, 13636, 26565],
+    line=dict(color=blue800, width=3, shape="spline"),
+    marker=dict(color="#ffffff", line=dict(color=blue800, width=2), size=7),
+    fill="tozeroy",
+    fillcolor="rgba(95, 168, 211, 0.18)",
+    hovertemplate="%{x}:00 horas<br><b>%{y:,}</b> registros<extra></extra>",
+))
+fig_horas.update_layout(
+    **base_layout,
+    title="Distribución por hora en el archivo original",
+    xaxis=dict(title="Hora del día", dtick=1, gridcolor=grid),
+    yaxis=dict(title="Registros", gridcolor=grid, zeroline=False),
+)
+fig_horas.show()
 ```
 
 ::: note-box
@@ -219,18 +273,68 @@ Las columnas `URBANA` y `SUBURBANA` son complementarias. Cuando el accidente ocu
 `SUBURBANA` contiene `Sin accidente en esta zona`, cuando ocurre en zona suburbana, sucede lo
 contrario. Ese texto no debe tratarse como dato faltante.
 
-```{=html}
-<div id="plot-zonas" class="plotly-chart"></div>
+```{python}
+zonas = [
+    "Urbana: intersección",
+    "Urbana: no intersección",
+    "Suburbana: carretera estatal",
+    "Suburbana: otro camino",
+    "Suburbana: camino rural",
+]
+accidentes_zonas = [259153, 86281, 20107, 5224, 4184]
+
+fig_zonas = go.Figure(go.Bar(
+    orientation="h",
+    y=zonas[::-1],
+    x=accidentes_zonas[::-1],
+    marker=dict(color=[blue800, blue700, blue500, blue400, blue300][::-1],
+                line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{y}<br><b>%{x:,}</b> accidentes<extra></extra>",
+))
+fig_zonas.update_layout(
+    **base_layout,
+    title="Accidentes por ubicación registrada",
+    margin=dict(l=230, r=35, t=54, b=55),
+    xaxis=dict(title="Accidentes", gridcolor=grid),
+    yaxis=dict(title=""),
+)
+fig_zonas.show()
 ```
 
 En conjunto, 345,434 accidentes corresponden a zonas urbanas y 29,515 a zonas suburbanas. La lectura principal es que la mayoría de los eventos ocurre en contexto urbano, especialmente en intersecciones. Esto no significa que las intersecciones sean necesariamente más riesgosas, porque el dataset no contiene una medida de exposición como volumen de tránsito o kilómetros recorridos.
 
 #### Tipo de accidente
 
-`TIPACCID` identifica el tipo de percance. La distribución está fuertemente concentrada en pocas categorías.
+`TIPACCID` identifica el tipo de accidente. La distribución está fuertemente concentrada en pocas categorías.
 
-```{=html}
-<div id="plot-tipos" class="plotly-chart"></div>
+```{python}
+tipos_accidente = [
+    "Colisión con vehículo automotor",
+    "Colisión con motocicleta",
+    "Colisión con objeto fijo",
+    "Volcadura",
+    "Colisión con peatón",
+    "Salida del camino",
+    "Colisión con ciclista",
+    "Otro",
+]
+accidentes_tipo = [224720, 61869, 43119, 13371, 11052, 10067, 4033, 2934]
+
+fig_tipos = go.Figure(go.Bar(
+    orientation="h",
+    y=tipos_accidente[::-1],
+    x=accidentes_tipo[::-1],
+    marker=dict(color=blues[::-1], line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{y}<br><b>%{x:,}</b> accidentes<extra></extra>",
+))
+fig_tipos.update_layout(
+    **base_layout,
+    title="Tipos de accidente más frecuentes",
+    margin=dict(l=255, r=35, t=54, b=55),
+    xaxis=dict(title="Accidentes", gridcolor=grid),
+    yaxis=dict(title=""),
+)
+fig_tipos.show()
 ```
 
 Las tres categorías principales son colisión con vehículo automotor, colisión con motocicleta y colisión con objeto fijo. Juntas concentran la mayor parte de los accidentes reales analizados. Esta concentración es útil para describir el fenómeno, pero también advierte que las categorías poco frecuentes podrían requerir cuidado especial en modelos o comparaciones posteriores.
@@ -239,8 +343,32 @@ Las tres categorías principales son colisión con vehículo automotor, colisió
 
 `CAUSAACCI` representa una causa presunta registrada en el dataset, no una demostración independiente de causalidad. `CAPAROD` indica si la superficie era pavimentada o no pavimentada.
 
-```{=html}
-<div id="plot-causa-superficie" class="plotly-chart"></div>
+```{python}
+fig_causa_superficie = make_subplots(rows=1, cols=2, subplot_titles=("Causa presunta", "Superficie"))
+fig_causa_superficie.add_trace(go.Bar(
+    name="Causa presunta",
+    x=["Conductor", "Condición del camino", "Falla del vehículo", "Otra", "Peatón o pasajero"],
+    y=[360051, 5991, 3978, 2631, 2298],
+    marker=dict(color=blue800),
+    hovertemplate="%{x}<br><b>%{y:,}</b> accidentes<extra>Causa</extra>",
+), row=1, col=1)
+fig_causa_superficie.add_trace(go.Bar(
+    name="Superficie",
+    x=["Pavimentada", "No pavimentada"],
+    y=[368913, 6036],
+    marker=dict(color=blue500),
+    hovertemplate="%{x}<br><b>%{y:,}</b> accidentes<extra>Superficie</extra>",
+), row=1, col=2)
+fig_causa_superficie.update_layout(
+    **base_layout,
+    title="Causa presunta y superficie de rodamiento",
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.22),
+)
+fig_causa_superficie.update_xaxes(tickangle=-20, automargin=True, row=1, col=1)
+fig_causa_superficie.update_xaxes(tickangle=-10, automargin=True, row=1, col=2)
+fig_causa_superficie.update_yaxes(title="Accidentes", gridcolor=grid, row=1, col=1)
+fig_causa_superficie.update_yaxes(title="Accidentes", gridcolor=grid, row=1, col=2)
+fig_causa_superficie.show()
 ```
 
 La categoría `Conductor` concentra 360,051 accidentes, equivalente al 96.03%. A su vez, 368,913 accidentes ocurrieron en superficie pavimentada, pero esto no implica que esas vías sean más peligrosas, porque el dataset no incluye medidas de exposición como flujo vehicular o longitud de vialidades.
@@ -249,22 +377,76 @@ La categoría `Conductor` concentra 360,051 accidentes, equivalente al 96.03%. A
 
 Las trece columnas vehiculares cuentan cuántas unidades participaron por categoría. No son excluyentes: un mismo accidente puede involucrar automóviles, motocicletas, camionetas u otros vehículos a la vez.
 
-```{=html}
-<div id="plot-vehiculos" class="plotly-chart"></div>
+```{python}
+fig_vehiculos = go.Figure(go.Bar(
+    x=["Automóvil", "Motocicleta", "Camioneta pasajeros", "Camioneta carga", "Camión", "Ómnibus", "Bicicleta", "Otros"],
+    y=[436681, 86124, 79558, 51106, 28064, 10583, 8139, 16149],
+    marker=dict(color=[blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200],
+                line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{x}<br><b>%{y:,}</b> vehículos<extra></extra>",
+))
+fig_vehiculos.update_layout(
+    **base_layout,
+    title="Total de vehículos involucrados por categoría",
+    xaxis=dict(title="", tickangle=-25, automargin=True),
+    yaxis=dict(title="Vehículos", gridcolor=grid, zeroline=False),
+)
+fig_vehiculos.show()
 ```
 
 En la vista auxiliar se contabilizaron 710,403 vehículos, con un promedio de 1.89 por accidente. La mayoría de los accidentes, aproximadamente 78.43%, involucra exactamente dos vehículos.
 
-```{=html}
-<div id="plot-vehiculos-por-accidente" class="plotly-chart"></div>
+```{python}
+fig_vehiculos_por_accidente = go.Figure(go.Bar(
+    x=["1", "2", "3", "4", "5 o más"],
+    y=[61910, 294083, 16313, 2083, 560],
+    text=["16.51%", "78.43%", "4.35%", "0.56%", "0.15%"],
+    textposition="outside",
+    cliponaxis=False,
+    marker=dict(color=[blue200, blue800, blue600, blue400, blue300],
+                line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{x} vehículo(s)<br><b>%{y:,}</b> accidentes<extra></extra>",
+))
+fig_vehiculos_por_accidente.update_layout(
+    **base_layout,
+    title="Cantidad de vehículos por accidente",
+    xaxis=dict(title="Vehículos por accidente"),
+    yaxis=dict(title="Accidentes", gridcolor=grid, range=[0, 330000]),
+)
+fig_vehiculos_por_accidente.show()
 ```
 
 #### Información del conductor
 
 `SEXO` e `ID_EDAD` describen al conductor presunto responsable. Antes de analizar la edad se separan dos códigos especiales: `0` significa conductor fugado y `99` edad desconocida.
 
-```{=html}
-<div id="plot-sexo-edad" class="plotly-chart"></div>
+```{python}
+fig_sexo_edad = make_subplots(
+    rows=1,
+    cols=2,
+    specs=[[{"type": "domain"}, {"type": "xy"}]],
+    column_widths=[0.42, 0.48],
+)
+fig_sexo_edad.add_trace(go.Pie(
+    labels=["Hombre", "Mujer", "Se fugó"],
+    values=[278004, 61908, 35037],
+    hole=0.52,
+    marker=dict(colors=[blue800, blue500, blue300], line=dict(color="#ffffff", width=2)),
+    hovertemplate="%{label}<br><b>%{value:,}</b> accidentes<extra></extra>",
+), row=1, col=1)
+fig_sexo_edad.add_trace(go.Bar(
+    x=["Fuga", "Edad desconocida", "Edades válidas"],
+    y=[35037, 61564, 278348],
+    marker=dict(color=[blue300, blue500, blue800], line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{x}<br><b>%{y:,}</b> registros<extra></extra>",
+), row=1, col=2)
+fig_sexo_edad.update_layout(
+    **base_layout,
+    title="Sexo registrado y tratamiento de edad",
+    annotations=[dict(text="<b>SEXO</b>", x=0.2, y=0.5, showarrow=False, font=dict(color=ink, size=16))],
+)
+fig_sexo_edad.update_yaxes(title="Registros", gridcolor=grid, row=1, col=2)
+fig_sexo_edad.show()
 ```
 
 En la vista auxiliar hay 278,004 registros con conductor hombre, 61,908 con conductor mujer y 35,037
@@ -277,24 +459,93 @@ como promedio, mediana y distribuciones por grupo etario.
 
 Las variables `ALIENTO` y `CINTURON` contienen una proporción importante de valores `Se ignora`. Por eso se interpretan distinguiendo el porcentaje sobre todos los accidentes y el porcentaje entre casos conocidos.
 
-```{=html}
-<div id="plot-aliento-cinturon" class="plotly-chart"></div>
+```{python}
+fig_aliento_cinturon = go.Figure()
+fig_aliento_cinturon.add_trace(go.Bar(
+    name="Sí",
+    x=["Aliento alcohólico", "Cinturón"],
+    y=[15915, 42451],
+    marker=dict(color=blue400),
+    hovertemplate="%{x}<br>Sí: <b>%{y:,}</b><extra></extra>",
+))
+fig_aliento_cinturon.add_trace(go.Bar(
+    name="No",
+    x=["Aliento alcohólico", "Cinturón"],
+    y=[239170, 43285],
+    marker=dict(color=blue800),
+    hovertemplate="%{x}<br>No: <b>%{y:,}</b><extra></extra>",
+))
+fig_aliento_cinturon.add_trace(go.Bar(
+    name="Se ignora",
+    x=["Aliento alcohólico", "Cinturón"],
+    y=[119864, 289213],
+    marker=dict(color=blue200),
+    hovertemplate="%{x}<br>Se ignora: <b>%{y:,}</b><extra></extra>",
+))
+fig_aliento_cinturon.update_layout(
+    **base_layout,
+    barmode="stack",
+    title="Información disponible sobre aliento y cinturón",
+    xaxis=dict(title=""),
+    yaxis=dict(title="Accidentes", gridcolor=grid),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.18),
+)
+fig_aliento_cinturon.show()
 ```
 
 En `ALIENTO`, el porcentaje de registros con aliento alcohólico entre casos conocidos es 6.24%. En `CINTURON`, la información desconocida es especialmente alta: 289,213 accidentes, es decir, 77.13% del total.
 
 #### Víctimas y severidad
 
-Las columnas de víctimas cuentan personas heridas y fallecidas por tipo de participación. Estos totales no equivalen al número de accidentes, porque un solo percance puede afectar a más de una persona.
+Las columnas de víctimas cuentan personas heridas y fallecidas por tipo de participación. Estos totales no equivalen al número de accidentes, porque un solo accidente puede afectar a más de una persona.
 
-```{=html}
-<div id="plot-victimas" class="plotly-chart"></div>
+```{python}
+fig_victimas = go.Figure()
+fig_victimas.add_trace(go.Bar(
+    name="Fallecidas",
+    x=["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
+    y=[2614, 972, 901, 142, 27],
+    marker=dict(color=blue500),
+    hovertemplate="%{x}<br><b>%{y:,}</b> fallecidas<extra></extra>",
+))
+fig_victimas.add_trace(go.Bar(
+    name="Heridas",
+    x=["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
+    y=[45442, 26828, 11509, 2097, 104],
+    marker=dict(color=blue800),
+    hovertemplate="%{x}<br><b>%{y:,}</b> heridas<extra></extra>",
+))
+fig_victimas.update_layout(
+    **base_layout,
+    barmode="group",
+    title="Personas heridas y fallecidas por tipo de participación",
+    xaxis=dict(title="", tickangle=-15, automargin=True),
+    yaxis=dict(title="Personas", gridcolor=grid),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.2),
+)
+fig_victimas.show()
 ```
 
 En total se registraron 4,656 personas fallecidas y 85,980 heridas. Los conductores concentran el mayor número de víctimas, seguidos por pasajeros y peatones.
 
-```{=html}
-<div id="plot-severidad" class="plotly-chart"></div>
+```{python}
+fig_severidad = go.Figure(go.Pie(
+    labels=["Sólo daños", "No fatal", "Fatal"],
+    values=[306841, 63920, 4188],
+    hole=0.58,
+    sort=False,
+    marker=dict(colors=[blue200, blue500, blue900], line=dict(color="#ffffff", width=2)),
+    textinfo="label+percent",
+    hovertemplate="%{label}<br><b>%{value:,}</b> accidentes<extra></extra>",
+))
+fig_severidad.update_layout(
+    **base_layout,
+    title="Clasificación de severidad de los accidentes",
+    annotations=[dict(text="<b>374,949</b><br>accidentes", showarrow=False, font=dict(color=ink, size=18))],
+    margin=dict(l=20, r=20, t=54, b=35),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.08),
+)
+fig_severidad.show()
 ```
 
 La cantidad de accidentes fatales coincide con los 4,188 eventos donde se registró al menos una persona fallecida. La distribución también evidencia un desbalance fuerte de clases, especialmente para `Fatal`, que representa 1.12% de los accidentes reales.
@@ -343,8 +594,22 @@ La limpieza conserva el archivo original sin modificaciones y exporta un nuevo C
 
 El resultado se exportó como `data/atus_anual_2024_limpio.csv`.
 
-```{=html}
-<div id="plot-dimensiones" class="plotly-chart"></div>
+```{python}
+fig_dimensiones = go.Figure(go.Bar(
+    x=["Antes de limpieza", "Después de limpieza"],
+    y=[390627, 374078],
+    text=["390,627", "374,078"],
+    textposition="outside",
+    marker=dict(color=[blue800, blue500], line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{x}<br><b>%{y:,}</b> filas<extra></extra>",
+))
+fig_dimensiones.update_layout(
+    **base_layout,
+    title="Filas del dataset antes y después de la limpieza",
+    xaxis=dict(title=""),
+    yaxis=dict(title="Filas", gridcolor=grid, range=[0, 430000]),
+)
+fig_dimensiones.show()
 ```
 
 ```{=html}
@@ -364,30 +629,128 @@ Este dataset limpio conserva únicamente accidentes reales y será la base para 
 
 Con el fin de poder enfocar nuestro análisis en un fenómeno relevante en nuestros datos, es importante generar un panorama general de estos que nos puedan dar una evidencia de dichos eventos que estamos buscando. Exponemos este panorama en una presentación de los datos predominantes de categorías que nos ayudan a entender el motivo de los accidentes de transito, el tema principal de nuestro dataset. Fue necesario implementar una columna adicional para mapear el ID de las entidades federativas para poder ser desplegadas de manera correcta en nuestras gráficas.
 
-```{=html}
-<div id="plot-genero" class="plotly-chart"></div>
+```{python}
+fig_genero = go.Figure(go.Pie(
+    labels=["Hombre", "Mujer", "Se fugó"],
+    values=[278004, 61908, 35037],
+    marker=dict(colors=[blue900, blue500, blue200], line=dict(color="#ffffff", width=2)),
+    textinfo="percent+label",
+    hovertemplate="%{label}<br><b>%{value:,}</b> accidentes<extra></extra>",
+))
+fig_genero.update_layout(
+    **base_layout,
+    title="Distribución de Accidentes por Género",
+    margin=dict(l=20, r=20, t=54, b=35),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.08),
+)
+fig_genero.show()
 ```
 
-```{=html}
-<div id="plot-entidades" class="plotly-chart"></div>
+```{python}
+entidades_top = [
+    "Ciudad de México",
+    "Jalisco",
+    "Nuevo León",
+    "Guanajuato",
+    "Estado de México",
+    "Veracruz",
+    "Puebla",
+    "Chihuahua",
+    "Baja California",
+    "Coahuila",
+]
+accidentes_entidad = [50000, 42000, 39000, 35000, 33000, 30000, 28000, 25000, 23000, 21000]
+
+fig_entidades = go.Figure(go.Bar(
+    orientation="h",
+    y=entidades_top[::-1],
+    x=accidentes_entidad[::-1],
+    marker=dict(color=[blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200, blue300, blue400][::-1],
+                line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{y}<br><b>%{x:,}</b> accidentes<extra></extra>",
+))
+fig_entidades.update_layout(
+    **base_layout,
+    title="Top 10 Entidades Federativas con Mayor Frecuencia de Accidentes",
+    margin=dict(l=180, r=35, t=54, b=55),
+    xaxis=dict(title="Cantidad de accidentes", gridcolor=grid),
+    yaxis=dict(title=""),
+)
+fig_entidades.show()
 ```
 
-```{=html}
-<div id="plot-vehiculos-pastel" class="plotly-chart"></div>
+```{python}
+fig_vehiculos_pastel = go.Figure(go.Pie(
+    labels=["Automóvil", "Motocicleta", "Camioneta pasajeros", "Camioneta carga", "Camión", "Ómnibus", "Bicicleta", "Otros"],
+    values=[436681, 86124, 79558, 51106, 28064, 10583, 8139, 16149],
+    marker=dict(colors=[blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200],
+                line=dict(color="#ffffff", width=2)),
+    textinfo="percent",
+    hovertemplate="%{label}<br><b>%{value:,}</b> incidentes<extra></extra>",
+))
+fig_vehiculos_pastel.update_layout(
+    **base_layout,
+    title="Proporción de Accidentes por Tipo de Vehículo",
+    margin=dict(l=20, r=20, t=54, b=35),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.1),
+)
+fig_vehiculos_pastel.show()
 ```
 
-```{=html}
-<div id="plot-aliento" class="plotly-chart"></div>
+```{python}
+fig_aliento = go.Figure(go.Pie(
+    labels=["No", "Sí"],
+    values=[239170, 15915],
+    hole=0.4,
+    marker=dict(colors=["#BDC3C7", "#E74C3C"], line=dict(color="#FFFFFF", width=2)),
+    textinfo="percent+value",
+    textposition="inside",
+    hovertemplate="%{label}<br><b>%{value:,}</b> accidentes<extra></extra>",
+))
+fig_aliento.update_layout(
+    **base_layout,
+    title="Proporción de Accidentes según la Presencia de Aliento Alcohólico",
+    margin=dict(l=20, r=20, t=54, b=35),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.08),
+)
+fig_aliento.show()
 ```
 
 Pero hay dos columnas de información que también nos dan información adicional que consideramos relevante para un análisis más exhaustivo: La edad y las horas en las que ocurren los accidentes. Podemos determinar un promedio de la edad de los involucrados en los accidentes, así como el poder recopilar una media en la que generalmente los accidentes, así como recopilar un punto medio de la información de ambas categorías conocido como mediana.
 
-```{=html}
-<div id="plot-edades" class="plotly-chart"></div>
+```{python}
+edades = [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98]
+accidentes_edad = [165,264,623,1228,2096,3538,5775,6154,6754,6859,7231,7859,7642,7682,7374,7452,7892,7706,8673,7084,7838,7439,7242,7661,6883,6446,6856,5742,6639,5297,6079,5310,4784,5529,4485,4634,4621,4308,4910,3669,4079,3691,3579,3289,3023,2680,2628,2518,2574,1982,2205,1966,1813,1903,1457,1335,1180,1086,1190,808,906,754,750,652,489,471,423,322,358,197,209,167,175,104,90,62,38,34,25,20,9,14,21,29,34,36,58]
+
+fig_edades = go.Figure(go.Bar(
+    x=edades,
+    y=accidentes_edad,
+    marker=dict(color=blue700),
+    hovertemplate="%{x} años<br><b>%{y:,}</b> accidentes<extra></extra>",
+))
+fig_edades.update_layout(
+    **base_layout,
+    title="Distribución de Accidentes por Edad",
+    xaxis=dict(title="Edad del conductor", gridcolor=grid),
+    yaxis=dict(title="Cantidad de accidentes", gridcolor=grid, zeroline=False),
+)
+fig_edades.show()
 ```
 
-```{=html}
-<div id="plot-horas-media" class="plotly-chart"></div>
+```{python}
+fig_horas_media = go.Figure(go.Bar(
+    x=list(range(24)),
+    y=[9068,7380,6582,5678,4875,4973,8008,15134,20619,19438,18039,17949,19630,20633,24169,23604,22494,22295,21832,21433,20007,15769,13602,10867],
+    marker=dict(color=blue700),
+    hovertemplate="%{x}:00 hrs<br><b>%{y:,}</b> accidentes<extra></extra>",
+))
+fig_horas_media.update_layout(
+    **base_layout,
+    title="Frecuencia de Accidentes por Hora",
+    xaxis=dict(title="Hora del día", dtick=1, gridcolor=grid),
+    yaxis=dict(title="Cantidad de accidentes", gridcolor=grid, zeroline=False),
+)
+fig_horas_media.show()
 ```
 
 ### Variabilidad
@@ -867,586 +1230,4 @@ fig_heatmap_riesgo = px.imshow(matriz_riesgo,
 
 fig_heatmap_riesgo.update_layout(template='plotly_white', width=1000, height=800)
 fig_heatmap_riesgo.show()
-```
-
-```{=html}
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const ink = "#1f2937";
-  const muted = "#526171";
-  const grid = "#d8e0e8";
-  const paper = "#ffffff";
-  const blue900 = "#123047";
-  const blue800 = "#163f5f";
-  const blue700 = "#1f5f87";
-  const blue600 = "#2f7fac";
-  const blue500 = "#4c9bc6";
-  const blue400 = "#78b6d7";
-  const blue300 = "#a7d0e7";
-  const blue200 = "#cfe5f2";
-  const blue100 = "#e8f3f9";
-  const blues = [blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200];
-
-  const config = {
-    responsive: true,
-    displayModeBar: true,
-    displaylogo: false,
-    modeBarButtonsToRemove: ["lasso2d", "select2d"]
-  };
-
-  const baseLayout = {
-    autosize: true,
-    paper_bgcolor: paper,
-    plot_bgcolor: paper,
-    font: { family: "Inter, Aptos, Segoe UI, sans-serif", color: muted, size: 13 },
-    margin: { l: 75, r: 28, t: 42, b: 62 },
-    hoverlabel: { bgcolor: "#ffffff", bordercolor: grid, font: { color: ink } }
-  };
-
-  const comma = (n) => n.toLocaleString("en-US");
-
-  Plotly.newPlot("plot-vista-auxiliar", [{
-    type: "funnel",
-    y: ["Archivo original", "Registros administrativos separados", "Vista auxiliar de accidentes"],
-    x: [390627, 15678, 374949],
-    marker: { color: [blue900, blue500, blue700] },
-    textinfo: "value+percent initial",
-    hovertemplate: "%{y}<br><b>%{x:,}</b> registros<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Separación inicial de registros administrativos",
-    margin: { l: 210, r: 35, t: 54, b: 40 }
-  }, config);
-
-  Plotly.newPlot("plot-horas", [{
-    type: "scatter",
-    mode: "lines+markers",
-    x: Array.from({ length: 24 }, (_, i) => i),
-    y: [9143, 7400, 6594, 5694, 4880, 4986, 8034, 15159, 20666, 19486, 18076, 17983, 19678, 20678, 24225, 23663, 22532, 22348, 21872, 21473, 20055, 15801, 13636, 26565],
-    line: { color: blue800, width: 3, shape: "spline" },
-    marker: { color: "#ffffff", line: { color: blue800, width: 2 }, size: 7 },
-    fill: "tozeroy",
-    fillcolor: "rgba(95, 168, 211, 0.18)",
-    hovertemplate: "%{x}:00 horas<br><b>%{y:,}</b> registros<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Distribución por hora en el archivo original",
-    xaxis: { title: "Hora del día", dtick: 1, gridcolor: grid },
-    yaxis: { title: "Registros", gridcolor: grid, zeroline: false }
-  }, config);
-
-  Plotly.newPlot("plot-zonas", [{
-    type: "bar",
-    orientation: "h",
-    y: [
-      "Urbana: intersección",
-      "Urbana: no intersección",
-      "Suburbana: carretera estatal",
-      "Suburbana: otro camino",
-      "Suburbana: camino rural"
-    ].reverse(),
-    x: [259153, 86281, 20107, 5224, 4184].reverse(),
-    marker: { color: [blue800, blue700, blue500, blue400, blue300].reverse(), line: { color: "#ffffff", width: 1 } },
-    hovertemplate: "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Accidentes por ubicación registrada",
-    margin: { l: 230, r: 35, t: 54, b: 55 },
-    xaxis: { title: "Accidentes", gridcolor: grid },
-    yaxis: { title: "" }
-  }, config);
-
-  Plotly.newPlot("plot-tipos", [{
-    type: "bar",
-    orientation: "h",
-    y: [
-      "Colisión con vehículo automotor",
-      "Colisión con motocicleta",
-      "Colisión con objeto fijo",
-      "Volcadura",
-      "Colisión con peatón",
-      "Salida del camino",
-      "Colisión con ciclista",
-      "Otro"
-    ].reverse(),
-    x: [224720, 61869, 43119, 13371, 11052, 10067, 4033, 2934].reverse(),
-    marker: { color: [...blues].reverse(), line: { color: "#ffffff", width: 1 } },
-    hovertemplate: "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Tipos de accidente más frecuentes",
-    margin: { l: 255, r: 35, t: 54, b: 55 },
-    xaxis: { title: "Accidentes", gridcolor: grid },
-    yaxis: { title: "" }
-  }, config);
-
-  Plotly.newPlot("plot-causa-superficie", [{
-    type: "bar",
-    name: "Causa presunta",
-    x: ["Conductor", "Condición del camino", "Falla del vehículo", "Otra", "Peatón o pasajero"],
-    y: [360051, 5991, 3978, 2631, 2298],
-    marker: { color: blue800 },
-    hovertemplate: "%{x}<br><b>%{y:,}</b> accidentes<extra>Causa</extra>"
-  }, {
-    type: "bar",
-    name: "Superficie",
-    x: ["Pavimentada", "No pavimentada"],
-    y: [368913, 6036],
-    marker: { color: blue500 },
-    xaxis: "x2",
-    yaxis: "y2",
-    hovertemplate: "%{x}<br><b>%{y:,}</b> accidentes<extra>Superficie</extra>"
-  }], {
-    ...baseLayout,
-    title: "Causa presunta y superficie de rodamiento",
-    grid: { rows: 1, columns: 2, pattern: "independent" },
-    xaxis: { title: "", tickangle: -20, automargin: true },
-    yaxis: { title: "Accidentes", gridcolor: grid },
-    xaxis2: { title: "", tickangle: -10, automargin: true },
-    yaxis2: { title: "Accidentes", gridcolor: grid },
-    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.22 }
-  }, config);
-
-  Plotly.newPlot("plot-vehiculos", [{
-    type: "bar",
-    x: ["Automóvil", "Motocicleta", "Camioneta pasajeros", "Camioneta carga", "Camión", "Ómnibus", "Bicicleta", "Otros"],
-    y: [436681, 86124, 79558, 51106, 28064, 10583, 8139, 16149],
-    marker: { color: [blue900, blue800, blue700, blue600, blue500, blue400, blue300, blue200], line: { color: "#ffffff", width: 1 } },
-    hovertemplate: "%{x}<br><b>%{y:,}</b> vehículos<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Total de vehículos involucrados por categoría",
-    xaxis: { title: "", tickangle: -25, automargin: true },
-    yaxis: { title: "Vehículos", gridcolor: grid, zeroline: false }
-  }, config);
-
-  Plotly.newPlot("plot-vehiculos-por-accidente", [{
-    type: "bar",
-    x: ["1", "2", "3", "4", "5 o más"],
-    y: [61910, 294083, 16313, 2083, 560],
-    marker: { color: [blue200, blue800, blue600, blue400, blue300], line: { color: "#ffffff", width: 1 } },
-    text: ["16.51%", "78.43%", "4.35%", "0.56%", "0.15%"],
-    textposition: "outside",
-    cliponaxis: false,
-    hovertemplate: "%{x} vehículo(s)<br><b>%{y:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Cantidad de vehículos por accidente",
-    xaxis: { title: "Vehículos por accidente" },
-    yaxis: { title: "Accidentes", gridcolor: grid, range: [0, 330000] }
-  }, config);
-
-  Plotly.newPlot("plot-sexo-edad", [{
-    type: "pie",
-    labels: ["Hombre", "Mujer", "Se fugó"],
-    values: [278004, 61908, 35037],
-    hole: 0.52,
-    marker: { colors: [blue800, blue500, blue300], line: { color: "#ffffff", width: 2 } },
-    domain: { x: [0, 0.42] },
-    hovertemplate: "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
-  }, {
-    type: "bar",
-    x: ["Fuga", "Edad desconocida", "Edades válidas"],
-    y: [35037, 61564, 278348],
-    marker: { color: [blue300, blue500, blue800], line: { color: "#ffffff", width: 1 } },
-    xaxis: "x2",
-    yaxis: "y2",
-    hovertemplate: "%{x}<br><b>%{y:,}</b> registros<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Sexo registrado y tratamiento de edad",
-    grid: { rows: 1, columns: 2, pattern: "independent" },
-    xaxis2: { domain: [0.52, 1], title: "" },
-    yaxis2: { domain: [0, 1], title: "Registros", gridcolor: grid },
-    annotations: [{
-      text: "<b>SEXO</b>",
-      x: 0.2,
-      y: 0.5,
-      showarrow: false,
-      font: { color: ink, size: 16 }
-    }]
-  }, config);
-
-  Plotly.newPlot("plot-aliento-cinturon", [{
-    type: "bar",
-    name: "Sí",
-    x: ["Aliento alcohólico", "Cinturón"],
-    y: [15915, 42451],
-    marker: { color: blue400 },
-    hovertemplate: "%{x}<br>Sí: <b>%{y:,}</b><extra></extra>"
-  }, {
-    type: "bar",
-    name: "No",
-    x: ["Aliento alcohólico", "Cinturón"],
-    y: [239170, 43285],
-    marker: { color: blue800 },
-    hovertemplate: "%{x}<br>No: <b>%{y:,}</b><extra></extra>"
-  }, {
-    type: "bar",
-    name: "Se ignora",
-    x: ["Aliento alcohólico", "Cinturón"],
-    y: [119864, 289213],
-    marker: { color: blue200 },
-    hovertemplate: "%{x}<br>Se ignora: <b>%{y:,}</b><extra></extra>"
-  }], {
-    ...baseLayout,
-    barmode: "stack",
-    title: "Información disponible sobre aliento y cinturón",
-    xaxis: { title: "" },
-    yaxis: { title: "Accidentes", gridcolor: grid },
-    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.18 }
-  }, config);
-
-  Plotly.newPlot("plot-victimas", [{
-    type: "bar",
-    name: "Fallecidas",
-    x: ["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
-    y: [2614, 972, 901, 142, 27],
-    marker: { color: blue500 },
-    hovertemplate: "%{x}<br><b>%{y:,}</b> fallecidas<extra></extra>"
-  }, {
-    type: "bar",
-    name: "Heridas",
-    x: ["Conductores", "Pasajeros", "Peatones", "Ciclistas", "Otras personas"],
-    y: [45442, 26828, 11509, 2097, 104],
-    marker: { color: blue800 },
-    hovertemplate: "%{x}<br><b>%{y:,}</b> heridas<extra></extra>"
-  }], {
-    ...baseLayout,
-    barmode: "group",
-    title: "Personas heridas y fallecidas por tipo de participación",
-    xaxis: { title: "", tickangle: -15, automargin: true },
-    yaxis: { title: "Personas", gridcolor: grid },
-    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.2 }
-  }, config);
-
-  Plotly.newPlot("plot-severidad", [{
-    type: "pie",
-    labels: ["Sólo daños", "No fatal", "Fatal"],
-    values: [306841, 63920, 4188],
-    hole: 0.58,
-    sort: false,
-    marker: { colors: [blue200, blue500, blue900], line: { color: "#ffffff", width: 2 } },
-    textinfo: "label+percent",
-    hovertemplate: "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Clasificación de severidad de los accidentes",
-    annotations: [{
-      text: "<b>374,949</b><br>accidentes",
-      showarrow: false,
-      font: { color: ink, size: 18 }
-    }],
-    margin: { l: 20, r: 20, t: 54, b: 35 },
-    legend: { orientation: "h", x: 0.5, xanchor: "center", y: -0.08 }
-  }, config);
-
-  Plotly.newPlot("plot-dimensiones", [{
-    type: "bar",
-    x: ["Antes de limpieza", "Después de limpieza"],
-    y: [390627, 374078],
-    marker: { color: [blue800, blue500], line: { color: "#ffffff", width: 1 } },
-    text: ["390,627", "374,078"],
-    textposition: "outside",
-    hovertemplate: "%{x}<br><b>%{y:,}</b> filas<extra></extra>"
-  }], {
-    ...baseLayout,
-    title: "Filas del dataset antes y después de la limpieza",
-    xaxis: { title: "" },
-    yaxis: { title: "Filas", gridcolor: grid, range: [0, 430000] }
-  }, config);
-
-
-  Plotly.newPlot("plot-genero", [{
-  type: "pie",
-  labels: ["Hombre", "Mujer", "Se fugó"],
-  values: [278004, 61908, 35037],
-  marker: {
-    colors: [blue900, blue500, blue200],
-    line: {
-      color: "#ffffff",
-      width: 2
-    }
-  },
-  textinfo: "percent+label",
-  hovertemplate:
-    "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
-}], {
-  ...baseLayout,
-  title: "Distribución de Accidentes por Género",
-  margin: {
-    l: 20,
-    r: 20,
-    t: 54,
-    b: 35
-  },
-  legend: {
-    orientation: "h",
-    x: 0.5,
-    xanchor: "center",
-    y: -0.08
-  }
-}, config);
-  Plotly.newPlot("plot-entidades", [{
-  type: "bar",
-  orientation: "h",
-  y: [
-    "Ciudad de México",
-    "Jalisco",
-    "Nuevo León",
-    "Guanajuato",
-    "Estado de México",
-    "Veracruz",
-    "Puebla",
-    "Chihuahua",
-    "Baja California",
-    "Coahuila"
-  ].reverse(),
-
-  x: [
-    50000,
-    42000,
-    39000,
-    35000,
-    33000,
-    30000,
-    28000,
-    25000,
-    23000,
-    21000
-  ].reverse(),
-
-  marker: {
-    color: [
-      blue900,
-      blue800,
-      blue700,
-      blue600,
-      blue500,
-      blue400,
-      blue300,
-      blue200,
-      blue300,
-      blue400
-    ].reverse(),
-    line: {
-      color: "#ffffff",
-      width: 1
-    }
-  },
-
-  hovertemplate:
-    "%{y}<br><b>%{x:,}</b> accidentes<extra></extra>"
-}], {
-  ...baseLayout,
-
-  title: "Top 10 Entidades Federativas con Mayor Frecuencia de Accidentes",
-
-  margin: {
-    l: 180,
-    r: 35,
-    t: 54,
-    b: 55
-  },
-
-  xaxis: {
-    title: "Cantidad de accidentes",
-    gridcolor: grid
-  },
-
-  yaxis: {
-    title: ""
-  }
-
-}, config);
-
-  Plotly.newPlot("plot-vehiculos-pastel", [{
-  type: "pie",
-
-  labels: [
-    "Automóvil",
-    "Motocicleta",
-    "Camioneta pasajeros",
-    "Camioneta carga",
-    "Camión",
-    "Ómnibus",
-    "Bicicleta",
-    "Otros"
-  ],
-
-  values: [
-    436681,
-    86124,
-    79558,
-    51106,
-    28064,
-    10583,
-    8139,
-    16149
-  ],
-
-  marker: {
-    colors: [
-      blue900,
-      blue800,
-      blue700,
-      blue600,
-      blue500,
-      blue400,
-      blue300,
-      blue200
-    ],
-    line: {
-      color: "#ffffff",
-      width: 2
-    }
-  },
-
-  textinfo: "percent",
-
-  hovertemplate:
-    "%{label}<br><b>%{value:,}</b> incidentes<extra></extra>"
-}], {
-  ...baseLayout,
-
-  title: "Proporción de Accidentes por Tipo de Vehículo",
-
-  margin: {
-    l: 20,
-    r: 20,
-    t: 54,
-    b: 35
-  },
-
-  legend: {
-    orientation: "h",
-    x: 0.5,
-    xanchor: "center",
-    y: -0.1
-  }
-
-}, config);
-
-  
-  const resizePlots = () => {
-    document.querySelectorAll(".plotly-chart").forEach((chart) => {
-      if (chart.data) Plotly.Plots.resize(chart);
-    });
-  };
-  Plotly.newPlot("plot-aliento", [{
-  type: "pie",
-
-  labels: ["No", "Sí"],
-
-  values: [
-    239170,
-    15915
-  ],
-
-  hole: 0.4,
-
-  marker: {
-    colors: [
-      "#BDC3C7", // No
-      "#E74C3C"  // Sí
-    ],
-    line: {
-      color: "#FFFFFF",
-      width: 2
-    }
-  },
-
-  textinfo: "percent+value",
-  textposition: "inside",
-
-  hovertemplate:
-    "%{label}<br><b>%{value:,}</b> accidentes<extra></extra>"
-}], {
-  ...baseLayout,
-
-  title: "Proporción de Accidentes según la Presencia de Aliento Alcohólico",
-
-  margin: {
-    l: 20,
-    r: 20,
-    t: 54,
-    b: 35
-  },
-
-  legend: {
-    orientation: "h",
-    x: 0.5,
-    xanchor: "center",
-    y: -0.08
-  }
-
-}, config);
-    
-  Plotly.newPlot("plot-edades", [{
-  type: "bar",
-
-  x: [12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98],
-
-  y: [165,264,623,1228,2096,3538,5775,6154,6754,6859,7231,7859,7642,7682,7374,7452,7892,7706,8673,7084,7838,7439,7242,7661,6883,6446,6856,5742,6639,5297,6079,5310,4784,5529,4485,4634,4621,4308,4910,3669,4079,3691,3579,3289,3023,2680,2628,2518,2574,1982,2205,1966,1813,1903,1457,1335,1180,1086,1190,808,906,754,750,652,489,471,423,322,358,197,209,167,175,104,90,62,38,34,25,20,9,14,21,29,34,36,58],
-
-  marker: {
-    color: blue700
-  },
-
-  hovertemplate:
-    "%{x} años<br><b>%{y:,}</b> accidentes<extra></extra>"
-}], {
-  ...baseLayout,
-
-  title: "Distribución de Accidentes por Edad",
-
-  xaxis: {
-    title: "Edad del conductor",
-    gridcolor: grid
-  },
-
-  yaxis: {
-    title: "Cantidad de accidentes",
-    gridcolor: grid,
-    zeroline: false
-  }
-
-}, config);
-  Plotly.newPlot("plot-horas-media", [{
-  type: "bar",
-
-  x: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
-
-  y: [9068,7380,6582,5678,4875,4973,8008,15134,20619,19438,18039,17949,19630,20633,24169,23604,22494,22295,21832,21433,20007,15769,13602,10867],
-
-  marker: {
-    color: blue700
-  },
-
-  hovertemplate:
-    "%{x}:00 hrs<br><b>%{y:,}</b> accidentes<extra></extra>"
-}], {
-  ...baseLayout,
-
-  title: "Frecuencia de Accidentes por Hora",
-
-  xaxis: {
-    title: "Hora del día",
-    dtick: 1,
-    gridcolor: grid
-  },
-
-  yaxis: {
-    title: "Cantidad de accidentes",
-    gridcolor: grid,
-    zeroline: false
-  }
-
-}, config);
-
-  window.addEventListener("resize", resizePlots);
-  window.addEventListener("load", () => requestAnimationFrame(resizePlots));
-});
-</script>
 ```
