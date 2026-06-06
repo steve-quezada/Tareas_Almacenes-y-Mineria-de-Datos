@@ -1,6 +1,6 @@
 project:
   type: website
-  output-dir: _site
+  output-dir: ..
 
 website:
   title: "ATUS Anual 2024 | Proyecto Final"

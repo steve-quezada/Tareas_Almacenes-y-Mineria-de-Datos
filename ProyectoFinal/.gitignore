@@ -17,7 +17,7 @@ htmlcov/
 .ipynb_checkpoints/
 
 # Quarto
-docs/pagina_interactiva/_site/
+docs/.quarto/
 docs/pagina_interactiva/.quarto/
 reports/_site/
 reports/.quarto/
