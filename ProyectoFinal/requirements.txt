@@ -1,7 +1,9 @@
 matplotlib
 numpy
+notebook
 pandas
 seaborn
 plotly
 nbformat
 pyyaml
+
