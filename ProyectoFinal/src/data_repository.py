@@ -1,9 +1,11 @@
 """
 data_repository.py
+==================
+Patrón de diseño: Repository
 
 Abstrae el acceso al dataset limpio detrás de una interfaz uniforme.
 El resto del proyecto (notebook de modelado, trainer, etc.) nunca
-accede directamente al sistema de archivos, siempre usa esta clase.
+accede directamente al sistema de archivos — siempre usa esta clase.
 Esto permite cambiar la fuente de datos (CSV, base de datos, API)
 sin modificar el código cliente.
 
@@ -56,7 +58,10 @@ class DataRepository:
     ... )
     """
 
-    DEFAULT_CONFIG_PATH = Path("src/config/repository_config.yaml")
+    # Ruta relativa al propio archivo data_repository.py, no al cwd.
+    # Esto garantiza que el config se encuentre independientemente de
+    # desde donde se ejecute el codigo (notebook, script, tests, etc.)
+    DEFAULT_CONFIG_PATH = Path(__file__).parent / "config" / "repository_config.yaml"
 
     def __init__(self, data_path: str, config_path: str = None):
         """
