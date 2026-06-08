@@ -123,7 +123,7 @@ Heridos y fallecidos: conductores, pasajeros, peatones, ciclistas y otras person
 :::
 
 ::: path-card
-**Agrupamiento**
+**Agrupamiento (Clustering)**
 
 Al retirar la etiqueta de severidad, las variables descriptivas permiten formar perfiles de accidentes similares.
 :::
@@ -546,3 +546,246 @@ También contamos con el número de vehículos involucrados en el accidente y su
 ## Agravantes y mitigantes de riesgo. Repercusiones.
 
 ![](images/paste-18.png)
+
+# Agrupamiento (Clustering) {data-background-color="#213849"}
+
+## ¿Existen perfiles de accidente?
+
+::: kicker
+Agrupamiento no supervisado · K-Means · 374,078 registros
+:::
+
+::::: two-paths
+::: path-card
+**La pregunta** Hasta ahora describimos la severidad. Ahora preguntamos distinto:
+
+**¿Hay tipos naturales de accidente que agrupen registros con condiciones similares, sin usar la etiqueta de gravedad?**
+:::
+
+::: path-card
+**La decisión clave**
+
+Excluimos `CLASACC` y de la entrada las **10 columnas de víctimas.** Si las incluyéramos, los grupos reconstruirían la severidad que ya conocemos.
+
+Al retirarlas, los perfiles emergen solo del contexto del accidente: **vehículos, hora, zona, conductor.**
+:::
+:::::
+
+::: attention-note
+La validez del método depende de esta exclusión. Si `CLASACC` aparece ordenada después, no fue porque el modelo la vio, fue porque los perfiles capturan física real.
+:::
+
+## ¿Cómo preparamos los datos?
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1em; margin-top:0.5em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:1.1em 1.2em; font-size:0.76em; line-height:1.45"}
+**Variables incluidas — contexto del accidente**
+
+**Temporales (3):** `MES` · `ID_HORA` · `DIASEMANA`
+
+**Zona (2):** `URBANA` · `SUBURBANA`
+
+**Tipo y causa (3):** `TIPACCID` · `CAUSAACCI` · `CAPAROD`
+
+**Vehículos (13):** `AUTOMOVIL` · `CAMPASAJ` · `MICROBUS` · `PASCAMION` · `OMNIBUS` · `TRANVIA` · `CAMIONETA` · `CAMION` · `TRACTOR` · `FERROCARRI` · `MOTOCICLET` · `BICICLETA` · `OTROVEHIC`
+
+**Conductor (6):** `SEXO` · `ALIENTO` · `CINTURON` · `ID_EDAD` · `CONDUCTOR_FUGADO` · `EDAD_DESCONOCIDA`
+
+→ **27 variables** · 18 numéricas + 9 categóricas → **60 columnas** tras one-hot
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:1.1em 1.2em; font-size:0.76em; line-height:1.45"}
+**Variables excluidas — desenlace**
+
+**Objetivo supervisado (1):** `CLASACC`
+
+**Víctimas (10):** `CONDMUERTO` · `CONDHERIDO` · `PASAMUERTO` · `PASAHERIDO` · `PEATMUERTO` · `PEATHERIDO` · `CICLMUERTO` · `CICLHERIDO` · `OTROMUERTO` · `OTROHERIDO`
+
+→ Revelan directamente la gravedad: incluirlas haría que los grupos recuperaran la severidad en lugar de descubrir perfiles nuevos.
+
+**Alta cardinalidad (2):** `NOM_ENT` (32 categorías) · `NOM_MUN` (1,435 categorías)
+
+**Granularidad fina (2):** `ID_MINUTO` · `ID_DIA`
+
+→ Sin valor de perfil y generarían ruido dimensional.
+:::
+:::
+
+## Preprocesamiento y estrategia de cómputo
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1em; margin-top:0.4em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:1.1em 1.2em; font-size:0.79em; line-height:1.42"}
+**Preprocesamiento con `ColumnTransformer`**
+
+Las **18 variables numéricas** pasan por imputación por mediana y luego por `StandardScaler`. La estandarización es **obligatoria para K-Means**: el algoritmo calcula distancias euclidianas, por lo que una variable en miles (ej. conteo de vehículos) dominaría sobre una en unidades (ej. hora) si no se normalizan.
+
+Las **9 variables categóricas** pasan por imputación por moda y `OneHotEncoder` con `handle_unknown="ignore"`, lo que permite usar el modelo en datos nuevos sin fallar si aparece una categoría no vista durante el entrenamiento.
+
+El resultado es una **matriz de 60 columnas** donde todas las variables tienen la misma escala y están listas para el cálculo de distancias.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--yellow); border-radius:var(--radius); padding:1.1em 1.2em; font-size:0.79em; line-height:1.42"}
+
+**Fase exploratoria — muestra de 40,000 registros** con `random_state=42`: se usa para el método del codo, el coeficiente de silueta, la comparación de algoritmos, PCA y t-SNE. Calcular silueta o t-SNE sobre 374k registros es inviable en tiempo y memoria; 40k ya produce estimaciones estables dado el tamaño original.
+
+**Fase final — 374,078 registros completos**: una vez elegido el algoritmo y los parámetros, K-Means se re-entrena sobre todo el dataset. Los tamaños de cluster, los porcentajes de severidad y los perfiles descriptivos que reportamos provienen exclusivamente de esta fase.
+
+Los IDs numéricos de cluster pueden diferir entre fases; la correspondencia se establece por el perfil semántico de cada grupo, no por el número asignado.
+:::
+:::
+
+## ¿Cuántos grupos? Codo y silueta. {.center}
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1.2em; align-items:center; margin-top:0.3em"}
+![](images/cluster_codo.png){style="width:100%; border-radius:14px"}
+
+![](images/cluster_silueta.png){style="width:100%; border-radius:14px"}
+:::
+
+::: attention-note
+La inercia cae gradual (sin codo nítido) y la silueta es máxima en k=2 (partición trivial: motos vs. todo). Priorizamos **interpretabilidad**: **k = 4** produce perfiles distintos y accionables.
+:::
+
+## Comparamos tres algoritmos
+
+::: {style="margin-top:0.4em"}
+| Algoritmo | Grupos | Ruido | Silueta | Decisión |
+|---|---:|---:|---:|:---|
+| **K-Means (k=4)** | **4** | **0** | **0.104** | **Elegido — escala a 374k**, **tiene** `predict` |
+| Aglomerativo (Ward) | 4 | 0 | 0.228 | O(n²): requeriría ~140 mil millones de entradas |
+| DBSCAN (ε=2.0) | 44 | 7,636 | 0.186 | Fragmenta en 44 microgrupos; 19% descartado como ruido |
+:::
+
+::: attention-note
+El aglomerativo tiene mejor silueta pero **no escala**. DBSCAN confirma que no hay densidad bien definida en estos datos y la nube es continua. K-Means gana por **escalabilidad, interpretabilidad y `predict`**.
+:::
+
+## Proyección PCA y t-SNE {.center}
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1em; align-items:center"}
+![PCA — estructura global lineal (muestra 40k)](images/cluster_pca_scatter.png){style="width:100%; border-radius:14px"}
+
+![t-SNE — vecindad local (submuestra 5k)](images/cluster_tsne.png){style="width:100%; border-radius:14px"}
+:::
+
+::: {.source-line style="font-size:0.62em; margin-top:0.3em; text-align:center"}
+Ambas son proyecciones cualitativas: comprimen 60 dimensiones a 2. Las fronteras son graduales.
+:::
+
+## Los 4 perfiles encontrados
+
+::: {.source-line style="font-size:0.72em; margin-bottom:0.5em; line-height:1.4"}
+Cada perfil recibió su nombre después del agrupamiento, al observar qué variable domina su comportamiento.
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:0.8em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.9em 1em; font-size:0.74em; line-height:1.42"}
+**C0 — Conductor fugado, accidente mixto** · 9.3%
+
+`CONDUCTOR_FUGADO ≈ 1.0` prácticamente el 100% de los registros son fugas. Por eso sexo, alcohol y cinturón aparecen como "desconocido" o "se ignora": nadie quedó en escena para ser registrado. Ocurre más los **domingos (21.2%)** que cualquier otro día. El **2.2% de sus accidentes son fatales** el triple del 0.7% que presentan los grupos de camioneta y multi-automóvil.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--orange); border-radius:var(--radius); padding:0.9em 1em; font-size:0.74em; line-height:1.42"}
+**C1 — Colisión con camioneta** · 31.2%
+
+En promedio, cada accidente de este grupo involucra **0.35 camionetas de carga** el valor más alto de los cuatro grupos. El conductor tiene la mayor edad media (39.6 años) y la menor presencia de alcohol (76% sin aliento). Perfil compatible con conductor de reparto o carga en horario diurno. **90.7% termina en solo daños** es el más benigno de los cuatro.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:0.9em 1em; font-size:0.74em; line-height:1.42"}
+**C2 — Accidente con motocicleta** · 20.3%
+
+`MOTOCICLET = 1.03` toda colisión del grupo involucra una moto. El conductor más joven (34.4 años), mayormente masculinos (86%), y accidenta en el horario más tardío (14.1 h). Sin carrocería protectora entre el cuerpo y el impacto. Resultado: **43.2% de heridos** cinco veces más que camioneta.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:0.9em 1em; font-size:0.74em; line-height:1.42"}
+**C3 — Colisión multi-automóvil** · 39.1%
+
+`AUTOMOVIL = 1.83` promedio casi dos autos por accidente. Es el grupo más numeroso y el menos diferenciado: sin pico claro de hora ni día, sin señal de alcohol o fuga. Representa el choque urbano cotidiano. La carrocería de ambos vehículos absorbe el impacto: **88.8% solo daños**.
+:::
+:::
+
+
+
+## La validación más importante {.center}
+
+![](images/cluster_clasacc.png){.r-stretch style="border-radius:14px; margin:0 auto; display:block"}
+
+::: {.attention-note .attention-success style="margin-top:0.5em"}
+Los grupos se ordenan por severidad de manera natural. El **Cluster 2 (motos)** concentra **43.2% de heridos**. Los perfiles capturaron **física real**: cuerpo expuesto en moto vs. blindaje del automóvil.
+:::
+
+## Arquitectura del módulo `src/clustering/`
+
+::: {style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:1.2em; align-items:center; margin-top:0.3em"}
+![](images/clustering_uml.png){style="width:100%; border-radius:14px"}
+
+::: {style="display:flex; flex-direction:column; gap:0.7em; font-size:0.8em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.3"}
+**Repository** · `DataRepository`\
+Abstrae el acceso al CSV detrás de una interfaz uniforme.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--orange); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.3"}
+**Strategy** · `ClusteringStrategy`\
+Intercambia K-Means, Ward y DBSCAN sin cambiar el cliente.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.3"}
+**Composición** · `ClusterAnalyzer`, `ClusteringModel`\
+Modelo serializable en `clustering_kmeans.joblib` predice sin re-entrenar.
+:::
+:::
+:::
+
+## En conclusión: ¿a qué llegamos?
+
+::: kicker
+Frecuencia y gravedad apuntan a lugares distintos
+:::
+
+Los accidentes **no son homogéneos** — el algoritmo descubrió cuatro perfiles sin ver la severidad.
+
+:::::: metric-strip
+::: metric
+**70.3%**\
+son leves (auto + camioneta)
+:::
+::: metric
+**5×**\
+más heridos en moto que en camioneta
+:::
+::: metric
+**2.2%**\
+mortalidad en fugados — el triple que autos
+:::
+::::::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:0.75em; margin-top:0.7em; font-size:0.74em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**El vehículo define el accidente**\
+Hora, zona y causa son casi iguales en los 4 grupos. Lo que los separa es el vehículo. Antes era una hipótesis — ahora es un hecho demostrado matemáticamente.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--orange); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**La validación es la prueba más fuerte**\
+`CLASACC` nunca entró al modelo y aun así ordena los grupos limpiamente. Si los perfiles fueran ruido, la severidad se distribuiría igual en los cuatro. No lo hace.
+:::
+:::
+
+## Implicación de política vial
+
+::: kicker
+La frecuencia no es el problema — el daño humano sí
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:0.85em; margin-top:0.5em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:1em 1.1em; font-size:0.8em; line-height:1.4"}
+**Prioridad 1 — Proteger al motociclista**\
+Conductor joven (34 años), varón (86%), horario vespertino (14 h), sin carrocería protectora.\
+43.2% de heridos contra 8.6% en camioneta.\
+El modelo lo descubrió **sin ver datos de víctimas**: es física, no correlación casual.
+:::
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:1em 1.1em; font-size:0.8em; line-height:1.4"}
+**Prioridad 2 — Disuadir la fuga**\
+Pico en domingo, conductor desconocido, mayor mortalidad (2.2% — el triple).\
+Sin responsable identificado por definición.\
+El perfil con mayor costo humano y **menor rendición de cuentas**.
+:::
+:::
+
+::: attention-note
+Perseguir el accidente más **frecuente** (choque entre autos) para mejorar seguridad vial es ineficiente. Los datos señalan dónde está el problema real: **motociclistas** y **conductores que huyen**. El modelo queda guardado y puede clasificar cualquier accidente nuevo sin re-entrenar.
+:::
+
