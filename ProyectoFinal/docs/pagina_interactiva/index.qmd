@@ -855,8 +855,8 @@ diccionario_estados = {
     26: 'Sonora', 27: 'Tabasco', 28: 'Tamaulipas', 29: 'Tlaxcala', 
     30: 'Veracruz', 31: 'Yucatán', 32: 'Zacatecas'
 }
-# Creamos una columna auxiliar con el nombre mapeado
-df['NOMBRE_ENTIDAD'] = df['ID_ENTIDAD'].map(diccionario_estados)
+# La columna de entidad ya viene mapeada como 'NOM_ENT' en el CSV limpio, usamos esa directamente.
+df['NOMBRE_ENTIDAD'] = df['NOM_ENT'] if 'NOM_ENT' in df.columns else df.get('ID_ENTIDAD', pd.Series()).map(diccionario_estados)
 
 # Los días de la semana se presentan como números del 1 al 7, donde 1 es Lunes y 7 es Domingo. Creamos una columna auxiliar con el nombre mapeado.
 diccionario_dias = {
@@ -1556,3 +1556,17 @@ El agrupamiento respondió la pregunta de partida: los accidentes de tránsito e
 **Cluster 2 — Accidente con motocicleta.** Además de la tasa de lesionados ya visible en la tabla, es el único grupo que accidenta predominantemente en la tarde (14.1h de media, frente a 12.6–13.4h en los demás) y el más masculino (86.0% hombres). Conductor joven, varón, en horario vespertino y sin carrocería protectora: esa combinación explica la brecha de riesgo.
 
 **Cluster 3 — Colisión multi-automóvil.** El más numeroso y el menos diferenciado: sin desviaciones en alcohol, hora ni día. Representa el accidente cotidiano sin un factor de riesgo dominante.
+
+### Arquitectura del módulo `src/clustering/`
+
+El código se organizó con Programación Orientada a Objetos en el paquete `src/clustering/`, combinando tres patrones de diseño:
+
+| Patrón | Clase | Rol |
+|------|-------|------------|
+| **Repository** | `DataRepository` | Abstrae el acceso al CSV detrás de una interfaz uniforme. |
+| **Strategy** | `ClusteringStrategy` + subclases | Permite intercambiar K-Means, Aglomerativo y DBSCAN sin modificar el código cliente. |
+| **Composición** | `ClusterAnalyzer`, `ClusteringModel` | Reúnen repositorio, preprocesador y estrategia como colaboradores. |
+
+El diagrama muestra todas las clases, atributos, métodos y relaciones del módulo.
+
+![Diagrama UML del módulo `src/clustering/`](images/clustering/clustering_uml.png){fig-alt="Diagrama de clases UML del módulo de agrupamiento"}
