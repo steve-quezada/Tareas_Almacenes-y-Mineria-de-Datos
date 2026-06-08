@@ -1231,3 +1231,328 @@ fig_heatmap_riesgo = px.imshow(matriz_riesgo,
 fig_heatmap_riesgo.update_layout(template='plotly_white', width=1000, height=800)
 fig_heatmap_riesgo.show()
 ```
+
+## Agrupamiento de perfiles de accidente
+
+Tras describir la severidad y sus factores asociados, esta etapa responde una pregunta complementaria: **¿existen perfiles naturales de accidente que agrupen registros con condiciones similares, sin indicarle al algoritmo la severidad del evento?** Para responderla se aplicó un agrupamiento no supervisado con **K-Means** sobre el dataset limpio `atus_anual_2024_limpio.csv` (374,078 registros, 42 columnas). El proceso completo se documenta en el notebook `agrupamiento.ipynb` y se encapsula en el módulo `src/clustering/`.
+
+### Selección y exclusión de variables
+
+::: note-box
+La decisión metodológica más importante fue **excluir la variable objetivo `CLASACC` y todas las columnas de víctimas** del conjunto de entrada. Si los grupos se formaran a partir del número de heridos o muertos, el agrupamiento reconstruiría la severidad y no aportaría información nueva. Al retirarlas, los perfiles se forman únicamente con el *contexto* del accidente, lo que permite contrastar después cada grupo contra `CLASACC` como validación independiente.
+:::
+
+| Grupo de variables | Tratamiento |
+|------------------------|------------------------|
+| Temporales (`MES`, `ID_HORA`, `DIASEMANA`) | Incluidas. |
+| Zona (`URBANA`, `SUBURBANA`) | Incluidas como categóricas. |
+| Accidente (`TIPACCID`, `CAUSAACCI`, `CAPAROD`) | Incluidas. |
+| Vehículos (13 columnas) | Incluidas como numéricas. |
+| Conductor (`SEXO`, `ALIENTO`, `CINTURON`, `ID_EDAD`, `CONDUCTOR_FUGADO`, `EDAD_DESCONOCIDA`) | Incluidas. |
+| `CLASACC` y víctimas (10 columnas) | **Excluidas:** son la consecuencia a interpretar. |
+| `NOM_ENT`, `NOM_MUN` | Excluidas por alta cardinalidad. |
+| `ID_MINUTO`, `ID_DIA` | Excluidas por ser demasiado finas. |
+
+### Preprocesamiento
+
+El preprocesamiento se construyó con un `ColumnTransformer` de `scikit-learn` con dos ramas: la **numérica** (18 variables) aplica imputación por mediana y estandarización (`StandardScaler`, obligatorio para K-Means); la **categórica** (9 variables) aplica imputación por moda y codificación `OneHotEncoder`. El resultado es una matriz de **60 columnas**. Los cálculos exploratorios (codo, silueta, PCA, t-SNE) se hicieron sobre una muestra reproducible de 40,000 registros (`random_state=42`); el modelo final y los perfiles de los grupos se calcularon sobre los 374,078 registros completos.
+
+::: note-box
+K-Means no garantiza IDs de cluster estables entre dos ajustes distintos. Por eso las visualizaciones **exploratorias** (PCA, t-SNE) reflejan los IDs de la muestra de 40,000 registros, mientras que las **tablas de perfiles y la gráfica de severidad** corresponden al modelo entrenado sobre los 374,078 registros completos (cargado desde `models/clustering_kmeans.joblib`). Por eso la numeración de los grupos en la sección exploratoria puede no coincidir con la de los perfiles finales: la correspondencia se establece por el perfil semántico, no por el número.
+:::
+
+```{python}
+# Setup de agrupamiento — carga datos y calcula todo lo necesario para las gráficas
+# Este bloque puede tardar ~3–4 minutos (silueta + t-SNE)
+import sys, numpy as np, pandas as pd
+from pathlib import Path
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+_SRC = Path("../../src")
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from clustering import ClusterAnalyzer, ClusteringModel, KMeansStrategy
+
+_RANDOM_STATE = 42
+np.random.seed(_RANDOM_STATE)
+_K = 4
+
+_cl_layout = dict(
+    autosize=True,
+    paper_bgcolor="#ffffff",
+    plot_bgcolor="#ffffff",
+    font=dict(family="Inter, Aptos, Segoe UI, sans-serif", color="#526171", size=13),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor="#d8e0e8", font=dict(color="#1f2937")),
+    margin=dict(t=55, b=45, l=55, r=35),
+)
+_CL_COLORS = ["#2f7fac", "#f28e2b", "#59a14f", "#e15759"]
+
+_analyzer = ClusterAnalyzer(
+    "../../data/atus_anual_2024_limpio.csv",
+    config_path="../../src/config/repository_config.yaml",
+    random_state=_RANDOM_STATE,
+)
+_analyzer.prepare(sample_size=40_000)
+
+_k_range  = range(2, 11)
+_elbow    = _analyzer.elbow_scores(_k_range)
+_sil      = _analyzer.silhouette_scores(_k_range)
+_varianza = _analyzer.pca_explained_variance(n_components=10)
+
+_etiquetas = _analyzer.fit_strategy(KMeansStrategy(n_clusters=_K, random_state=_RANDOM_STATE))
+_coords_pca = _analyzer.reduce_pca(n_components=2)
+_coords_tsne, _idx_tsne = _analyzer.reduce_tsne(sample_size=5_000, perplexity=30.0)
+
+_cruce = _analyzer.crosstab_with_target(_etiquetas, target="CLASACC", normalize="index")
+_cruce = _cruce[[c for c in ["Sólo daños", "No fatal", "Fatal"] if c in _cruce.columns]]
+
+# ── Modelo final (374,078 registros) ──────────────────────────────────────
+# La severidad y los perfiles se reportan sobre el modelo completo, no la muestra.
+# Se carga el artefacto guardado y se predice sobre todo el dataset (sin reentrenar).
+_modelo = ClusteringModel.load("../../models/clustering_kmeans.joblib")
+_ids_full = _modelo.predict(_analyzer.df_full)
+
+_cruce_full = pd.crosstab(_ids_full, _analyzer.df_full["CLASACC"], normalize="index")
+_cruce_full = _cruce_full[[c for c in ["Sólo daños", "No fatal", "Fatal"] if c in _cruce_full.columns]]
+
+# Etiquetas interpretativas por ID de cluster del modelo final
+_perfil_nombre = {
+    0: "Conductor fugado",
+    1: "Colisión con camioneta",
+    2: "Accidente con motocicleta",
+    3: "Colisión multi-automóvil",
+}
+```
+
+### Elección del número de grupos
+
+Se evaluó K-Means para $k \in \{2, \dots, 10\}$ con el método del codo (inercia) y el coeficiente de silueta. La inercia desciende de forma continua sin un codo pronunciado; la silueta es máxima en $k=2$ pero produce una partición trivial. Se eligió **$k = 4$** por ofrecer grupos diferenciados e interpretables.
+
+| k | Inercia | Silueta |
+|---:|---:|---:|
+| 2 | 806,656 | 0.1921 |
+| 3 | 765,158 | 0.0800 |
+| **4** | **721,335** | **0.1037** |
+| 5 | 687,205 | 0.1204 |
+| 6 | 649,590 | 0.1456 |
+| 7 | 612,342 | 0.1492 |
+| 8 | 565,118 | 0.1381 |
+| 9 | 536,051 | 0.1602 |
+| 10 | 498,718 | 0.1821 |
+
+```{python}
+_fig_ks = make_subplots(
+    rows=1, cols=2,
+    subplot_titles=("Método del codo (inercia)", "Coeficiente de silueta promedio"),
+)
+_fig_ks.add_trace(
+    go.Scatter(
+        x=_elbow["k"], y=_elbow["inercia"], mode="lines+markers",
+        marker=dict(color="#2f7fac", size=7), line=dict(color="#2f7fac"),
+        name="Inercia",
+        hovertemplate="k=%{x}<br>Inercia=%{y:,.0f}<extra></extra>",
+    ),
+    row=1, col=1,
+)
+_fig_ks.add_vline(x=_K, line_dash="dash", line_color="#e15759", row=1, col=1)
+_fig_ks.add_trace(
+    go.Scatter(
+        x=_sil["k"], y=_sil["silueta"], mode="lines+markers",
+        marker=dict(color="#59a14f", size=7), line=dict(color="#59a14f"),
+        name="Silueta",
+        hovertemplate="k=%{x}<br>Silueta=%{y:.4f}<extra></extra>",
+    ),
+    row=1, col=2,
+)
+_fig_ks.add_vline(x=_K, line_dash="dash", line_color="#e15759", row=1, col=2)
+_fig_ks.update_layout(**_cl_layout, height=380, showlegend=False)
+_fig_ks.update_yaxes(title_text="Inercia", row=1, col=1)
+_fig_ks.update_yaxes(title_text="Silueta", row=1, col=2)
+_fig_ks.update_xaxes(title_text="k", dtick=1, row=1, col=1)
+_fig_ks.update_xaxes(title_text="k", dtick=1, row=1, col=2)
+_fig_ks.show()
+```
+
+**Lectura de las curvas.** La inercia cae de forma monótona y casi lineal (806,656 → 498,718 entre $k=2$ y $k=10$), una reducción acumulada del 38% sin ningún quiebre marcado. La ausencia de un codo nítido es el comportamiento esperado en espacios de alta dimensionalidad y dispersos como este (60 columnas tras la codificación *one-hot*): la distancia euclidiana se diluye y la inercia se vuelve poco discriminante. La silueta, por su parte, no es monótona: alcanza su máximo en $k=2$ (0.192), se desploma en $k=3$ (0.080) y vuelve a crecer de forma irregular hacia valores altos de $k$.
+
+Ninguno de los dos criterios señala un óptimo limpio, así que la elección de $k$ no puede delegarse a la métrica. El máximo de silueta en $k=2$ corresponde a una partición trivial, motocicletas frente a todo lo demás, que maximiza la separación geométrica pero no aporta valor analítico. Se priorizó la interpretabilidad sobre la métrica pura y se fijó $k=4$, el menor número de grupos produce perfiles operativamente distintos (fugados, camionetas, motocicletas y multi-automóvil) manteniendo una silueta razonable (0.104).
+
+### Comparación de algoritmos
+
+Para justificar la elección de K-Means se compararon tres algoritmos sobre la misma muestra, implementados con un patrón **Strategy** que permite intercambiarlos sin modificar el código cliente.
+
+| Algoritmo | Grupos | Ruido | Silueta | Observación |
+|------------------|---:|---:|---:|------------------|
+| K-Means ($k=4$) | 4 | 0 | 0.104 | Balanceado e interpretable; escala a 374k. |
+| Aglomerativo (Ward) | 4 | 0 | 0.228 | Mejor silueta, pero $O(n^2)$: no escala. |
+| DBSCAN ($\varepsilon=2.0$) | 44 | 7,636 | 0.186 | Fragmenta en 44 microgrupos; ~19% como ruido. |
+
+**Qué dice cada algoritmo.** Los tres resultados son coherentes con la geometría que ya anticipaba la silueta. El **aglomerativo (Ward)** logra la mejor silueta (0.228, más del doble que K-Means) porque optimiza explícitamente la cohesión jerárquica, pero su complejidad $O(n^2)$ en memoria lo descarta a escala real: ajustarlo sobre los 374,078 registros completos exigiría una matriz de distancias de ~140 mil millones de entradas. **DBSCAN** ($\varepsilon=2.0$) confirma que no hay densidad bien definida: en lugar de 4 grupos compactos encuentra **44 microgrupos** y marca 7,636 puntos (~19% de la muestra) como ruido. Eso no es un fallo del parámetro sino una señal estructural: tras la codificación *one-hot*, los datos forman una nube continua sin valles de densidad que separen regiones, por lo que un método basado en densidad fragmenta en exceso.
+
+**Por qué K-Means.** Su silueta intermedia (0.104) es el precio de tres ventajas decisivas: escala de forma lineal a los 374k registros, produce centroides que se interpretan directamente sobre las variables originales, y expone un método `predict` que permite asignar accidentes nuevos sin reentrenar. En un problema donde ningún algoritmo encuentra una estructura geométricamente nítida, la elección se inclina hacia el que ofrece grupos **estables, escalables y explicables**: K-Means.
+
+### Reducción de dimensionalidad y visualización
+
+Con 60 dimensiones tras la codificación, se aplicó PCA para visualizar la estructura: las primeras 10 componentes explican el **54.40%** de la varianza. Las proyecciones PCA y t-SNE confirman que los grupos ocupan regiones distinguibles.
+
+```{python}
+_fig_pca_var = make_subplots(specs=[[{"secondary_y": True}]])
+_fig_pca_var.add_trace(
+    go.Bar(
+        x=_varianza["componente"], y=(_varianza["varianza"] * 100).round(2),
+        name="Individual", marker_color="#2f7fac",
+        hovertemplate="Componente %{x}<br>Varianza: %{y:.2f}%<extra></extra>",
+    ),
+    secondary_y=False,
+)
+_fig_pca_var.add_trace(
+    go.Scatter(
+        x=_varianza["componente"], y=(_varianza["varianza_acumulada"] * 100).round(2),
+        mode="lines+markers", name="Acumulada",
+        marker=dict(color="#e15759", size=6), line=dict(color="#e15759"),
+        hovertemplate="Componente %{x}<br>Acumulada: %{y:.2f}%<extra></extra>",
+    ),
+    secondary_y=True,
+)
+_fig_pca_var.update_layout(
+    **_cl_layout,
+    title="PCA — Varianza explicada por componente",
+    height=420,
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+)
+_fig_pca_var.update_yaxes(title_text="Varianza individual (%)", secondary_y=False)
+_fig_pca_var.update_yaxes(title_text="Varianza acumulada (%)", range=[0, 100], secondary_y=True)
+_fig_pca_var.update_xaxes(title_text="Componente principal", dtick=1)
+_fig_pca_var.show()
+```
+
+**Varianza muy repartida.** La primera componente explica apenas una fracción del total y se necesitan **10 componentes para alcanzar el 54.40%** de la varianza acumulada. Esta dispersión ninguna dirección domina es la firma de un espacio multidimensional: la información del accidente no se concentra en uno o dos ejes latentes, sino que está distribuida entre muchas variables casi independientes (tipo de vehículo, hora, zona, comportamiento del conductor). Es la misma causa de fondo de la silueta baja: cuando la varianza se reparte así, no existen fronteras limpias entre grupos. Por eso las proyecciones 2D que siguen deben leerse como apoyo visual cualitativo, no como prueba de separación: comprimir 60 dimensiones a 2 descarta el 98% de los ejes y necesariamente solapa estructura real.
+
+```{python}
+_pca_df = pd.DataFrame({"PC1": _coords_pca[:, 0], "PC2": _coords_pca[:, 1], "Grupo": _etiquetas})
+_fig_pca = go.Figure()
+for _g in sorted(_pca_df["Grupo"].unique()):
+    _sub = _pca_df[_pca_df["Grupo"] == _g]
+    _fig_pca.add_trace(go.Scattergl(
+        x=_sub["PC1"], y=_sub["PC2"], mode="markers",
+        marker=dict(color=_CL_COLORS[_g], size=3, opacity=0.45),
+        name=f"Grupo {_g}",
+        hovertemplate=f"Grupo {_g}<br>PC1=%{{x:.2f}}<br>PC2=%{{y:.2f}}<extra></extra>",
+    ))
+_fig_pca.update_layout(
+    **_cl_layout,
+    title=f"Grupos K-Means (k={_K}) — proyección PCA (muestra 40,000)",
+    xaxis_title="Componente principal 1",
+    yaxis_title="Componente principal 2",
+    height=470,
+)
+_fig_pca.show()
+```
+
+```{python}
+_tsne_df = pd.DataFrame({"t1": _coords_tsne[:, 0], "t2": _coords_tsne[:, 1], "Grupo": _etiquetas[_idx_tsne]})
+_fig_tsne = go.Figure()
+for _g in sorted(_tsne_df["Grupo"].unique()):
+    _sub = _tsne_df[_tsne_df["Grupo"] == _g]
+    _fig_tsne.add_trace(go.Scattergl(
+        x=_sub["t1"], y=_sub["t2"], mode="markers",
+        marker=dict(color=_CL_COLORS[_g], size=4, opacity=0.6),
+        name=f"Grupo {_g}",
+        hovertemplate=f"Grupo {_g}<br>t1=%{{x:.2f}}<br>t2=%{{y:.2f}}<extra></extra>",
+    ))
+_fig_tsne.update_layout(
+    **_cl_layout,
+    title=f"Grupos K-Means (k={_K}) — proyección t-SNE (submuestra 5,000)",
+    xaxis_title="Dimensión t-SNE 1",
+    yaxis_title="Dimensión t-SNE 2",
+    height=470,
+)
+_fig_tsne.show()
+```
+
+**Qué muestran las proyecciones.** PCA preserva la estructura global lineal y, pese a retener solo el ~14% de la varianza en sus dos primeros ejes, ya deja ver que los grupos ocupan regiones preferentes con zonas de transición difusas —consistente con la nube continua que detectó DBSCAN—. t-SNE, que preserva la vecindad local, separa los conglomerados de forma más marcada porque agrupa puntos que comparten el mismo patrón categórico (mismo tipo de vehículo, misma combinación urbana/causa); conviene recordar que sus distancias y el tamaño de los islotes **no son métricamente interpretables**, solo indican qué registros son vecinos. La conclusión combinada es matizada pero honesta: existe estructura agrupable y los perfiles son reales, pero las fronteras son graduales, no tajantes. Esto coincide con la silueta de 0.104 y refuerza que el valor del modelo está en la **caracterización de cada grupo**, no en una separación geométrica perfecta.
+
+### Interpretación de los perfiles
+
+Cada grupo se describe a partir de las variables originales del **modelo entrenado sobre los 374,078 registros**. La columna `CLASACC` se usa como validación externa.
+
+| Cluster | Tamaño | Edad^1^ | Moto | Auto | Tipo dominante |
+|:---:|:---|---:|---:|---:|:---|
+| 0 | 34,944 (9.3%) | — | 0.20 | 1.07 | Mixto (col. veh. 44%, obj. fijo 23%, moto 15%) |
+| 1 | 116,665 (31.2%) | 39.6 | 0.00 | 0.63 | Colisión con camioneta (81%) |
+| 2 | 76,057 (20.3%) | 34.4 | 1.03 | 0.75 | Colisión con motocicleta (74%) |
+| 3 | 146,412 (39.1%) | 38.3 | 0.00 | 1.83 | Colisión multi-automóvil (77%) |
+
+^1^ Edad media calculada sólo sobre registros con edad válida. En el Cluster 0, el 99.9% son conductores que se dieron a la fuga (`CONDUCTOR_FUGADO = 1`): no existen datos de edad representativos para este grupo.
+
+| Cluster | Fatal (%) | No fatal (%) | Sólo daños (%) |
+|:---:|---:|---:|---:|
+| 0 | 2.2 | 15.7 | 82.0 |
+| 1 | 0.7 |  8.6 | 90.7 |
+| 2 | 2.1 | 43.2 | 54.7 |
+| 3 | 0.7 | 10.5 | 88.8 |
+
+```{python}
+_sev_colors = {"Sólo daños": "#9ecae1", "No fatal": "#fdae6b", "Fatal": "#de2d26"}
+_x_labels = [f"Cluster {c}<br>{_perfil_nombre.get(c, '')}" for c in _cruce_full.index]
+_fig_clasacc = go.Figure()
+for _sev in _cruce_full.columns:
+    _fig_clasacc.add_trace(go.Bar(
+        name=_sev,
+        x=_x_labels,
+        y=(_cruce_full[_sev] * 100).round(1),
+        marker_color=_sev_colors.get(_sev, "#cccccc"),
+        hovertemplate=f"<b>{_sev}</b><br>%{{x}}: %{{y:.1f}}%<extra></extra>",
+    ))
+_fig_clasacc.update_layout(
+    **_cl_layout,
+    title="Severidad del accidente (CLASACC) por cluster — modelo final (374,078 registros)",
+    barmode="stack",
+    xaxis_title="Cluster",
+    yaxis_title="Porcentaje (%)",
+    height=430,
+    legend=dict(
+        title="CLASACC", orientation="h",
+        yanchor="bottom", y=1.02, xanchor="right", x=1,
+    ),
+)
+_fig_clasacc.show()
+```
+
+**El hallazgo central, en números.** La distribución de severidad por grupo es la validación más fuerte de todo el agrupamiento, precisamente porque `CLASACC` **nunca entró al modelo**. Si los grupos fueran ruido, la severidad se repartiría de forma homogénea (~la base global) en los cuatro; en cambio se separa nítidamente. El **Cluster 2 (motocicletas)** dispara la tasa de heridos a **43.2% `No fatal`**, frente a 8.6%, 10.5% y 15.7% en los otros tres grupos: un accidente del grupo de motos tiene entre **2.8 y 5 veces más probabilidad** de dejar personas lesionadas que cualquier otro perfil (5.0× frente a camioneta, 4.1× frente a multi-automóvil, 2.8× frente a fugados). En el extremo opuesto, los clusters dominados por carrocería metálica (1 camioneta y 3 multi-automóvil) concentran ~89–91% en `Sólo daños`: el chasis absorbe la energía del impacto y protege al ocupante.
+
+Que una variable de desenlace excluida del entrenamiento se ordene tan limpiamente por grupo demuestra que los perfiles capturaron mecanismos físicos reales de riesgo exposición del cuerpo en moto, protección estructural en auto y no artefactos del muestreo. Es la confirmación independiente de lo que el análisis de correlaciones ya sugería: `MOTOCICLET` es el predictor de lesión más fuerte del dataset.
+
+### Reutilización del modelo
+
+El modelo final se entrenó sobre los 374,078 registros completos y se serializó como un objeto `ClusteringModel` en `models/clustering_kmeans.joblib`, que encapsula el preprocesador ajustado, el estimador K-Means y las etiquetas interpretativas. Esto permite cargar el artefacto en una sesión independiente y asignar el perfil de accidentes nuevos **sin re-entrenar**:
+
+```python
+from src.clustering import ClusteringModel
+modelo = ClusteringModel.load('models/clustering_kmeans.joblib')
+etiquetas = modelo.predict_labels(df_nuevos)   # e.g. ['Accidente con motocicleta', ...]
+```
+
+| Cluster | Nombre | Registros (dataset completo) |
+|:---:|:---|---:|
+| 0 | Conductor fugado, accidente mixto | 34,944 |
+| 1 | Colisión con camioneta | 116,665 |
+| 2 | Accidente con motocicleta | 76,057 |
+| 3 | Colisión multi-automóvil | 146,412 |
+| **Total** | | **374,078** |
+
+### Conclusión del agrupamiento
+
+El agrupamiento respondió la pregunta de partida: los accidentes de tránsito en México **no son homogéneos**. Lo que sigue no repite los números de las tablas sino lo que las tablas no cuentan.
+
+#### Lo que las tablas no muestran de cada perfil
+
+**Cluster 0 — Conductor fugado.** Su firma no es un vehículo sino la *ausencia de datos*: sexo, aliento y cinturón figuran como “Desconocido” o “Se ignora” en prácticamente el 100% de los casos, porque el conductor no quedó en escena para ser registrado. Ocurre más en domingo (21.2% frente al ~15% del resto), lo que apunta a una dinámica de fin de semana donde la evasión es más probable.
+
+**Cluster 1 — Colisión con camioneta.** Es el grupo más sobrio: 76.0% declara sin alcohol, la proporción más alta de los cuatro. Con la edad media más alta (39.6 años), el perfil apunta a un conductor de carga o reparto en horario laboral que accidenta por descuido, no por imprudencia extrema.
+
+**Cluster 2 — Accidente con motocicleta.** Además de la tasa de lesionados ya visible en la tabla, es el único grupo que accidenta predominantemente en la tarde (14.1h de media, frente a 12.6–13.4h en los demás) y el más masculino (86.0% hombres). Conductor joven, varón, en horario vespertino y sin carrocería protectora: esa combinación explica la brecha de riesgo.
+
+**Cluster 3 — Colisión multi-automóvil.** El más numeroso y el menos diferenciado: sin desviaciones en alcohol, hora ni día. Representa el accidente cotidiano sin un factor de riesgo dominante.
