@@ -84,7 +84,7 @@ quarto render docs/pagina_interactiva
 La salida se genera en:
 
 ```text
-docs/pagina_interactiva/_site/index.html
+docs/index.html
 ```
 
 ## Renderizar la presentación

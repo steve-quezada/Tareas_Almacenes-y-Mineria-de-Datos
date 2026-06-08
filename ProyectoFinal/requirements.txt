@@ -1,9 +1,15 @@
-matplotlib
-numpy
-notebook
-pandas
-seaborn
-plotly
-nbformat
-pyyaml
+ipykernel==7.2.0
+joblib==1.5.3
+jupyter==1.1.1
+matplotlib==3.10.8
+nbclient==0.11.0
+nbformat==5.10.4
+notebook==7.5.7
+numpy==2.4.3
+pandas==3.0.1
+plotly==6.8.0
+PyYAML==6.0.3
+scikit-learn==1.9.0
+scipy==1.17.1
+seaborn==0.13.2
 
