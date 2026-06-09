@@ -1,0 +1,26 @@
+feature,importance
+categorical__TIPACCID_Colisión con peatón (atropellamiento),0.27738133
+categorical__TIPACCID_Colisión con vehículo automotor,0.10411387
+numeric__MOTOCICLET,0.07200672
+categorical__NOM_ENT_Nuevo León,0.050447028
+categorical__TIPACCID_Colisión con motocicleta,0.028448286
+categorical__TIPACCID_Colisión con objeto fijo,0.025005147
+categorical__NOM_ENT_Sinaloa,0.023255952
+numeric__BICICLETA,0.021852698
+categorical__TIPACCID_Colisión con ciclista,0.014198346
+numeric__PASCAMION,0.014169468
+categorical__CAUSAACCI_Peatón o pasajero,0.013065158
+categorical__NOM_ENT_México,0.013037743
+categorical__NOM_ENT_Yucatán,0.012942136
+categorical__URBANA_Sin accidente en esta zona,0.012662257
+binary__CONDUCTOR_FUGADO,0.011949352
+categorical__SUBURBANA_Sin accidente en esta zona,0.0117762685
+categorical__TIPACCID_Incendio,0.011020786
+categorical__NOM_ENT_Quintana Roo,0.010300699
+categorical__NOM_ENT_Coahuila de Zaragoza,0.009808712
+categorical__TIPACCID_Volcadura,0.009663079
+categorical__NOM_ENT_Puebla,0.009498707
+categorical__TIPACCID_Otro,0.009381943
+categorical__CINTURON_Se ignora,0.0077197957
+categorical__NOM_ENT_Ciudad de México,0.0076888837
+categorical__CINTURON_Sí,0.0070835995
