@@ -32,7 +32,8 @@ random_forest:
 
 xgboost:
   param_grid:
-    n_estimators: [100, 200]
+    n_estimators: [100, 200, 300]
     max_depth: [4, 6, 8]
-    learning_rate: [0.05, 0.1]
+    learning_rate: [0.05, 0.1, 0.2]
     subsample: [0.8, 1.0]
+    colsample_bytree: [0.8, 1.0]

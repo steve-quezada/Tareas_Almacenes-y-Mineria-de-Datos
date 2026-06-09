@@ -1,6 +1,7 @@
 """
 preprocessor.py
 ===============
+Patrón de diseño: Pipeline
 
 Encapsula el pipeline completo de preprocesamiento de features para
 el dataset ATUS 2024. Construye internamente un ColumnTransformer de
@@ -44,7 +45,7 @@ class CyclicEncoder(BaseEstimator, TransformerMixin):
     Parameters
     ----------
     period : int
-        Valor máximo del ciclo.
+        Valor máximo del ciclo (12 para meses, 24 para horas).
 
     Example
     -------
@@ -356,3 +357,120 @@ class Preprocessor:
 
         lines.append("=" * 55)
         return "\n".join(lines)
+
+    def fit_transform_target(self, y) -> np.ndarray:
+        """
+        Ajusta el LabelEncoder sobre y y retorna y codificado.
+
+        Usar solo sobre y_train para evitar data leakage.
+
+        Parameters
+        ----------
+        y : array-like
+            Variable objetivo con etiquetas string (e.g. 'Fatal',
+            'No fatal', 'Sólo daños').
+
+        Returns
+        -------
+        np.ndarray
+            Variable objetivo codificada como enteros.
+
+        Example
+        -------
+        >>> y_train_enc = prep.fit_transform_target(y_train)
+        """
+        from sklearn.preprocessing import LabelEncoder
+
+        self._label_encoder = LabelEncoder()
+        y_enc = self._label_encoder.fit_transform(y)
+
+        print("Clases codificadas:")
+        for i, clase in enumerate(self._label_encoder.classes_):
+            print(f"  {i} → {clase}")
+
+        return y_enc
+
+    def transform_target(self, y) -> np.ndarray:
+        """
+        Transforma y usando el LabelEncoder ajustado.
+
+        Usar sobre y_test después de haber llamado fit_transform_target()
+        sobre y_train.
+
+        Parameters
+        ----------
+        y : array-like
+            Variable objetivo con etiquetas string.
+
+        Returns
+        -------
+        np.ndarray
+            Variable objetivo codificada como enteros.
+
+        Raises
+        ------
+        RuntimeError
+            Si se llama antes de fit_transform_target().
+
+        Example
+        -------
+        >>> y_test_enc = prep.transform_target(y_test)
+        """
+        if not hasattr(self, '_label_encoder'):
+            raise RuntimeError(
+                "El LabelEncoder no ha sido ajustado. "
+                "Llama a fit_transform_target() primero."
+            )
+        return self._label_encoder.transform(y)
+
+    def inverse_transform_target(self, y_encoded) -> np.ndarray:
+        """
+        Revierte predicciones numéricas a etiquetas originales.
+
+        Parameters
+        ----------
+        y_encoded : array-like
+            Predicciones numéricas del modelo.
+
+        Returns
+        -------
+        np.ndarray
+            Etiquetas originales (e.g. 'Fatal', 'No fatal', 'Sólo daños').
+
+        Raises
+        ------
+        RuntimeError
+            Si se llama antes de fit_transform_target().
+
+        Example
+        -------
+        >>> y_pred_labels = prep.inverse_transform_target(y_pred)
+        """
+        if not hasattr(self, '_label_encoder'):
+            raise RuntimeError(
+                "El LabelEncoder no ha sido ajustado. "
+                "Llama a fit_transform_target() primero."
+            )
+        return self._label_encoder.inverse_transform(y_encoded)
+
+    @property
+    def target_classes(self) -> list:
+        """
+        Retorna las clases originales en el orden del LabelEncoder.
+
+        Returns
+        -------
+        list
+            Clases originales de la variable objetivo.
+
+        Raises
+        ------
+        RuntimeError
+            Si se llama antes de fit_transform_target().
+        """
+        if not hasattr(self, '_label_encoder'):
+            raise RuntimeError(
+                "El LabelEncoder no ha sido ajustado. "
+                "Llama a fit_transform_target() primero."
+            )
+        return self._label_encoder.classes_.tolist()

@@ -1,6 +1,7 @@
 """
 model_factory.py
 ================
+Patrón de diseño: Factory Method
 
 Encapsula la creación de instancias de modelos de clasificación.
 El código cliente solicita un modelo por nombre y recibe una instancia
@@ -129,14 +130,8 @@ class ModelFactory:
         >>> rf = ModelFactory.create('random_forest', n_estimators=200)
         >>> lr = ModelFactory.create('logistic_regression', max_iter=500)
         """
-        if model_name not in cls._REGISTRY:
-            raise ValueError(
-                f"Modelo '{model_name}' no disponible.\n"
-                f"Modelos disponibles: {cls.available_models()}"
-            )
 
-        # XGBoost se importa aquí para que la clase no falle si no está
-        # instalado y el usuario no lo necesita
+        # XGBoost se importa primero, ANTES de la validación
         if model_name == "xgboost":
             try:
                 from xgboost import XGBClassifier
@@ -145,6 +140,12 @@ class ModelFactory:
                 raise ImportError(
                     "XGBoost no está instalado. Instálalo con: pip install xgboost"
                 )
+
+        if model_name not in cls._REGISTRY:
+            raise ValueError(
+                f"Modelo '{model_name}' no disponible.\n"
+                f"Modelos disponibles: {cls.available_models()}"
+            )
 
         config_path = Path(config_path) if config_path else cls.DEFAULT_CONFIG_PATH
         config      = cls._load_config(config_path)
