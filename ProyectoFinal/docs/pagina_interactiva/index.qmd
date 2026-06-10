@@ -648,18 +648,18 @@ fig_genero.show()
 
 ```{python}
 entidades_top = [
-    "Ciudad de México",
-    "Jalisco",
     "Nuevo León",
-    "Guanajuato",
-    "Estado de México",
-    "Veracruz",
-    "Puebla",
     "Chihuahua",
+    "Sonora",
+    "México",
+    "Guanajuato",
+    "Jalisco",
+    "Michoacán de Ocampo",
+    "Tamaulipas",
+    "Puebla",
     "Baja California",
-    "Coahuila",
 ]
-accidentes_entidad = [50000, 42000, 39000, 35000, 33000, 30000, 28000, 25000, 23000, 21000]
+accidentes_entidad = [76019, 26706, 24786, 20612, 18561, 17937, 15851, 13339, 12909, 11652]
 
 fig_entidades = go.Figure(go.Bar(
     orientation="h",
@@ -1291,7 +1291,7 @@ _CL_COLORS = ["#2f7fac", "#f28e2b", "#59a14f", "#e15759"]
 
 _analyzer = ClusterAnalyzer(
     "../../data/atus_anual_2024_limpio.csv",
-    config_path="../../src/config/repository_config.yaml",
+    config_path="../../src/supervised/config/repository_config.yaml",
     random_state=_RANDOM_STATE,
 )
 _analyzer.prepare(sample_size=40_000)

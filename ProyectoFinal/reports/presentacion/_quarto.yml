@@ -7,6 +7,8 @@ project:
 
 lang: es
 
+jupyter: python3
+
 format:
   revealjs:
     theme: [simple, styles/tfidf-theme.scss]

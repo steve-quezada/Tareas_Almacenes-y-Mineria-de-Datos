@@ -2,6 +2,8 @@ project:
   type: website
   output-dir: ..
 
+jupyter: python3
+
 website:
   title: "ATUS Anual 2024 | Proyecto Final"
   search: true

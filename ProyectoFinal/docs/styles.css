@@ -1,0 +1,148 @@
+.mt-hero {
+  background: linear-gradient(135deg, #16384f 0%, #2f6f95 100%);
+  border-radius: 15px;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  padding: 2.5rem;
+}
+
+.mt-eyebrow {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mt-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.mt-project-name {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.mt-subtitle {
+  font-size: 1.25rem;
+  margin: 0;
+  max-width: 56rem;
+}
+
+.mt-authors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.mt-authors span {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.mt-card-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.mt-card {
+  border: 1px solid #d9dee3;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.mt-card-title {
+  color: #16384f;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.mt-card-body {
+  color: #526171;
+}
+
+.note-box {
+  background: #eef6fb;
+  border-left: 4px solid #2f6f95;
+  border-radius: 8px;
+  margin: 1.25rem 0;
+  padding: 1rem 1.15rem;
+}
+
+.decision-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  margin: 1.5rem 0;
+}
+
+.decision-card {
+  background: #ffffff;
+  border: 1px solid #d9dee3;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.decision-card h3 {
+  color: #16384f;
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.decision-card p {
+  margin: 0;
+}
+
+.cleaning-grid .decision-card p + p {
+  margin-top: 0.65rem;
+}
+
+.cleaning-grid .decision-card strong {
+  color: #16384f;
+}
+
+.plotly-chart {
+  border: 1px solid #d9dee3;
+  border-radius: 8px;
+  height: 430px;
+  margin: 1.25rem 0 1.75rem;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+#plot-severidad,
+#plot-sexo-edad {
+  height: 470px;
+}
+
+table {
+  font-size: 0.95rem;
+}
+
+code {
+  color: #16384f;
+}
+
+@media (max-width: 720px) {
+  .mt-hero {
+    padding: 1.5rem;
+  }
+
+  .mt-title {
+    font-size: 2rem;
+  }
+
+  .plotly-chart {
+    height: 360px;
+  }
+}
