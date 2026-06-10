@@ -655,3 +655,56 @@ class Evaluator:
         ]
 
         return "\n".join(lines)
+    def predict_with_threshold(
+        self,
+        y_prob: np.ndarray,
+        threshold: float,
+        fatal_class_idx: int = 0
+    ) -> np.ndarray:
+        """
+        Aplica el umbral ajustado sobre probabilidades de nuevos registros.
+
+        Método público para usar en producción o demo. No requiere haber
+        llamado a evaluate() previamente — opera directamente sobre las
+        probabilidades proporcionadas.
+
+        Parameters
+        ----------
+        y_prob : np.ndarray
+            Matriz de probabilidades por clase de shape (n_samples, n_classes),
+            obtenida con model.predict_proba().
+        threshold : float
+            Umbral de probabilidad para predecir la clase Fatal.
+            Usar el valor óptimo encontrado por find_optimal_threshold().
+        fatal_class_idx : int, optional
+            Índice de la clase Fatal en y_prob. Por defecto 0,
+            ya que LabelEncoder ordena alfabéticamente: Fatal=0.
+
+        Returns
+        -------
+        np.ndarray
+            Predicciones numéricas con el umbral aplicado. Usar
+            prep.inverse_transform_target() para obtener las etiquetas
+            originales.
+
+        Example
+        -------
+        >>> evaluator = Evaluator(prep.target_classes)
+        >>> y_prob    = model.predict_proba(X_transformed)
+        >>> y_pred    = evaluator.predict_with_threshold(y_prob, threshold=0.15)
+        >>> labels    = prep.inverse_transform_target(y_pred)
+        """
+        y_pred = []
+
+        for probs in y_prob:
+            if probs[fatal_class_idx] >= threshold:
+                y_pred.append(fatal_class_idx)
+            else:
+                other_probs = [
+                    (i, p) for i, p in enumerate(probs)
+                    if i != fatal_class_idx
+                ]
+                best_class = max(other_probs, key=lambda x: x[1])[0]
+                y_pred.append(best_class)
+
+        return np.array(y_pred)
