@@ -1,0 +1,39 @@
+# Configuración del Trainer para el dataset ATUS 2024.
+#
+# cross_validation:
+#   n_folds  : número de folds para GridSearchCV y cross_val_score
+#   scoring  : métrica principal de optimización. Se usa f1_macro
+#              porque pondera por igual las tres clases de CLASACC
+#              independientemente de su frecuencia, lo cual es crítico
+#              dado el desbalance severo de la clase Fatal (~1.1%)
+#
+# param_grid por modelo:
+#   Define el espacio de búsqueda de hiperparámetros para GridSearchCV.
+#   Agrega o elimina parámetros según las necesidades del proyecto.
+#   null en YAML equivale a None en Python.
+
+cross_validation:
+  n_folds: 3
+  scoring: f1_macro
+
+dummy:
+  param_grid: {}
+
+logistic_regression:
+  param_grid:
+    C: [0.1, 1.0, 10.0]
+    solver: [saga]
+
+random_forest:
+  param_grid:
+    n_estimators: [100, 200]
+    max_depth: [null, 10, 20]
+    min_samples_leaf: [1, 2]
+
+xgboost:
+  param_grid:
+    n_estimators: [100, 200, 300]
+    max_depth: [4, 6, 8]
+    learning_rate: [0.05, 0.1, 0.2]
+    subsample: [0.8, 1.0]
+    colsample_bytree: [0.8, 1.0]
