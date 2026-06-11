@@ -32,5 +32,10 @@
 |---|--------|---------|
 | 04 | Presentaciones de Algoritmos de Clustering, Outliers y NLP | [Examen04/](exposicionMineriaTextos/) |  
 
+## Proyecto Final
+| # | Título | Carpeta |
+|---|--------|---------|
+| 05 | Minería de Datos Aplicada a México, Outliers y NLP | [ProyectoFinal/](ProyectoFinal/) |  
+
 
 </div>
