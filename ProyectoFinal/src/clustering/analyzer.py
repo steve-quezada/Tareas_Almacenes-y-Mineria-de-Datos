@@ -35,7 +35,7 @@ _SRC_DIR = Path(__file__).resolve().parent.parent
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
-from data_repository import DataRepository
+from supervised.data_repository import DataRepository
 
 from .preprocessor import AccidentClusteringPreprocessor
 from .strategies import ClusteringStrategy, KMeansStrategy
