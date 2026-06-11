@@ -547,6 +547,423 @@ También contamos con el número de vehículos involucrados en el accidente y su
 
 ![](images/paste-18.png)
 
+
+
+
+# Modelo Supervisado de Clasificación {data-background-color="#213849"}
+
+## ¿Qué queremos predecir?
+
+::: kicker
+Clasificación multiclase · variable objetivo · desbalance severo
+:::
+
+::::: two-paths
+::: path-card
+**Variable objetivo: `CLASACC`**
+
+Predecir la severidad del accidente a partir de sus condiciones,
+sin usar información sobre sus consecuencias.
+:::
+
+::: path-card
+**El desafío principal**
+
+La clase `Fatal` representa apenas el **1.12%** de los registros.
+Un modelo que la ignore completamente alcanza 82% de accuracy
+sin ningún valor predictivo real.
+:::
+:::::
+
+:::::: metric-strip
+::: metric
+**81.82%**\
+Sólo daños
+:::
+
+::: metric
+**17.06%**\
+No fatal
+:::
+
+::: metric
+**1.12%**\
+Fatal
+:::
+::::::
+
+::: attention-note
+El **F1-score macro** es la métrica principal: pondera por igual las tres
+clases sin importar su frecuencia.
+:::
+
+------------------------------------------------------------------------
+
+## Pipeline de preprocesamiento
+
+::: kicker
+`Preprocessor` · 26 variables → 81 features · sin data leakage
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1em; margin-top:0.5em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:1em 1.1em; font-size:0.78em; line-height:1.45"}
+**Variables de entrada — contexto del accidente**
+
+**Numéricas:** `ID_EDAD` · conteos de vehículos\
+→ Imputación mediana + `StandardScaler`
+
+**Binarias:** `CONDUCTOR_FUGADO` · `EDAD_DESCONOCIDA`\
+→ Passthrough
+
+**Categóricas:** `TIPACCID` · `CAUSAACCI` · `SEXO` · `ALIENTO` ·
+`CINTURON` · `DIASEMANA` · `URBANA` · `SUBURBANA` · `CAPAROD` ·
+`NOM_ENT`\
+→ `OneHotEncoder(drop='first')`
+
+**Temporales cíclicas:** `MES` · `ID_HORA`\
+→ Encoding seno/coseno
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:1em 1.1em; font-size:0.78em; line-height:1.45"}
+**Variables excluidas — data leakage**
+
+**Víctimas (10):** `CONDMUERTO` · `CONDHERIDO` · `PASAMUERTO` ·
+`PASAHERIDO` · `PEATMUERTO` · `PEATHERIDO` · `CICLMUERTO` ·
+`CICLHERIDO` · `OTROMUERTO` · `OTROHERIDO`
+
+→ Son consecuencias del accidente, no condiciones previas.
+En producción no estarían disponibles al momento de clasificar.
+
+**Alta cardinalidad:** `NOM_MUN` (1,435 categorías)
+
+**Sin relación causal:** `ID_MINUTO` · `ID_DIA`
+
+**Sin variación real:** `TRANVIA` · `FERROCARRI` · `OTROVEHIC`
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Modelos entrenados
+
+::: kicker
+Complejidad creciente · 299,262 registros de entrenamiento
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.7em; margin-top:0.5em; font-size:0.76em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--line); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**Línea base**\
+`DummyClassifier`
+
+Siempre predice\
+`Sólo daños`.
+
+Establece el piso mínimo a superar.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--line); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**Regresión logística**\
+`LogisticRegression`
+
+No convergió con el volumen y dimensionalidad del dataset.
+
+Sugiere que la relación no es linealmente separable.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**Random Forest**\
+`RandomForestClassifier`
+
+Ensamble robusto al desbalance. Produce importancia de características
+para el clustering.
+
+F1-macro: **0.5453**
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**XGBoost**\
+`XGBClassifier`
+
+Gradiente potenciado con GPU (RTX 3080). Seleccionado como
+modelo final.
+
+F1-macro: **0.5636**\
+(umbral ajustado)
+:::
+:::
+
+:::::: metric-strip
+::: metric
+**80/20**\
+división train/test
+:::
+
+::: metric
+**3 folds**\
+validación cruzada
+:::
+
+::: metric
+**81**\
+features tras preprocesamiento
+:::
+::::::
+
+------------------------------------------------------------------------
+
+## Resultados con umbral por defecto
+
+::: kicker
+F1-macro como métrica principal · accuracy no es confiable
+:::
+
+::: {style="margin-top:0.5em; font-size:0.82em"}
+| Modelo | Accuracy | Precision macro | Recall macro | F1 macro |
+|---|---:|---:|---:|---:|
+| Línea base | 0.8182 | 0.2727 | 0.3333 | 0.2985 |
+| Random Forest | 0.8193 | 0.5259 | 0.5794 | **0.5453** |
+| XGBoost | 0.8727 | 0.6473 | 0.4946 | 0.5265 |
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:0.9em; margin-top:0.7em; font-size:0.78em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**Random Forest gana en F1-macro (0.5453)**\
+Recall de `Fatal`: **17.94%**\
+Recall de `No fatal`: **70.73%**\
+Recall de `Sólo daños`: **85.14%**
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:0.85em 0.9em; line-height:1.4"}
+**XGBoost falla en `Fatal` (4.67% recall)**\
+Predice correctamente apenas **39 de 836**
+accidentes fatales del conjunto de prueba.
+
+AUC ≈ 0.88 en ambos — la capacidad discriminativa
+existe, pero el umbral por defecto no la aprovecha.
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Matriz de confusión — Random Forest (umbral por defecto)
+
+::: {style="display:flex; flex-direction:column; align-items:center; margin-top:0.5em"}
+![](images/confusion_matrix_forest.png){style="width:82%; border-radius:12px"}
+
+::: {style="font-size:0.72em; color:var(--text-muted); margin-top:-0.15em"}
+F1‑macro = 0.5453 · recall macro = 0.5794
+:::
+:::
+
+::: {style="margin-top:0.55em; font-size:0.76em; border-left:0.35em solid var(--blue); padding-left:0.6em; line-height:1.3"}
+**Recupera 150 fatales (17.9 %)** y mantiene buena precisión en *No fatal* y *Sólo daños*.  
+El balance entre clases explica su F1‑macro más alto.
+:::
+
+------------------------------------------------------------------------
+
+## Matriz de confusión — XGBoost (umbral por defecto)
+
+::: {style="display:flex; flex-direction:column; align-items:center; margin-top:0.5em"}
+![](images/confusion_matrix_xgboost.png){style="width:82%; border-radius:12px"}
+
+::: {style="font-size:0.72em; color:var(--text-muted); margin-top:-0.15em"}
+F1‑macro = 0.5265 · recall macro = 0.4946
+:::
+:::
+
+::: {style="margin-top:0.55em; font-size:0.76em; border-left:0.35em solid var(--red); padding-left:0.6em; line-height:1.3"}
+**Apenas detecta 39 fatales (4.7 %)**, con una fuerte tendencia a predecir las clases mayoritarias.  
+La capacidad discriminativa (AUC ≈ 0.88) no se refleja con el umbral estándar.
+:::
+
+------------------------------------------------------------------------
+
+## Curvas ROC — Random Forest y XGBoost
+
+::: kicker
+One-vs-Rest · AUC ≈ 0.88 en ambos modelos · capacidad discriminativa real
+:::
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:1em; align-items:center; margin-top:0.3em"}
+![Random Forest](images/curva_roc_forest){style="width:100%; border-radius:14px"}
+
+![XGBoost](images/curva_roc_xgboost){style="width:100%; border-radius:14px"}
+:::
+
+
+------------------------------------------------------------------------
+
+## Ajuste de umbral — el hallazgo clave
+
+::: kicker
+AUC ≈ 0.88 · umbral por defecto mal calibrado · búsqueda sistemática
+:::
+
+::::: two-paths
+::: path-card
+**¿Por qué ajustar el umbral?**
+
+Un AUC de 0.88 indica que el modelo **sí puede ordenar** los casos
+por probabilidad de fatalidad. El problema es que el umbral 0.5
+no aprovecha esa capacidad para una clase con solo 1.12% de registros.
+:::
+
+::: path-card
+**¿Cómo se encontró el umbral óptimo?**
+
+Se evaluaron umbrales de 0.01 a 0.50 en incrementos de 0.01.
+Para cada valor, un accidente se clasifica como `Fatal` si su
+probabilidad supera el umbral. Se eligió el que maximiza el
+**F1-macro** sobre el conjunto de prueba.
+:::
+:::::
+
+::: {style="margin-top:0.6em; font-size:0.82em"}
+| Modelo | Umbral óptimo | F1-macro default | F1-macro ajustado | Mejora |
+|---|---:|---:|---:|---:|
+| Random Forest | 0.44 | 0.5453 | 0.5497 | +0.0044 |
+| **XGBoost** | **0.15** | **0.5265** | **0.5636** | **+0.0371** |
+:::
+
+::: {.attention-note .attention-success}
+Con umbral ajustado **XGBoost supera a Random Forest** y se convierte
+en el modelo final. El umbral 0.15 revela que XGBoost necesitaba ver
+solo 15% de probabilidad para clasificar correctamente los accidentes
+fatales.
+:::
+
+------------------------------------------------------------------------
+
+## Modelo final — XGBoost (t = 0.15)
+
+::: kicker
+F1-macro: 0.5636 · Accuracy: 0.8727 · 74,816 registros de prueba
+:::
+
+::: {style="display:grid; grid-template-columns:1.1fr 0.9fr; gap:1em; align-items:center; margin-top:0.3em"}
+![](images/cm_xgboost_ajustado.png){style="width:100%; border-radius:14px"}
+
+::: {style="display:flex; flex-direction:column; gap:0.65em; font-size:0.78em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--red); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**`Fatal`**\
+Precision: 0.21 · Recall: **0.22**\
+De 39 → **180** identificados correctamente\
+(+362% respecto al umbral por defecto)
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--orange); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**`No fatal`**\
+Precision: 0.73 · Recall: 0.44\
+Prácticamente sin cambio respecto al umbral por defecto.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**`Sólo daños`**\
+Precision: 0.89 · Recall: **0.97**\
+La clase mayoritaria es robusta al ajuste.
+:::
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Importancia de características XGBoost
+
+
+::: {style="display:grid; grid-template-columns:1.3fr 0.7fr; gap:1em; align-items:center; margin-top:0.3em"}
+![](images/xgb_feature_importance.png){style="width:75%; border-radius:14px"}
+
+::: {style="display:flex; flex-direction:column; gap:0.65em; font-size:0.76em"}
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--blue); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**Colisión con peatón (27%)**\
+El predictor más determinante de severidad — casi 3× más que el segundo.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--orange); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**`MOTOCICLET` (7%)**\
+Confirmado también por el clustering: la física del impacto sin carrocería.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.42em solid var(--green); border-radius:var(--radius); padding:0.75em 0.9em; line-height:1.35"}
+**Nuevo León (5%)**\
+Patrones geográficos específicos de severidad — consistente con el EDA.
+:::
+:::
+:::
+
+------------------------------------------------------------------------
+
+
+## Importancia de características — Random Forest
+
+::: {style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:1em; align-items:start; margin-top:0.3em"}
+![](images/forest_feature_importance.png){style="width:75%; border-radius:14px"}
+
+::: {style="display:flex; flex-direction:column; gap:0.45em; font-size:0.68em"}
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--blue); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2"}
+**Colisión con vehículo automotor (8%)**\
+Tipo de accidente más frecuente y predictor más importante.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--orange); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2"}
+**`ID_EDAD` (7.3%)**\
+La edad del conductor es el segundo predictor, relación confirmada en el análisis descriptivo.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--green); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2"}
+**`ID_HORA` (~12% combinado)**\
+Encoding cíclico captura patrones nocturnos que un escalado lineal perdería.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--red); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2"}
+**`MOTOCICLET` y `AUTOMOVIL` (~4.5% c/u)**\
+El tipo de vehículo involucrado tiene alto poder predictivo.
+:::
+:::
+:::
+
+
+------------------------------------------------------------------------
+
+## Arquitectura módulo `src/supervised/`
+
+::: {style="display:grid; grid-template-columns:1.2fr 0.8fr; gap:1em; align-items:start; margin-top:0.3em"}
+![](images/modeling_uml.png){style="width:65%; border-radius:14px"}
+
+::: {style="display:grid; grid-template-columns:1fr 1fr; gap:0.4em; font-size:0.63em"}
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--blue); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2; grid-column:1/-1"}
+**DataRepository**\
+Abstrae el acceso al CSV. Valida columnas requeridas y expone variable a clasificar desde YAML.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--orange); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2; grid-column:1/-1"}
+**Preprocessor** + **CyclicEncoder**\
+Encadena imputación, escalado, OHE y encoding cíclico. Ajuste exclusivo sobre entrenamiento.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--green); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2; grid-column:1/-1"}
+**ModelFactory**\
+Crea modelos usando hiperparámetros desde YAML.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--red); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2; grid-column:1/-1"}
+**Trainer**\
+Validación cruzada, GridSearchCV y medición de tiempos. Serializa y carga modelos con `joblib`.
+:::
+
+::: {style="border:2px solid var(--line); border-left:0.35em solid var(--yellow); border-radius:var(--radius); padding:0.45em 0.6em; line-height:1.2; grid-column:1/-1"}
+**Evaluator**\
+Métricas completas, curva ROC, importancia de características y ajuste de umbral óptimo.
+:::
+:::
+:::
+
+
+
+
+
 # Agrupamiento (Clustering) {data-background-color="#213849"}
 
 ## ¿Existen perfiles de accidente?
