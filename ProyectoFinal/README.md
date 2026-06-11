@@ -2,7 +2,12 @@
 
 Este repositorio contiene la implementación técnica y el análisis derivado del Proyecto Final para la asignatura de Almacenes y Minería de Datos. La investigación se enfoca en el análisis exhaustivo de los **Accidentes de Tránsito Terrestre en Zonas Urbanas y Suburbanas de México**, empleando la base de datos oficial ATUS 2024 provista por el Instituto Nacional de Estadística y Geografía (INEGI).
 
-## 1. Objetivos del Estudio
+## Recursos publicados
+
+*   **Página interactiva:** <https://steve-quezada.github.io/Tareas_Almacenes-y-Mineria-de-Datos/proyecto-final/>
+*   **Slides:** <https://steve-quezada.github.io/Tareas_Almacenes-y-Mineria-de-Datos/proyecto-final/slides.html>
+
+## 1. Objetivos del Proyecto
 
 El propósito central de este análisis es la identificación de patrones subyacentes y factores de riesgo determinantes en la severidad y mortalidad de los accidentes de tránsito. Para lograrlo, se ha desarrollado un pipeline integral de ciencia de datos que comprende:
 
