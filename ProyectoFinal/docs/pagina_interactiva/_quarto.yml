@@ -1,8 +1,12 @@
 project:
   type: website
+<<<<<<< HEAD
   output-dir: ..
 
 jupyter: python3
+=======
+  output-dir: _site
+>>>>>>> main
 
 website:
   title: "ATUS Anual 2024 | Proyecto Final"

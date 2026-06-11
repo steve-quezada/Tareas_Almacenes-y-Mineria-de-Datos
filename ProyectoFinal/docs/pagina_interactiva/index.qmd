@@ -54,6 +54,10 @@ en la sección de microdatos. Para este proyecto se seleccionó el archivo anual
   <div class="mt-card"><div class="mt-card-title">390,627</div><div class="mt-card-body">registros originales</div></div>
   <div class="mt-card"><div class="mt-card-title">45</div><div class="mt-card-body">variables documentadas</div></div>
   <div class="mt-card"><div class="mt-card-title">32</div><div class="mt-card-body">entidades federativas</div></div>
+<<<<<<< HEAD
+=======
+  <div class="mt-card"><div class="mt-card-title">102 MB</div><div class="mt-card-body">tamaño aproximado</div></div>
+>>>>>>> main
 </div>
 ```
 
@@ -647,6 +651,7 @@ fig_genero.show()
 
 ```{python}
 entidades_top = [
+<<<<<<< HEAD
     "Nuevo León",
     "Chihuahua",
     "Sonora",
@@ -659,6 +664,20 @@ entidades_top = [
     "Baja California",
 ]
 accidentes_entidad = [76019, 26706, 24786, 20612, 18561, 17937, 15851, 13339, 12909, 11652]
+=======
+    "Ciudad de México",
+    "Jalisco",
+    "Nuevo León",
+    "Guanajuato",
+    "Estado de México",
+    "Veracruz",
+    "Puebla",
+    "Chihuahua",
+    "Baja California",
+    "Coahuila",
+]
+accidentes_entidad = [50000, 42000, 39000, 35000, 33000, 30000, 28000, 25000, 23000, 21000]
+>>>>>>> main
 
 fig_entidades = go.Figure(go.Bar(
     orientation="h",
@@ -854,8 +873,13 @@ diccionario_estados = {
     26: 'Sonora', 27: 'Tabasco', 28: 'Tamaulipas', 29: 'Tlaxcala', 
     30: 'Veracruz', 31: 'Yucatán', 32: 'Zacatecas'
 }
+<<<<<<< HEAD
 # La columna de entidad ya viene mapeada como 'NOM_ENT' en el CSV limpio, usamos esa directamente.
 df['NOMBRE_ENTIDAD'] = df['NOM_ENT'] if 'NOM_ENT' in df.columns else df.get('ID_ENTIDAD', pd.Series()).map(diccionario_estados)
+=======
+# Creamos una columna auxiliar con el nombre mapeado
+df['NOMBRE_ENTIDAD'] = df['ID_ENTIDAD'].map(diccionario_estados)
+>>>>>>> main
 
 # Los días de la semana se presentan como números del 1 al 7, donde 1 es Lunes y 7 es Domingo. Creamos una columna auxiliar con el nombre mapeado.
 diccionario_dias = {
@@ -1230,6 +1254,7 @@ fig_heatmap_riesgo = px.imshow(matriz_riesgo,
 fig_heatmap_riesgo.update_layout(template='plotly_white', width=1000, height=800)
 fig_heatmap_riesgo.show()
 ```
+<<<<<<< HEAD
 
 ## Modelo Supervisado de Clasificación
 
@@ -1863,3 +1888,5 @@ El código se organizó con Programación Orientada a Objetos en el paquete `src
 El diagrama muestra todas las clases, atributos, métodos y relaciones del módulo.
 
 ![Diagrama UML del módulo `src/clustering/`](images/clustering/clustering_uml.png){fig-alt="Diagrama de clases UML del módulo de agrupamiento"}
+=======
+>>>>>>> main
