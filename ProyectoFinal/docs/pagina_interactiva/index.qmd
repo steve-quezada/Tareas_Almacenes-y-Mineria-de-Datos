@@ -54,7 +54,6 @@ en la sección de microdatos. Para este proyecto se seleccionó el archivo anual
   <div class="mt-card"><div class="mt-card-title">390,627</div><div class="mt-card-body">registros originales</div></div>
   <div class="mt-card"><div class="mt-card-title">45</div><div class="mt-card-body">variables documentadas</div></div>
   <div class="mt-card"><div class="mt-card-title">32</div><div class="mt-card-body">entidades federativas</div></div>
-  <div class="mt-card"><div class="mt-card-title">102 MB</div><div class="mt-card-body">tamaño aproximado</div></div>
 </div>
 ```
 
@@ -1231,6 +1230,300 @@ fig_heatmap_riesgo = px.imshow(matriz_riesgo,
 fig_heatmap_riesgo.update_layout(template='plotly_white', width=1000, height=800)
 fig_heatmap_riesgo.show()
 ```
+
+## Modelo Supervisado de Clasificación
+
+El pipeline de clasificación supervisada se implementó en el módulo `src/supervised/` con una estrategia de complejidad creciente: primero se estableció una línea base trivial y después se evaluaron modelos más sofisticados para comprobar si la complejidad adicional producía una mejora medible.
+
+El objetivo del modelo es predecir la severidad de un accidente de tránsito a partir de las condiciones en que ocurrió, sin utilizar información sobre sus consecuencias. La variable objetivo es `CLASACC`, con tres clases: `Sólo daños`, `No fatal` y `Fatal`.
+
+
+### Planteamiento y desbalance de clases
+
+La distribución de `CLASACC` está fuertemente desbalanceada. La clase `Fatal` representa apenas 1.12% de los registros, por lo que el accuracy no es una métrica confiable: un clasificador que siempre prediga `Sólo daños` alcanza cerca de 82% de accuracy sin detectar accidentes fatales ni no fatales.
+
+```{python}
+import plotly.graph_objects as go
+import plotly.io as pio
+from pathlib import Path
+
+_sup_ink = "#1f2937"
+_sup_muted = "#526171"
+_sup_grid = "#d8e0e8"
+_sup_layout = dict(
+    autosize=True,
+    paper_bgcolor="#ffffff",
+    plot_bgcolor="#ffffff",
+    font=dict(family="Inter, Aptos, Segoe UI, sans-serif", color=_sup_muted, size=13),
+    hoverlabel=dict(bgcolor="#ffffff", bordercolor=_sup_grid, font=dict(color=_sup_ink)),
+)
+
+_clases = ["Sólo daños", "No fatal", "Fatal"]
+_registros = [306088, 63809, 4181]
+_porcentajes = [81.82, 17.06, 1.12]
+
+fig_clasacc_modelado = go.Figure(go.Bar(
+    x=_clases,
+    y=_registros,
+    text=[f"{p:.2f}%" for p in _porcentajes],
+    textposition="outside",
+    marker=dict(color=[blue200, blue500, blue900], line=dict(color="#ffffff", width=1)),
+    hovertemplate="%{x}<br><b>%{y:,}</b> registros<br>%{text}<extra></extra>",
+))
+fig_clasacc_modelado.update_layout(
+    **_sup_layout,
+    title="Distribución de la variable objetivo CLASACC",
+    xaxis=dict(title="Clase de severidad"),
+    yaxis=dict(title="Registros", gridcolor=_sup_grid, range=[0, 340000]),
+)
+fig_clasacc_modelado.show()
+```
+
+### Selección de variables y preprocesamiento
+
+Las variables de entrada se seleccionaron con base en el análisis exploratorio y el dominio del problema. El criterio principal fue incluir variables que describen el contexto del accidente y excluir explícitamente las que describen sus consecuencias.
+
+| Grupo | Variables | Tratamiento |
+|------------------------|------------------------|------------------------|
+| Numéricas | `ID_EDAD` y conteos de vehículos | Imputación por mediana y estandarización con `StandardScaler`. |
+| Binarias | `CONDUCTOR_FUGADO`, `EDAD_DESCONOCIDA` | Paso directo sin transformación. |
+| Categóricas | `TIPACCID`, `CAUSAACCI`, `SEXO`, `ALIENTO`, `CINTURON`, `DIASEMANA`, `URBANA`, `SUBURBANA`, `CAPAROD`, `NOM_ENT` | `OneHotEncoder(drop='first')`. |
+| Temporales cíclicas | `MES`, `ID_HORA` | Encoding seno/coseno mediante `CyclicEncoder`. |
+
+Las columnas de víctimas (`CONDMUERTO`, `CONDHERIDO`, `PASAMUERTO`, `PASAHERIDO`, `PEATMUERTO`, `PEATHERIDO`, `CICLMUERTO`, `CICLHERIDO`, `OTROMUERTO`, `OTROHERIDO`) se excluyeron por `data leakage`, porque son consecuencias directas del accidente y determinan la severidad. También se excluyeron `TOTAL_MUERTOS`, `NOM_MUN`, `ID_MINUTO`, `ID_DIA`, `TRANVIA`, `FERROCARRI` y `OTROVEHIC`.
+
+```{python}
+#| eval: false
+from preprocessor import Preprocessor
+from sklearn.model_selection import train_test_split
+
+y = df[repo.target_column]
+X = df.drop(columns=[repo.target_column])
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42,
+    stratify=y,
+)
+
+prep = Preprocessor()
+X_train_t = prep.fit_transform(X_train)
+X_test_t = prep.transform(X_test)
+```
+
+Los datos se dividieron en 80% entrenamiento y 20% prueba, preservando la distribución de `CLASACC` con `stratify=y`. El preprocesador se ajustó exclusivamente sobre el conjunto de entrenamiento para evitar fuga de información.
+
+### Modelos entrenados
+
+Se evaluaron cuatro aproximaciones. La línea base (`DummyClassifier`) siempre predice la clase mayoritaria. `LogisticRegression` se usó como referencia lineal, pero no logró converger con el volumen y la dimensionalidad del dataset. Los modelos principales fueron `RandomForestClassifier` y `XGBClassifier`.
+
+```{=html}
+<div class="decision-grid">
+  <div class="decision-card">
+    <h3>Línea base</h3>
+    <p><code>DummyClassifier</code> predice siempre <code>Sólo daños</code>. Sirve como piso mínimo.</p>
+  </div>
+  <div class="decision-card">
+    <h3>Regresión logística</h3>
+    <p>Modelo lineal interpretable, pero no convergió de forma estable con el dataset.</p>
+  </div>
+  <div class="decision-card">
+    <h3>Random Forest</h3>
+    <p>Ensamble robusto con <code>class_weight='balanced'</code> y validación cruzada.</p>
+  </div>
+  <div class="decision-card">
+    <h3>XGBoost</h3>
+    <p>Modelo de gradiente potenciado, seleccionado como modelo final tras ajustar el umbral.</p>
+  </div>
+</div>
+```
+
+| Modelo | CV F1 macro | Mejor F1 macro | Mejores hiperparámetros | Tiempo |
+|------------------------|---:|---:|------------------------|------------------------|
+| Random Forest | 0.5239 ± 0.0040 | 0.5482 | `max_depth=None`, `min_samples_leaf=2`, `n_estimators=100` | ≈ 8 min CPU |
+| XGBoost | 0.5005 ± 0.0016 | 0.5253 | `colsample_bytree=0.8`, `learning_rate=0.2`, `max_depth=6`, `n_estimators=300`, `subsample=0.8` | ≈ 25 min GPU |
+
+### Evaluación con umbral por defecto
+
+Las métricas se calcularon sobre el conjunto de prueba de 74,816 registros. Con el umbral por defecto, Random Forest obtiene el mejor F1 macro, pero ambos modelos tienen recall bajo para `Fatal`: 17.94% en Random Forest y 4.67% en XGBoost.
+
+```{python}
+_metricas_default = {
+    "Línea base": {"Accuracy": 0.8182, "Precision macro": 0.2727, "Recall macro": 0.3333, "F1 macro": 0.2985},
+    "Random Forest": {"Accuracy": 0.8193, "Precision macro": 0.5259, "Recall macro": 0.5794, "F1 macro": 0.5453},
+    "XGBoost": {"Accuracy": 0.8727, "Precision macro": 0.6473, "Recall macro": 0.4946, "F1 macro": 0.5265},
+}
+
+fig_metricas_default = go.Figure()
+for _metrica, _color in [
+    ("Accuracy", blue200),
+    ("Precision macro", blue400),
+    ("Recall macro", blue600),
+    ("F1 macro", blue900),
+]:
+    fig_metricas_default.add_trace(go.Bar(
+        name=_metrica,
+        x=list(_metricas_default.keys()),
+        y=[_metricas_default[m][_metrica] for m in _metricas_default],
+        marker_color=_color,
+        hovertemplate="%{x}<br>" + _metrica + ": <b>%{y:.4f}</b><extra></extra>",
+    ))
+
+fig_metricas_default.update_layout(
+    **_sup_layout,
+    title="Métricas de evaluación con umbral por defecto",
+    barmode="group",
+    yaxis=dict(title="Valor", range=[0, 1], gridcolor=_sup_grid),
+    xaxis=dict(title="Modelo"),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.18),
+)
+fig_metricas_default.show()
+```
+
+::: {.note-box}
+El F1 macro se usa como métrica principal porque da el mismo peso a las tres clases, independientemente de su frecuencia. Esto evita que la clase mayoritaria oculte el desempeño pobre en `Fatal`.
+:::
+
+#### Matrices de confusión con umbral por defecto
+
+![Matriz de confusión de Random Forest con umbral por defecto](images/supervised/random_forest_confusion_matrix.png){fig-alt="Matriz de confusión del modelo Random Forest con umbral de clasificación por defecto"}
+
+![Matriz de confusión de XGBoost con umbral por defecto](images/supervised/xgboost_confusion_matrix.png){fig-alt="Matriz de confusión del modelo XGBoost con umbral de clasificación por defecto"}
+
+#### Curvas ROC
+
+Las curvas ROC muestran que ambos modelos sí tienen capacidad discriminativa para ordenar los casos por probabilidad de fatalidad. El problema principal no es la separación, sino que el umbral por defecto de 0.5 no es adecuado para una clase tan minoritaria.
+
+```{python}
+_roc_rf = pio.from_json(Path("assets/supervised/random_forest_roc_curve.json").read_text(encoding="utf-8"))
+_roc_rf.update_layout(
+    **_sup_layout,
+    title="Curvas ROC — Random Forest",
+    height=430,
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.18),
+)
+_roc_rf.show()
+```
+
+```{python}
+_roc_xgb = pio.from_json(Path("assets/supervised/xgboost_roc_curve.json").read_text(encoding="utf-8"))
+_roc_xgb.update_layout(
+    **_sup_layout,
+    title="Curvas ROC — XGBoost",
+    height=430,
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.18),
+)
+_roc_xgb.show()
+```
+
+### Importancia de características
+
+Random Forest distribuye la importancia de forma más uniforme, destacando variables temporales y demográficas. En cambio, XGBoost concentra gran parte de su importancia en el tipo de accidente, especialmente `TIPACCID_Colisión con peatón`, que domina el ranking con aproximadamente 27%.
+
+![Top 25 variables más importantes en Random Forest](images/supervised/random_forest_feature_importance.png){fig-alt="Gráfica de importancia de características para Random Forest"}
+
+![Top 25 variables más importantes en XGBoost](images/supervised/xgboost_feature_importance.png){fig-alt="Gráfica de importancia de características para XGBoost"}
+
+En XGBoost, `TIPACCID_Colisión con peatón`, `TIPACCID_Colisión con vehículo automotor` y `MOTOCICLET` consolidan el tipo de accidente y el vehículo involucrado como los factores predictivos más relevantes. También aparecen variables geográficas como Nuevo León, Sinaloa, Yucatán, Quintana Roo, Coahuila, Puebla y Ciudad de México.
+
+### Ajuste de umbral de clasificación
+
+Se evaluaron umbrales entre 0.01 y 0.50 para la clase `Fatal`, seleccionando el que maximiza el F1 macro. Random Forest encontró su mejor umbral en 0.44, muy cerca del valor por defecto. XGBoost requirió un umbral de 0.15, lo que indica que con 0.5 estaba sesgado hacia las clases mayoritarias.
+
+```{python}
+fig_umbral = go.Figure()
+fig_umbral.add_trace(go.Bar(
+    name="F1 macro default",
+    x=["Random Forest", "XGBoost"],
+    y=[0.5453, 0.5265],
+    marker_color=blue300,
+    hovertemplate="%{x}<br>Default: <b>%{y:.4f}</b><extra></extra>",
+))
+fig_umbral.add_trace(go.Bar(
+    name="F1 macro ajustado",
+    x=["Random Forest", "XGBoost"],
+    y=[0.5497, 0.5636],
+    marker_color=blue800,
+    hovertemplate="%{x}<br>Ajustado: <b>%{y:.4f}</b><extra></extra>",
+))
+fig_umbral.add_trace(go.Scatter(
+    name="Umbral óptimo",
+    x=["Random Forest", "XGBoost"],
+    y=[0.44, 0.15],
+    mode="markers+text",
+    text=["t=0.44", "t=0.15"],
+    textposition="top center",
+    marker=dict(color="#e15759", size=11, line=dict(color="#ffffff", width=1)),
+    yaxis="y2",
+    hovertemplate="%{x}<br>Umbral óptimo: <b>%{y:.2f}</b><extra></extra>",
+))
+fig_umbral.update_layout(
+    **_sup_layout,
+    title="Efecto del ajuste de umbral para la clase Fatal",
+    barmode="group",
+    yaxis=dict(title="F1 macro", range=[0, 0.65], gridcolor=_sup_grid),
+    yaxis2=dict(title="Umbral óptimo", overlaying="y", side="right", range=[0, 0.55]),
+    legend=dict(orientation="h", x=0.5, xanchor="center", y=-0.18),
+)
+fig_umbral.show()
+```
+
+![Curva de ajuste de umbral para XGBoost](images/supervised/xgboost_threshold_curve.png){fig-alt="Curva de ajuste de umbral para la clase Fatal en XGBoost"}
+
+Con umbral ajustado, XGBoost alcanza F1 macro de 0.5636 y supera a Random Forest, que queda en 0.5497. Por esa razón se seleccionó XGBoost como modelo final.
+
+### Modelo final: XGBoost con umbral ajustado
+
+| Clase | Precision | Recall | F1-score | Support |
+|------------------------|---:|---:|---:|---:|
+| Fatal | 0.21 | 0.22 | 0.21 | 836 |
+| No fatal | 0.73 | 0.44 | 0.55 | 12,762 |
+| Sólo daños | 0.89 | 0.97 | 0.93 | 61,218 |
+| **Macro avg** | 0.61 | 0.54 | **0.5636** | 74,816 |
+| **Weighted avg** | 0.86 | 0.87 | 0.86 | 74,816 |
+
+El ajuste elevó el recall de `Fatal` de 4.67% a 21.53%, pasando de identificar correctamente 39 a 180 accidentes fatales de los 836 del conjunto de prueba. La mejora es importante, aunque todavía limitada por el desbalance extremo de la clase fatal.
+
+![Matriz de confusión de XGBoost con umbral ajustado](images/supervised/xgboost_confusion_matrix_threshold_ajustado.png){fig-alt="Matriz de confusión del modelo XGBoost con umbral ajustado para la clase Fatal"}
+
+### Persistencia y limitaciones
+
+El modelo final se serializó en `models/xgboost.joblib` mediante `joblib`. El notebook `demo.ipynb` demuestra que puede cargarse y utilizarse para nuevas predicciones sin acceder al dataset original ni reentrenar.
+
+```{python}
+#| eval: false
+from src.supervised.trainer import Trainer
+from src.supervised.preprocessor import Preprocessor
+from src.supervised.evaluator import Evaluator
+
+model = Trainer.load_model("xgboost", output_dir="models")
+prep = Preprocessor()
+evaluator = Evaluator(prep.target_classes)
+
+X_new_transformed = prep.transform(X_new)
+y_probs = model.predict_proba(X_new_transformed)
+y_pred = evaluator.predict_with_threshold(y_probs, threshold=0.15)
+y_labels = prep.inverse_transform_target(y_pred)
+```
+
+### Arquitectura del módulo `src/supervised/`
+
+El código de clasificación supervisada se organizó en el paquete `src/supervised/`, separando carga de datos, preprocesamiento, creación de modelos, entrenamiento y evaluación. Esta separación permite cambiar el modelo o la configuración sin reescribir el flujo completo.
+
+| Patrón | Clase | Rol |
+|------|-------|------------|
+| **Repository** | `DataRepository` | Abstrae el acceso al CSV y a la configuración del dataset. |
+| **Factory** | `ModelFactory` | Centraliza la creación de `DummyClassifier`, `LogisticRegression`, `RandomForestClassifier` y `XGBClassifier` desde configuración. |
+| **Strategy** | Modelos compatibles con scikit-learn/XGBoost | Permite intercambiar algoritmos manteniendo el mismo flujo de entrenamiento y evaluación. |
+| **Composición** | `Preprocessor`, `Trainer`, `Evaluator` | Divide el pipeline en colaboradores especializados para transformar datos, entrenar modelos, evaluarlos y reutilizarlos. |
+
+El diagrama muestra las clases principales del módulo de modelado supervisado y sus relaciones.
+
+![Diagrama UML del módulo `src/supervised/`](images/supervised/modeling_uml.png){fig-alt="Diagrama de clases UML del módulo de modelado supervisado"}
+
+Las limitaciones principales son el recall todavía bajo en `Fatal`, la falta de convergencia del modelo lineal, la ausencia de medidas de exposición como volumen de tránsito o kilómetros recorridos, y la alta proporción de valores `Se ignora` en `CINTURON` y `ALIENTO`.
 
 ## Agrupamiento de perfiles de accidente
 
